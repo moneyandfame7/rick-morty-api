@@ -1,19 +1,27 @@
+import { CreateLocationDto } from 'src/location/dto/create-location.dto'
 import { Location } from 'src/location/entities/location.entity'
+import { ILocation } from 'src/types'
+import { fetchData } from 'src/utils/fetch-data'
 import { DataSource } from 'typeorm'
 import { Seeder, SeederFactoryManager } from 'typeorm-extension'
 export class LocationSeeder implements Seeder {
   public async run(dataSource: DataSource, factoryManager: SeederFactoryManager): Promise<void> {
-    const locationRepository = dataSource.getRepository(Location)
-
-    const locationData = {
-      name: 'TEST NAME',
-      type: 'TEST TYPE',
-      dimension: 'TEST DIMENSION',
-      createdAt: new Date()
+    try {
+      const locationRepository = dataSource.getRepository(Location)
+      const locations: CreateLocationDto[] = []
+      const responseLocation = await fetchData<ILocation>('https://rickandmortyapi.com/api/location')
+      responseLocation.map(location => {
+        locations.push({
+          name: location.name,
+          type: location.type,
+          dimension: location.dimension,
+          createdAt: new Date()
+        })
+      })
+      await locationRepository.insert(locations)
+      console.log('✅ Locations filling successfully. ')
+    } catch (error) {
+      console.log('❌ Locations filling failed ')
     }
-
-    const newLocation = locationRepository.create(locationData)
-    const locationExists = locationRepository.findOneBy({ id: newLocation.id })
-    locationExists ? console.log('❌ Location already exist.') : await locationRepository.save(newLocation)
   }
 }

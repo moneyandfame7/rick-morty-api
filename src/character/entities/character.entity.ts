@@ -37,16 +37,18 @@ export class Character {
   createdAt: Date
 
   @ManyToMany(() => Episode, episode => episode.characters, {
-    cascade: true
+    cascade: true,
+    onDelete: 'CASCADE',
+    onUpdate: 'CASCADE'
   })
   @JoinTable()
   episodes: Episode[]
 
   @ManyToOne(() => Location)
-  @JoinColumn({ name: 'LocationId' })
+  @JoinColumn({ name: 'locationId' })
   location: Location
 
   @ManyToOne(() => Location)
-  @JoinColumn({ name: 'OriginId' })
+  @JoinColumn({ name: 'originId' })
   origin: Location
 }

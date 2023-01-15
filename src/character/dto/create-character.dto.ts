@@ -5,4 +5,7 @@ export class CreateCharacterDto {
   gender: string
   species: string
   image: string
+  originId?: number
+  locationId?: number
+  createdAt: Date
 }
