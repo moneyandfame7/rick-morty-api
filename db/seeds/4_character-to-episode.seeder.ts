@@ -18,6 +18,6 @@ export class CharacterToEpisodeSeeder implements Seeder {
       }
     }
 
-    console.log('✅ Episode created successfully.')
+    console.log('✅ Episode to character added successfully.')
   }
 }
