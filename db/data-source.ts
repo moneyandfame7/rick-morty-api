@@ -2,6 +2,7 @@ import 'dotenv/config'
 import { DataSource, DataSourceOptions } from 'typeorm'
 import { SeederOptions } from 'typeorm-extension'
 import { MainSeeder } from './seeds/0_main.seeder'
+
 export const dataSourceOptions: DataSourceOptions & SeederOptions = {
   type: 'postgres',
   host: process.env.DB_HOST,
@@ -11,10 +12,10 @@ export const dataSourceOptions: DataSourceOptions & SeederOptions = {
   database: process.env.DB_NAME,
   logging: false,
   synchronize: true,
-  entities: ['dist/**/*.entity.js'],
-  migrations: ['dist/db/migrations/*.js'],
   migrationsTableName: 'migrations_typeorm',
   seeds: [MainSeeder],
+  entities: ['dist/**/*.entity.js'],
+  migrations: ['dist/db/migrations/*.js'],
   factories: ['./db/factories/**/*.ts']
 }
 

@@ -7,10 +7,8 @@ import { Character } from './entities/character.entity'
 
 @Injectable()
 export class CharacterService {
-  constructor(
-    @InjectRepository(Character)
-    private charactersRepository: Repository<Character>
-  ) {}
+  constructor(@InjectRepository(Character) private readonly charactersRepository: Repository<Character>) {}
+
   create(createCharacterDto: CreateCharacterDto) {
     const character = this.charactersRepository.create(createCharacterDto)
     return this.charactersRepository.save(character)
