@@ -17,9 +17,11 @@ export class CharacterService {
   findAll() {
     return this.charactersRepository.find({
       relations: {
-        episodes: true
+        episodes: true,
+        location: true,
+        origin: true
       }
-    }) // SELECT * FROM characters
+    })
   }
 
   findOne(id: number) {

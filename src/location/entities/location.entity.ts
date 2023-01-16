@@ -1,11 +1,5 @@
 import { Character } from 'src/character/entities/character.entity'
-import {
-  Column,
-  CreateDateColumn,
-  Entity,
-  OneToMany,
-  PrimaryGeneratedColumn
-} from 'typeorm'
+import { Column, CreateDateColumn, Entity, OneToMany, PrimaryGeneratedColumn } from 'typeorm'
 
 @Entity('locations')
 export class Location {

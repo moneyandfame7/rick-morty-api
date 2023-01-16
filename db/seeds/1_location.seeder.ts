@@ -4,6 +4,7 @@ import { ILocation } from 'src/types'
 import { fetchData } from 'src/utils/fetch-data'
 import { DataSource } from 'typeorm'
 import { Seeder, SeederFactoryManager } from 'typeorm-extension'
+
 export class LocationSeeder implements Seeder {
   public async run(dataSource: DataSource, factoryManager: SeederFactoryManager): Promise<void> {
     try {
@@ -14,8 +15,7 @@ export class LocationSeeder implements Seeder {
         locations.push({
           name: location.name,
           type: location.type,
-          dimension: location.dimension,
-          createdAt: new Date()
+          dimension: location.dimension
         })
       })
       await locationRepository.insert(locations)

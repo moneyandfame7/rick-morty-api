@@ -13,3 +13,12 @@ export const fetchData = async <T>(url: string): Promise<Array<T>> => {
     throw err
   }
 }
+
+export const fetchObject = async <T>(url: string): Promise<T> => {
+  try {
+    const response = await axios.get(url)
+    return response.data
+  } catch (e) {
+    console.log(e)
+  }
+}

@@ -1,15 +1,7 @@
-import {
-  Column,
-  CreateDateColumn,
-  Entity,
-  JoinColumn,
-  JoinTable,
-  ManyToMany,
-  ManyToOne,
-  PrimaryGeneratedColumn
-} from 'typeorm'
+import { Column, CreateDateColumn, Entity, JoinTable, ManyToMany, ManyToOne, PrimaryGeneratedColumn } from 'typeorm'
 import { Episode } from 'src/episode/entities/episode.entity'
 import { Location } from 'src/location/entities/location.entity'
+
 @Entity('characters')
 export class Character {
   @PrimaryGeneratedColumn()
@@ -44,11 +36,9 @@ export class Character {
   @JoinTable()
   episodes: Episode[]
 
-  @ManyToOne(() => Location)
-  @JoinColumn({ name: 'locationId' })
+  @ManyToOne(() => Location, location => location.residents)
   location: Location
 
-  @ManyToOne(() => Location)
-  @JoinColumn({ name: 'originId' })
+  @ManyToOne(() => Location, location => location.residents)
   origin: Location
 }

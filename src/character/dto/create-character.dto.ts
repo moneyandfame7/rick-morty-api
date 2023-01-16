@@ -1,3 +1,5 @@
+import { CreateLocationDto } from '../../location/dto/create-location.dto'
+
 export class CreateCharacterDto {
   name: string
   type: string
@@ -5,7 +7,7 @@ export class CreateCharacterDto {
   gender: string
   species: string
   image: string
-  originId?: number
-  locationId?: number
+  location?: CreateLocationDto
+  origin?: CreateLocationDto
   createdAt: Date
 }

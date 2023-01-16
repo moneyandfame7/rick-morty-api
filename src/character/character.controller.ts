@@ -1,6 +1,7 @@
-import { Body, Controller, Delete, Get, HttpCode, HttpStatus, Param, Patch, Post } from '@nestjs/common'
-import { dataSourceOptions } from 'db/data-source'
+import { Body, Controller, Delete, Get, HttpCode, HttpStatus, Param, Patch, Post, Query } from '@nestjs/common'
 import { CharacterService } from './character.service'
+import { fetchData } from '../utils/fetch-data'
+import { ILocation } from '../types'
 
 @Controller('characters')
 export class CharacterController {
@@ -12,18 +13,17 @@ export class CharacterController {
     return this.characterService.create(body)
   }
 
-  // @Get()
-  // findAll(@Query() query: any, @Param() param: any) {
-  //   console.log(query, ' << QUERY')
-  //   return this.characterService.findAll()
-  // }
+  @Get('')
+  async findAll(@Query() query) {
+    // return this.characterService.findAll()
+    const responseLocation = await fetchData<ILocation>('https://rickandmortyapi.com/api/location')
+
+    return this.characterService.findAll()
+  }
+
   @Get(':id')
   findOne(@Param('id') id: string) {
     return this.characterService.findOne(+id)
-  }
-  @Get('')
-  test() {
-    return dataSourceOptions
   }
 
   @Patch(':id')
