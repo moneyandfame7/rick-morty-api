@@ -1,6 +1,19 @@
-import { Body, Controller, Delete, Get, HttpCode, HttpStatus, Param, Patch, Post, Query } from '@nestjs/common'
+import {
+  Body,
+  Controller,
+  Delete,
+  Get,
+  HttpCode,
+  HttpStatus,
+  Param,
+  ParseIntPipe,
+  Patch,
+  Post,
+  Query
+} from '@nestjs/common'
 import { CharacterService } from './character.service'
 import { CreateCharacterDto } from './dto/create-character.dto'
+import { UpdateCharacterDto } from './dto/update-character.dto'
 
 @Controller('characters')
 export class CharacterController {
@@ -18,22 +31,22 @@ export class CharacterController {
   }
 
   @Get('/episode/:id')
-  async findAllByEpisode(@Param('id') id: string) {
+  async findAllByEpisode(@Param('id', ParseIntPipe) id: number) {
     return this.characterService.findAllByEpisode(+id)
   }
 
   @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.characterService.findOne(+id)
+  findOne(@Param('id', ParseIntPipe) id: number) {
+    return this.characterService.findOne(id)
   }
 
   @Patch(':id')
-  update(@Param('id') id: string, @Body() body) {
-    return this.characterService.update(+id, body)
+  update(@Param('id', ParseIntPipe) id: number, @Body() updateCharacterDto: UpdateCharacterDto) {
+    return this.characterService.update(id, updateCharacterDto)
   }
 
   @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.characterService.remove(+id)
+  remove(@Param('id', ParseIntPipe) id: number) {
+    return this.characterService.remove(id)
   }
 }

@@ -7,11 +7,7 @@ async function bootstrap() {
   const app = await NestFactory.create(AppModule)
 
   app.setGlobalPrefix('api')
-  app.useGlobalPipes(
-    new ValidationPipe({
-      transform: true
-    })
-  )
+  app.useGlobalPipes(new ValidationPipe())
   await app.listen(PORT, () => console.log(` >> 🥶️🚀Server started on http://localhost:${PORT}/api >> `))
 }
 
