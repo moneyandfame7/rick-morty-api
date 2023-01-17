@@ -13,7 +13,7 @@ export class CharacterController {
 
   @Get('')
   async findAll(@Query() query) {
-    return this.characterService.findAll()
+    return this.characterService.findAll(query)
   }
 
   @Get(':id')

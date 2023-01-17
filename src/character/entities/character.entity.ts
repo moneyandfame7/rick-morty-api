@@ -22,7 +22,7 @@ export class Character {
   @Column()
   type: string
 
-  @Column()
+  @Column({ select: false })
   image: string
 
   @ManyToOne(() => Location, location => location.residents)
@@ -39,6 +39,6 @@ export class Character {
   @JoinTable()
   episodes: Episode[]
 
-  @CreateDateColumn({ name: 'created_at' })
+  @CreateDateColumn({ name: 'created_at', select: false })
   createdAt: Date
 }

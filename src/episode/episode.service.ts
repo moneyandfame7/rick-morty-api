@@ -1,28 +1,29 @@
 import { InjectRepository } from '@nestjs/typeorm'
 import { Injectable, NotFoundException } from '@nestjs/common'
-import { Repository, SelectQueryBuilder } from 'typeorm'
+import { FindManyOptions, Repository } from 'typeorm'
 import { CreateEpisodeDto } from './dto/create-episode.dto'
 import { UpdateEpisodeDto } from './dto/update-episode.dto'
 import { Episode } from './entities/episode.entity'
 
 @Injectable()
 export class EpisodeService {
-  private readonly queryBuilder: SelectQueryBuilder<Episode> = this.episodeRepository
-    .createQueryBuilder('episode')
-    .leftJoinAndSelect('episode.characters', 'characters')
-    .select(['episode', 'episode.airDate', 'episode.createdAt'])
-    .loadAllRelationIds()
+  private readonly relations: FindManyOptions<Episode> = {
+    loadRelationIds: {
+      relations: ['characters']
+    },
+    select: ['episode', 'airDate', 'createdAt', 'id', 'name']
+  }
 
   constructor(@InjectRepository(Episode) private readonly episodeRepository: Repository<Episode>) {}
 
-  create(createEpisodeDto: CreateEpisodeDto) {
-    const episode = this.episodeRepository.create(createEpisodeDto)
-    return this.episodeRepository.save(episode)
+  async create(createEpisodeDto: CreateEpisodeDto) {
+    const episode = await this.episodeRepository.create(createEpisodeDto)
+    return await this.episodeRepository.save(episode)
   }
 
-  findAll() {
+  async findAll() {
     // TODO: зробити фільтрацію
-    const episodes = this.queryBuilder.getMany()
+    const episodes = await this.episodeRepository.find(this.relations)
     if (!episodes) {
       throw new NotFoundException(`Episodes not found`)
     }
@@ -31,10 +32,7 @@ export class EpisodeService {
 
   async findOne(id: number) {
     const episode = await this.episodeRepository.findOne({
-      relations: {
-        characters: {}
-      },
-      select: ['episode', 'airDate', 'createdAt', 'id', 'name'],
+      ...this.relations,
       where: { id }
     })
     if (!episode) {

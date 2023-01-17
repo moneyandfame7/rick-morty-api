@@ -1,42 +1,28 @@
 import { Injectable, NotFoundException } from '@nestjs/common'
-import { InjectRepository } from '@nestjs/typeorm'
-import { Repository, SelectQueryBuilder } from 'typeorm'
+import { FindManyOptions, Repository } from 'typeorm'
 import { CreateCharacterDto } from './dto/create-character.dto'
 import { UpdateCharacterDto } from './dto/update-character.dto'
 import { Character } from './entities/character.entity'
+import { InjectRepository } from '@nestjs/typeorm'
 
 @Injectable()
 export class CharacterService {
-  private readonly queryBuilder: SelectQueryBuilder<Character> = this.characterRepository
-    .createQueryBuilder('character')
-    .leftJoinAndSelect('character.origin', 'origin')
-    .leftJoinAndSelect('character.location', 'location')
-    .leftJoinAndSelect('character.episodes', 'episodes')
-    .select([
-      'character',
-      'origin.name',
-      'origin.type',
-      'origin.dimension',
-      'location.name',
-      'location.type',
-      'location.dimension',
-      'episodes'
-    ])
+  private readonly relations: FindManyOptions<Character> = {
+    relations: ['origin', 'location'],
+    loadRelationIds: {
+      relations: ['episodes']
+    }
+  }
 
   constructor(@InjectRepository(Character) private readonly characterRepository: Repository<Character>) {}
 
-  create(createCharacterDto: CreateCharacterDto) {
-    const character = this.characterRepository.create(createCharacterDto)
-    return this.characterRepository.save(character)
+  async create(createCharacterDto: CreateCharacterDto) {
+    const character = await this.characterRepository.create(createCharacterDto)
+    return await this.characterRepository.save(character)
   }
 
-  findAll() {
-    const characters = this.characterRepository.find({
-      relations: ['origin', 'location'],
-      loadRelationIds: {
-        relations: ['episodes']
-      }
-    })
+  async findAll(query?: any) {
+    const characters = await this.characterRepository.find(this.relations)
     if (!characters) {
       throw new NotFoundException(`Characters not found`)
     }
@@ -45,11 +31,9 @@ export class CharacterService {
 
   async findOne(id: number) {
     const character = await this.characterRepository.findOne({
+      ...this.relations,
       where: {
         id
-      },
-      relations: {
-        origin: {}
       }
     })
     if (!character) {
@@ -62,15 +46,8 @@ export class CharacterService {
     // TODO: закинути це в findAll і через query ?episode_id=$id$ шукати
     // TODO: зробити функцію в яку ми передаємо characters, і викидуємо помилку ( мб )
     const characters = await this.characterRepository.find({
-      relations: {
-        episodes: true,
-        origin: true,
-        location: true
-      },
       where: {
-        episodes: {
-          id: episodeId
-        }
+        episodes: { id: episodeId }
       }
     })
     if (!characters) {

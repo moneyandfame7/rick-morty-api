@@ -3,28 +3,26 @@ import { CreateLocationDto } from './dto/create-location.dto'
 import { UpdateLocationDto } from './dto/update-location.dto'
 import { InjectRepository } from '@nestjs/typeorm'
 import { Location } from './entities/location.entity'
-import { Repository, SelectQueryBuilder } from 'typeorm'
+import { FindManyOptions, Repository } from 'typeorm'
 
 @Injectable()
 export class LocationService {
-  private readonly queryBuilder: SelectQueryBuilder<Location> = this.locationRepository
-    .createQueryBuilder('location')
-    .innerJoinAndSelect('location.residents', 'residents')
-    .select(['location', 'location.id'])
-    .loadAllRelationIds()
+  private readonly relations: FindManyOptions<Location> = {
+    loadRelationIds: {
+      relations: ['residents']
+    },
+    select: ['id', 'dimension', 'name', 'type', 'createdAt']
+  }
 
   constructor(@InjectRepository(Location) private readonly locationRepository: Repository<Location>) {}
 
-  create(createLocationDto: CreateLocationDto) {
-    return this.locationRepository.create(createLocationDto)
+  async create(createLocationDto: CreateLocationDto) {
+    const location = await this.locationRepository.create(createLocationDto)
+    return await this.locationRepository.save(location)
   }
 
   async findAll() {
-    const locations = await this.locationRepository.find({
-      loadRelationIds: {
-        relations: ['residents']
-      }
-    })
+    const locations = await this.locationRepository.find(this.relations)
     if (!locations) {
       throw new NotFoundException('Locations not found')
     }
@@ -33,9 +31,7 @@ export class LocationService {
 
   async findOne(id: number) {
     const location = await this.locationRepository.findOne({
-      loadRelationIds: {
-        relations: ['residents']
-      },
+      ...this.relations,
       where: {
         id
       }
@@ -46,11 +42,11 @@ export class LocationService {
     return location
   }
 
-  update(id: number, updateLocationDto: UpdateLocationDto) {
-    return `This action updates a #${id} location`
+  async update(id: number, updateLocationDto: UpdateLocationDto) {
+    return await this.locationRepository.update(id, updateLocationDto)
   }
 
-  remove(id: number) {
-    return `This action removes a #${id} location`
+  async remove(id: number) {
+    return await this.locationRepository.delete(id)
   }
 }
