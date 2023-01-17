@@ -19,6 +19,5 @@ export class Location {
   createdAt: Date
 
   @OneToMany(() => Character, character => character.location)
-  @OneToMany(() => Character, character => character.origin)
   residents: Character[]
 }
