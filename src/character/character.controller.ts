@@ -1,19 +1,25 @@
 import { Body, Controller, Delete, Get, HttpCode, HttpStatus, Param, Patch, Post, Query } from '@nestjs/common'
 import { CharacterService } from './character.service'
+import { CreateCharacterDto } from './dto/create-character.dto'
 
 @Controller('characters')
 export class CharacterController {
   constructor(private readonly characterService: CharacterService) {}
 
-  @Post()
   @HttpCode(HttpStatus.CREATED)
-  create(@Body() body) {
-    return this.characterService.create(body)
+  @Post()
+  create(@Body() character: CreateCharacterDto) {
+    return this.characterService.create(character)
   }
 
-  @Get('')
+  @Get('/')
   async findAll(@Query() query) {
     return this.characterService.findAll(query)
+  }
+
+  @Get('/episode/:id')
+  async findAllByEpisode(@Param('id') id: string) {
+    return this.characterService.findAllByEpisode(+id)
   }
 
   @Get(':id')

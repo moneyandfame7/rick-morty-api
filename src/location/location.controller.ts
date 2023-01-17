@@ -17,7 +17,7 @@ export class LocationController {
     return this.locationService.findAll()
   }
 
-  @Get(':id')
+  @Get('/:id')
   findOne(@Param('id') id: string) {
     return this.locationService.findOne(+id)
   }
