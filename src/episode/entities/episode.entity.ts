@@ -3,7 +3,7 @@ import { Character } from 'src/character/entities/character.entity'
 
 @Entity('episodes')
 export class Episode {
-  @PrimaryGeneratedColumn()
+  @PrimaryGeneratedColumn('increment')
   id: number
 
   @Column()
@@ -12,12 +12,12 @@ export class Episode {
   @Column()
   episode: string
 
-  @Column({ name: 'air_date' })
+  @Column({ name: 'air_date', select: false })
   airDate: string
 
-  @CreateDateColumn({ name: 'created_at' })
+  @CreateDateColumn({ name: 'created_at', select: false })
   createdAt: Date
 
-  @ManyToMany(() => Character, character => character.episodes)
+  @ManyToMany(() => Character, character => character.episodes, { onDelete: 'CASCADE' })
   characters: Character[]
 }

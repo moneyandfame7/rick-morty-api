@@ -1,7 +1,5 @@
 import { Body, Controller, Delete, Get, HttpCode, HttpStatus, Param, Patch, Post, Query } from '@nestjs/common'
 import { CharacterService } from './character.service'
-import { fetchData } from '../utils/fetch-data'
-import { ILocation } from '../types'
 
 @Controller('characters')
 export class CharacterController {
@@ -15,9 +13,6 @@ export class CharacterController {
 
   @Get('')
   async findAll(@Query() query) {
-    // return this.characterService.findAll()
-    const responseLocation = await fetchData<ILocation>('https://rickandmortyapi.com/api/location')
-
     return this.characterService.findAll()
   }
 

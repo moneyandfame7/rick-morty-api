@@ -15,7 +15,7 @@ export class Location {
   @Column()
   dimension: string
 
-  @CreateDateColumn({ name: 'created_at' })
+  @CreateDateColumn({ name: 'created_at', select: false })
   createdAt: Date
 
   @OneToMany(() => Character, character => character.location)

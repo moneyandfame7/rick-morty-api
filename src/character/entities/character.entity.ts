@@ -25,8 +25,11 @@ export class Character {
   @Column()
   image: string
 
-  @CreateDateColumn({ name: 'created_at' })
-  createdAt: Date
+  @ManyToOne(() => Location, location => location.residents)
+  location: Location
+
+  @ManyToOne(() => Location, location => location.residents)
+  origin: Location
 
   @ManyToMany(() => Episode, episode => episode.characters, {
     cascade: true,
@@ -36,9 +39,6 @@ export class Character {
   @JoinTable()
   episodes: Episode[]
 
-  @ManyToOne(() => Location, location => location.residents)
-  location: Location
-
-  @ManyToOne(() => Location, location => location.residents)
-  origin: Location
+  @CreateDateColumn({ name: 'created_at' })
+  createdAt: Date
 }
