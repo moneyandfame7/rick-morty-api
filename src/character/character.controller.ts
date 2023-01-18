@@ -1,18 +1,4 @@
-import {
-  Body,
-  Controller,
-  Delete,
-  Get,
-  HttpCode,
-  HttpStatus,
-  Param,
-  ParseIntPipe,
-  Patch,
-  Post,
-  Query,
-  Req,
-  UsePipes
-} from '@nestjs/common'
+import { Body, Controller, Delete, Get, Param, ParseIntPipe, Patch, Post, Query, Req } from '@nestjs/common'
 import { CharacterService } from './character.service'
 import { CreateCharacterDto } from './dto/create-character.dto'
 import { UpdateCharacterDto } from './dto/update-character.dto'
@@ -25,16 +11,14 @@ import { CharacterQueryPipe } from './character-query.pipe'
 export class CharacterController {
   constructor(private readonly characterService: CharacterService) {}
 
-  @HttpCode(HttpStatus.CREATED)
   @Post()
   create(@Body() character: CreateCharacterDto) {
     return this.characterService.create(character)
   }
 
   @Get('/')
-  @UsePipes(new CharacterQueryPipe())
   async findAll(
-    @Query()
+    @Query(CharacterQueryPipe)
     queryDto: QueryCharacterDto,
     @Req() req: Request
   ) {

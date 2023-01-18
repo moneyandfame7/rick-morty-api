@@ -1,4 +1,4 @@
-import { Body, Controller, Delete, Get, Param, ParseIntPipe, Patch, Post, Query, Req, UsePipes } from '@nestjs/common'
+import { Body, Controller, Delete, Get, Param, ParseIntPipe, Patch, Post, Query, Req } from '@nestjs/common'
 import { EpisodeService } from './episode.service'
 import { CreateEpisodeDto } from './dto/create-episode.dto'
 import { UpdateEpisodeDto } from './dto/update-episode.dto'
@@ -17,8 +17,7 @@ export class EpisodeController {
   }
 
   @Get()
-  @UsePipes(new EpisodeQueryPipe())
-  async findAll(@Query() queryDto: QueryEpisodeDto, @Req() req: Request) {
+  async findAll(@Query(EpisodeQueryPipe) queryDto: QueryEpisodeDto, @Req() req: Request) {
     const { episodes, count } = await this.episodeService.findAll(queryDto)
     return pagination(
       {

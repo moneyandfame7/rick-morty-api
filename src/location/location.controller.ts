@@ -1,4 +1,4 @@
-import { Body, Controller, Delete, Get, Param, ParseIntPipe, Patch, Post, Query, Req, UsePipes } from '@nestjs/common'
+import { Body, Controller, Delete, Get, Param, ParseIntPipe, Patch, Post, Query, Req } from '@nestjs/common'
 import { Request } from 'express'
 import { LocationService } from './location.service'
 import { CreateLocationDto } from './dto/create-location.dto'
@@ -17,8 +17,7 @@ export class LocationController {
   }
 
   @Get()
-  @UsePipes(new LocationQueryPipe())
-  async findAll(@Query() queryDto: QueryLocationDto, @Req() req: Request) {
+  async findAll(@Query(LocationQueryPipe) queryDto: QueryLocationDto, @Req() req: Request) {
     const { locations, count } = await this.locationService.findAll(queryDto)
     return pagination(
       {
