@@ -4,6 +4,7 @@ import { UpdateLocationDto } from './dto/update-location.dto'
 import { InjectRepository } from '@nestjs/typeorm'
 import { Location } from './entities/location.entity'
 import { FindManyOptions, Repository } from 'typeorm'
+import { QueryLocationDto } from './dto/query-location.dto'
 
 @Injectable()
 export class LocationService {
@@ -21,12 +22,13 @@ export class LocationService {
     return await this.locationRepository.save(location)
   }
 
-  async findAll() {
-    const locations = await this.locationRepository.find(this.relations)
-    if (!locations) {
+  async findAll(query?: QueryLocationDto) {
+    const [locations, count] = await this.locationRepository.findAndCount({ ...this.relations, ...query })
+
+    if (!locations.length) {
       throw new NotFoundException('Locations not found')
     }
-    return locations
+    return { locations, count }
   }
 
   async findOne(id: number) {

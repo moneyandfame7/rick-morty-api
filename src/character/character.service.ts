@@ -4,6 +4,7 @@ import { CreateCharacterDto } from './dto/create-character.dto'
 import { UpdateCharacterDto } from './dto/update-character.dto'
 import { Character } from './entities/character.entity'
 import { InjectRepository } from '@nestjs/typeorm'
+import { QueryCharacterDto } from './dto/query-character.dto'
 
 @Injectable()
 export class CharacterService {
@@ -21,21 +22,13 @@ export class CharacterService {
     return await this.characterRepository.save(character)
   }
 
-  async findAll(query?: any) {
-    // const characters = await this.characterRepository
-    //   .createQueryBuilder('character')
-    //   .leftJoinAndSelect('character.origin', 'origin')
-    //   .leftJoinAndSelect('character.location', 'location')
-    //   .leftJoinAndSelect('character.episodes', 'episodes')
-    //   .select(['character', 'origin.id', 'location.name', 'episodes.id'])
-    //   .cache(1000)
-    //   .getMany()
-    const characters = await this.characterRepository.find(this.relations)
-
-    if (!characters) {
-      throw new NotFoundException(`Characters not found`)
+  async findAll(query?: QueryCharacterDto) {
+    const [characters, count] = await this.characterRepository.findAndCount({ ...this.relations, ...query })
+    console.log(characters)
+    if (!characters.length) {
+      throw new NotFoundException('Characters not found')
     }
-    return characters
+    return { characters, count }
   }
 
   async findOne(id: number) {
@@ -71,6 +64,10 @@ export class CharacterService {
       throw new NotFoundException(`Characters with episodeId ${episodeId} not found`)
     }
     return characters
+  }
+
+  async getCount() {
+    return await this.characterRepository.count()
   }
 
   async update(id: number, updateCharacterDto: UpdateCharacterDto) {

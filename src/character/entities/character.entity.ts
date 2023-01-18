@@ -22,7 +22,7 @@ export class Character {
   @Column()
   type: string
 
-  @Column({ select: false })
+  @Column()
   image: string
 
   @ManyToOne(() => Location, location => location.residents)

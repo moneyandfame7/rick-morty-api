@@ -4,6 +4,7 @@ import { FindManyOptions, Repository } from 'typeorm'
 import { CreateEpisodeDto } from './dto/create-episode.dto'
 import { UpdateEpisodeDto } from './dto/update-episode.dto'
 import { Episode } from './entities/episode.entity'
+import { QueryEpisodeDto } from './dto/query-episode.dto'
 
 @Injectable()
 export class EpisodeService {
@@ -21,13 +22,13 @@ export class EpisodeService {
     return await this.episodeRepository.save(episode)
   }
 
-  async findAll() {
+  async findAll(query?: QueryEpisodeDto) {
     // TODO: зробити фільтрацію
-    const episodes = await this.episodeRepository.find(this.relations)
-    if (!episodes) {
+    const [episodes, count] = await this.episodeRepository.findAndCount({ ...this.relations, ...query })
+    if (!episodes.length) {
       throw new NotFoundException(`Episodes not found`)
     }
-    return episodes
+    return { episodes, count }
   }
 
   async findOne(id: number) {

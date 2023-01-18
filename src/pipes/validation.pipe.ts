@@ -1,21 +1,21 @@
-import { ArgumentMetadata, Injectable, PipeTransform } from '@nestjs/common'
+import { ArgumentMetadata, HttpException, HttpStatus, Injectable, PipeTransform, ValidationError } from '@nestjs/common'
 import { plainToInstance } from 'class-transformer'
 import { validate } from 'class-validator'
-import { ValidationException } from '../exception/validation.exception'
 
 @Injectable()
-export class ValidationPipe implements PipeTransform<any> {
+// for all other entity
+export class BackendValidationPipe implements PipeTransform {
   async transform(value: any, metadata: ArgumentMetadata): Promise<any> {
-    const obj = plainToInstance(metadata.metatype, value)
-    const errors = await validate(obj)
+    const object = plainToInstance(metadata.metatype, value)
+    const errors = await validate(object)
+    if (!errors.length) return value
+    throw new HttpException({ errors: this.formatError(errors) }, HttpStatus.BAD_REQUEST)
+  }
 
-    if (errors.length) {
-      console.log(errors)
-      const messages = errors.map(err => {
-        return { field: err.property, message: Object.values(err.constraints) }
-      })
-      throw new ValidationException({ error: messages })
-    }
-    return value
+  formatError(errors: ValidationError[]) {
+    return errors.reduce((acc, err) => {
+      acc[err.property] = Object.values(err.constraints)
+      return acc
+    }, {})
   }
 }
