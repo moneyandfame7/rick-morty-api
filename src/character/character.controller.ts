@@ -9,11 +9,16 @@ import {
   ParseIntPipe,
   Patch,
   Post,
-  Query
+  Query,
+  Req
 } from '@nestjs/common'
 import { CharacterService } from './character.service'
 import { CreateCharacterDto } from './dto/create-character.dto'
 import { UpdateCharacterDto } from './dto/update-character.dto'
+import { Request } from 'express'
+import { pagination } from '../utils/pagination'
+import { QueryDto } from './dto/query.dto'
+import filterData from '../common/filter-data'
 
 @Controller('characters')
 export class CharacterController {
@@ -26,8 +31,22 @@ export class CharacterController {
   }
 
   @Get('/')
-  async findAll(@Query() query) {
-    return this.characterService.findAll(query)
+  async findAll(@Query() queryDto: QueryDto, @Req() req: Request) {
+    const filters = filterData(queryDto as any, 'Character')
+    console.log(filters)
+    console.log(queryDto, '<<<< DTO')
+    const [characters, count] = await this.characterService.findAll(filters)
+
+    return pagination(
+      {
+        page: Number(req.query.page),
+        otherQuery: req.originalUrl,
+        count: count,
+        take: queryDto.take || 20
+      },
+      characters,
+      'characters'
+    )
   }
 
   @Get('/episode/:id')

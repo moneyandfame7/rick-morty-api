@@ -30,7 +30,9 @@ export class CharacterService {
     //   .select(['character', 'origin.id', 'location.name', 'episodes.id'])
     //   .cache(1000)
     //   .getMany()
-    const characters = await this.characterRepository.find(this.relations)
+    const characters = await this.characterRepository.findAndCount({
+      ...query
+    })
 
     if (!characters) {
       throw new NotFoundException(`Characters not found`)

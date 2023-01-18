@@ -8,6 +8,7 @@ export const fetchData = async <T>(url: string): Promise<Array<T>> => {
   try {
     const response = await axios.get(`${url}/${arr}`)
     // console.log(response.data);
+
     return response.data
   } catch (err) {
     throw err
