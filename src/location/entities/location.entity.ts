@@ -1,11 +1,5 @@
 import { Character } from 'src/character/entities/character.entity'
-import {
-  Column,
-  CreateDateColumn,
-  Entity,
-  OneToMany,
-  PrimaryGeneratedColumn
-} from 'typeorm'
+import { Column, CreateDateColumn, Entity, OneToMany, PrimaryGeneratedColumn } from 'typeorm'
 
 @Entity('locations')
 export class Location {
@@ -21,10 +15,9 @@ export class Location {
   @Column()
   dimension: string
 
-  @CreateDateColumn({ name: 'created_at' })
+  @CreateDateColumn({ name: 'created_at', select: false })
   createdAt: Date
 
   @OneToMany(() => Character, character => character.location)
-  @OneToMany(() => Character, character => character.origin)
   residents: Character[]
 }

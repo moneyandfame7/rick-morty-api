@@ -1,26 +1,54 @@
-import { Injectable } from '@nestjs/common';
-import { CreateEpisodeDto } from './dto/create-episode.dto';
-import { UpdateEpisodeDto } from './dto/update-episode.dto';
+import { InjectRepository } from '@nestjs/typeorm'
+import { Injectable, NotFoundException } from '@nestjs/common'
+import { FindManyOptions, Repository } from 'typeorm'
+import { CreateEpisodeDto } from './dto/create-episode.dto'
+import { UpdateEpisodeDto } from './dto/update-episode.dto'
+import { Episode } from './entities/episode.entity'
+import { QueryEpisodeDto } from './dto/query-episode.dto'
 
 @Injectable()
 export class EpisodeService {
-  create(createEpisodeDto: CreateEpisodeDto) {
-    return 'This action adds a new episode';
+  private readonly relations: FindManyOptions<Episode> = {
+    loadRelationIds: {
+      relations: ['characters']
+    },
+    select: ['episode', 'airDate', 'createdAt', 'id', 'name']
   }
 
-  findAll() {
-    return `This action returns all episode`;
+  constructor(@InjectRepository(Episode) private readonly episodeRepository: Repository<Episode>) {}
+
+  async create(createEpisodeDto: CreateEpisodeDto) {
+    const episode = await this.episodeRepository.create(createEpisodeDto)
+    return await this.episodeRepository.save(episode)
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} episode`;
+  async findAll(query?: QueryEpisodeDto) {
+    // TODO: зробити фільтрацію
+    const [episodes, count] = await this.episodeRepository.findAndCount({ ...this.relations, ...query })
+    if (!episodes.length) {
+      throw new NotFoundException(`Episodes not found`)
+    }
+    return { episodes, count }
   }
 
-  update(id: number, updateEpisodeDto: UpdateEpisodeDto) {
-    return `This action updates a #${id} episode`;
+  async findOne(id: number) {
+    const episode = await this.episodeRepository.findOne({
+      ...this.relations,
+      where: { id }
+    })
+    if (!episode) {
+      throw new NotFoundException(`Episode with id ${id} not found`)
+    }
+    return episode
   }
 
-  remove(id: number) {
-    return `This action removes a #${id} episode`;
+  async update(id: number, updateEpisodeDto: Partial<UpdateEpisodeDto>) {
+    // TODO: перевірити
+    return await this.episodeRepository.update(id, updateEpisodeDto)
+  }
+
+  async remove(id: number | number[]) {
+    // TODO: зробити видалення декількох одразу
+    return await this.episodeRepository.delete(id)
   }
 }

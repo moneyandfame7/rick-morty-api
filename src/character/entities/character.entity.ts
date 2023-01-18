@@ -1,15 +1,7 @@
-import {
-  Column,
-  CreateDateColumn,
-  Entity,
-  JoinColumn,
-  JoinTable,
-  ManyToMany,
-  ManyToOne,
-  PrimaryGeneratedColumn
-} from 'typeorm'
+import { Column, CreateDateColumn, Entity, JoinTable, ManyToMany, ManyToOne, PrimaryGeneratedColumn } from 'typeorm'
 import { Episode } from 'src/episode/entities/episode.entity'
 import { Location } from 'src/location/entities/location.entity'
+
 @Entity('characters')
 export class Character {
   @PrimaryGeneratedColumn()
@@ -33,20 +25,20 @@ export class Character {
   @Column()
   image: string
 
-  @CreateDateColumn({ name: 'created_at' })
-  createdAt: Date
+  @ManyToOne(() => Location, location => location.residents)
+  location: Location
+
+  @ManyToOne(() => Location, location => location.residents)
+  origin: Location
 
   @ManyToMany(() => Episode, episode => episode.characters, {
-    cascade: true
+    cascade: true,
+    onDelete: 'CASCADE',
+    onUpdate: 'CASCADE'
   })
   @JoinTable()
   episodes: Episode[]
 
-  @ManyToOne(() => Location)
-  @JoinColumn({ name: 'LocationId' })
-  location: Location
-
-  @ManyToOne(() => Location)
-  @JoinColumn({ name: 'OriginId' })
-  origin: Location
+  @CreateDateColumn({ name: 'created_at', select: false })
+  createdAt: Date
 }

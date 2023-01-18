@@ -6,12 +6,7 @@ import { LocationModule } from './location/location.module'
 import { dataSourceOptions } from '../db/data-source'
 
 @Module({
-  imports: [
-    TypeOrmModule.forRoot(dataSourceOptions),
-    CharacterModule,
-    EpisodeModule,
-    LocationModule
-  ],
+  imports: [TypeOrmModule.forRoot(dataSourceOptions), CharacterModule, EpisodeModule, LocationModule],
   controllers: [],
   providers: []
 })
