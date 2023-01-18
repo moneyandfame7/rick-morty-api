@@ -1,7 +1,11 @@
-import { Body, Controller, Delete, Get, Param, ParseIntPipe, Patch, Post } from '@nestjs/common'
+import { Body, Controller, Delete, Get, Param, ParseIntPipe, Patch, Post, Query, Req, UsePipes } from '@nestjs/common'
+import { Request } from 'express'
 import { LocationService } from './location.service'
 import { CreateLocationDto } from './dto/create-location.dto'
 import { UpdateLocationDto } from './dto/update-location.dto'
+import { pagination } from '../utils/pagination'
+import { QueryLocationDto } from './dto/query-location.dto'
+import { LocationQueryPipe } from './location-query.pipe'
 
 @Controller('locations')
 export class LocationController {
@@ -13,8 +17,19 @@ export class LocationController {
   }
 
   @Get()
-  findAll() {
-    return this.locationService.findAll()
+  @UsePipes(new LocationQueryPipe())
+  async findAll(@Query() queryDto: QueryLocationDto, @Req() req: Request) {
+    const { locations, count } = await this.locationService.findAll(queryDto)
+    return pagination(
+      {
+        page: Number(req.query.page),
+        otherQuery: req.originalUrl,
+        count: count,
+        take: queryDto.take
+      },
+      locations,
+      'locations'
+    )
   }
 
   @Get('/:id')

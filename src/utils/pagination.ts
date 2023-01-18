@@ -2,10 +2,11 @@ import * as _ from 'lodash'
 import { Pagination } from '../types/filters'
 import { Character } from '../character/entities/character.entity'
 import { Episode } from '../episode/entities/episode.entity'
+import { Location } from '../location/entities/location.entity'
 
 type PossibleData = Character[] | Location[] | Episode[]
 
-export const pagination = (options: Pagination, data: PossibleData, objectsName: string) => {
+export const pagination = (options: Pagination, data: PossibleData, entityName: string) => {
   const maxLimit = 20
   const page = options.page
   const take = options?.take || maxLimit
@@ -22,12 +23,12 @@ export const pagination = (options: Pagination, data: PossibleData, objectsName:
       pages,
       prev: prev
         ? `localhost/${
-            options.otherQuery === `/api/${objectsName}` ? `/api/${objectsName}?page=${prev}` : queryString(prev)
+            options.otherQuery === `/api/${entityName}` ? `/api/${entityName}?page=${prev}` : queryString(prev)
           }`
         : null,
       next: next
         ? `localhost/${
-            options.otherQuery === `/api/${objectsName}` ? `/api/${objectsName}?page=${next}` : queryString(next)
+            options.otherQuery === `/api/${entityName}` ? `/api/${entityName}?page=${next}` : queryString(next)
           }`
         : null,
       take

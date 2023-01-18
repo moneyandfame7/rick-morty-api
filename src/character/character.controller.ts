@@ -10,15 +10,16 @@ import {
   Patch,
   Post,
   Query,
-  Req
+  Req,
+  UsePipes
 } from '@nestjs/common'
 import { CharacterService } from './character.service'
 import { CreateCharacterDto } from './dto/create-character.dto'
 import { UpdateCharacterDto } from './dto/update-character.dto'
 import { Request } from 'express'
 import { pagination } from '../utils/pagination'
-import { QueryDto } from './dto/query.dto'
-import filterData from '../common/filter-data'
+import { QueryCharacterDto } from './dto/query-character.dto'
+import { CharacterQueryPipe } from './character-query.pipe'
 
 @Controller('characters')
 export class CharacterController {
@@ -31,18 +32,19 @@ export class CharacterController {
   }
 
   @Get('/')
-  async findAll(@Query() queryDto: QueryDto, @Req() req: Request) {
-    const filters = filterData(queryDto as any, 'Character')
-    console.log(filters)
-    console.log(queryDto, '<<<< DTO')
-    const [characters, count] = await this.characterService.findAll(filters)
-
+  @UsePipes(new CharacterQueryPipe())
+  async findAll(
+    @Query()
+    queryDto: QueryCharacterDto,
+    @Req() req: Request
+  ) {
+    const { characters, count } = await this.characterService.findAll(queryDto)
     return pagination(
       {
         page: Number(req.query.page),
         otherQuery: req.originalUrl,
         count: count,
-        take: queryDto.take || 20
+        take: queryDto.take
       },
       characters,
       'characters'

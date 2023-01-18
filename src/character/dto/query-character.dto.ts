@@ -1,19 +1,21 @@
-import { IsNumber, IsOptional, Min } from 'class-validator'
+import { IsArray, IsNumber, IsOptional, Max, Min } from 'class-validator'
 import { Transform } from 'class-transformer'
 import { toCorrectId } from '../../common/helper'
-import * as _ from 'lodash'
 
-export class QueryDto {
-  @IsOptional()
-  @Transform(({ value }) => _.toNumber(value))
+export class QueryCharacterDto {
   @IsNumber()
   @Min(1)
+  @Transform(({ value }) => Number(value))
+  @IsOptional()
   page: number = 1
 
-  @Transform(({ value }) => _.toNumber(value))
-  @IsOptional()
-  take: number
+  @IsNumber()
+  @Min(1)
+  @Max(100)
+  @Transform(({ value }) => Number(value))
+  take: number = 20
 
+  @IsArray()
   @Transform(({ value }) => toCorrectId(value))
   @IsOptional()
   id: string
@@ -33,6 +35,6 @@ export class QueryDto {
   @IsOptional()
   gender: string
 
-  // @IsOptional()
-  // episode: number | string;
+  @IsOptional()
+  episode_name: string
 }
