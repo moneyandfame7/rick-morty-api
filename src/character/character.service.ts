@@ -38,14 +38,6 @@ export class CharacterService {
         id
       }
     })
-    // const character = await this.characterRepository
-    //   .createQueryBuilder('character')
-    //   .leftJoinAndSelect('character.origin', 'origin')
-    //   .leftJoinAndSelect('character.location', 'location')
-    //   .leftJoinAndSelect('character.episodes', 'episodes')
-    //   .select(['character', 'origin.id', 'location.name', 'episodes.id'])
-    //   .where('character.id=:id', { id })
-    //   .getOne()
     if (!character) {
       throw new NotFoundException(`Character with id ${id} not found`)
     }
