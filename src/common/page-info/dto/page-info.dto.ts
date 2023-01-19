@@ -1,4 +1,5 @@
 import { PageInfoParametersDto } from '../interfaces/page-info-parameters.dto'
+import { HttpException, HttpStatus } from '@nestjs/common'
 
 export class PageInfoDto {
   readonly page: number
@@ -20,5 +21,8 @@ export class PageInfoDto {
     this.pages = Math.ceil(this.count / this.take)
     this.hasPreviousPage = this.page > 1
     this.hasNextPage = this.page < this.pages
+    if (this.page > this.pages) {
+      throw new HttpException('This page does not exist.', HttpStatus.BAD_REQUEST)
+    }
   }
 }

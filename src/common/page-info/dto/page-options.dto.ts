@@ -1,9 +1,10 @@
-import { IsEnum, IsInt, IsOptional, Max, Min } from 'class-validator'
+import { IsIn, IsInt, IsOptional, IsString, Max, Min } from 'class-validator'
 import { Type } from 'class-transformer'
 import { Order } from '../../constants/order.constant'
 
 export class PageOptionsDto {
-  @IsEnum(Order)
+  @IsString()
+  @IsIn(['DESC', 'ASC'])
   @IsOptional()
   readonly order?: Order = Order.ASC
 
