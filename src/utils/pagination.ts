@@ -13,12 +13,11 @@ export const pagination = (options: Pagination, data: PossibleData, entityName: 
   const pages = Math.ceil(options.count / take)
   const prev = options.page === 1 ? null : options.page - 1
   const next = options.page === pages ? null : options.page + 1
-  // todo зробити валідацію на кількість сторінок і take і т.д
   const queryString = (newPage: number) => _.replace(options.otherQuery as string, `?page=${page}`, `?page=${newPage}`)
 
   return {
     info: {
-      current: options.page,
+      current: options.page || 1,
       count: options.count,
       pages,
       prev: prev
@@ -30,7 +29,7 @@ export const pagination = (options: Pagination, data: PossibleData, entityName: 
         ? `localhost/${
             options.otherQuery === `/api/${entityName}` ? `/api/${entityName}?page=${next}` : queryString(next)
           }`
-        : null,
+        : 2,
       take
     },
     data: data

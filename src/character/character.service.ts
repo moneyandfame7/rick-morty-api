@@ -1,9 +1,12 @@
 import { Injectable, NotFoundException } from '@nestjs/common'
-import { FindManyOptions, Repository } from 'typeorm'
+import { FindManyOptions, Repository, SelectQueryBuilder } from 'typeorm'
 import { CreateCharacterDto } from './dto/create-character.dto'
 import { UpdateCharacterDto } from './dto/update-character.dto'
 import { Character } from './entities/character.entity'
 import { InjectRepository } from '@nestjs/typeorm'
+import { PageOptionsDto } from 'src/common/page-info/dto/page-options.dto'
+import { PageDto } from '../common/page-info/dto/page.dto'
+import { PageInfoDto } from '../common/page-info/dto/page-info.dto'
 import { QueryCharacterDto } from './dto/query-character.dto'
 
 @Injectable()
@@ -17,18 +20,48 @@ export class CharacterService {
 
   constructor(@InjectRepository(Character) private readonly characterRepository: Repository<Character>) {}
 
+  private buildSearchFilters(builder: SelectQueryBuilder<Character>, filters?: QueryCharacterDto) {
+    filters.id ? builder.where('character.id IN (:...ids)', { ids: filters.id }) : null
+
+    filters.name ? builder.andWhere('character.name ilike :name', { name: `%${filters.name}%` }) : null
+
+    filters.gender ? builder.andWhere('character.gender = :gender', { gender: filters.gender }) : null
+
+    filters.episode_name
+      ? builder.andWhere('episodes.name = :episode_name', { episode_name: filters.episode_name })
+      : null
+
+    filters.type ? builder.andWhere('character.type = :type', { type: filters.type }) : null
+
+    filters.status ? builder.andWhere('character.status = :status', { status: filters.status }) : null
+
+    filters.species ? builder.andWhere('character.species = :species', { species: filters.species }) : null
+  }
+
   async create(createCharacterDto: CreateCharacterDto) {
     const character = await this.characterRepository.create(createCharacterDto)
     return await this.characterRepository.save(character)
   }
 
-  async findAll(query?: QueryCharacterDto) {
-    const [characters, count] = await this.characterRepository.findAndCount({ ...this.relations, ...query })
-    console.log(characters)
-    if (!characters.length) {
-      throw new NotFoundException('Characters not found')
-    }
-    return { characters, count }
+  async findAll(
+    pageOptionsDto: PageOptionsDto,
+    queryCharacter: QueryCharacterDto
+  ): Promise<PageDto<CreateCharacterDto>> {
+    const queryBuilder = this.characterRepository
+      .createQueryBuilder('character')
+      .leftJoinAndSelect('character.origin', 'origin')
+      .leftJoinAndSelect('character.location', 'location')
+      .leftJoinAndSelect('character.episodes', 'episodes')
+      .skip(pageOptionsDto.skip)
+      .take(pageOptionsDto.take)
+      .addOrderBy('character.id', pageOptionsDto.order)
+
+    this.buildSearchFilters(queryBuilder, queryCharacter)
+
+    const count = await queryBuilder.getCount()
+    const characters = await queryBuilder.getMany()
+    const pageInfoDto = new PageInfoDto({ pageOptionsDto, count })
+    return new PageDto(characters, pageInfoDto)
   }
 
   async findOne(id: number) {
@@ -38,36 +71,10 @@ export class CharacterService {
         id
       }
     })
-    // const character = await this.characterRepository
-    //   .createQueryBuilder('character')
-    //   .leftJoinAndSelect('character.origin', 'origin')
-    //   .leftJoinAndSelect('character.location', 'location')
-    //   .leftJoinAndSelect('character.episodes', 'episodes')
-    //   .select(['character', 'origin.id', 'location.name', 'episodes.id'])
-    //   .where('character.id=:id', { id })
-    //   .getOne()
     if (!character) {
       throw new NotFoundException(`Character with id ${id} not found`)
     }
     return character
-  }
-
-  async findAllByEpisode(episodeId: number) {
-    // TODO: закинути це в findAll і через query ?episode_id=$id$ шукати
-    // TODO: зробити функцію в яку ми передаємо characters, і викидуємо помилку ( мб )
-    const characters = await this.characterRepository.find({
-      where: {
-        episodes: { id: episodeId }
-      }
-    })
-    if (!characters.length) {
-      throw new NotFoundException(`Characters with episodeId ${episodeId} not found`)
-    }
-    return characters
-  }
-
-  async getCount() {
-    return await this.characterRepository.count()
   }
 
   async update(id: number, updateCharacterDto: UpdateCharacterDto) {
