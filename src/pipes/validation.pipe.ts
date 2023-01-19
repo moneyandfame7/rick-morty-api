@@ -9,6 +9,7 @@ export class BackendValidationPipe implements PipeTransform {
     const object = plainToInstance(metadata.metatype, value)
     const errors = await validate(object)
     if (!errors.length) return value
+
     throw new HttpException({ errors: this.formatError(errors) }, HttpStatus.BAD_REQUEST)
   }
 

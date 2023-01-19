@@ -8,7 +8,6 @@ import * as _ from 'lodash'
 export class CharacterQueryPipe implements PipeTransform {
   async transform(value: QueryCharacterDto, metadata: ArgumentMetadata): Promise<any> {
     const object = plainToInstance(metadata.metatype, value)
-
     return {
       where: _.omitBy(
         {
@@ -27,7 +26,10 @@ export class CharacterQueryPipe implements PipeTransform {
         _.isNil
       ),
       take: object.take,
-      skip: object.page * object.take - object.take
+      skip: object.page * object.take - object.take,
+      order: {
+        id: object.order
+      }
     }
   }
 }
