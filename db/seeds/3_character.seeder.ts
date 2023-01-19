@@ -1,10 +1,31 @@
-import { CreateCharacterDto } from 'src/character/dto/create-character.dto'
-import { Character } from 'src/character/entities/character.entity'
-import { ICharacter, ILocation } from 'src/types'
-import { fetchData } from 'src/utils/fetch-data'
 import { DataSource } from 'typeorm'
 import { Seeder, SeederFactoryManager } from 'typeorm-extension'
-import { getIdFromUrl } from '../../src/utils/get-id-from-url'
+import { CreateCharacterDto } from 'src/character/dto/create-character.dto'
+import { Character } from 'src/character/entities/character.entity'
+import { fetchData } from 'src/utils/fetch-data'
+import { getIdFromUrl } from 'src/utils/get-id-from-url'
+import { ILocation } from './1_location.seeder'
+
+export interface ICharacter {
+  id: number
+  name: string
+  created: string
+  url: string
+  episode: Array<string>
+  gender: string
+  image: string
+  type: string
+  location: {
+    name: string
+    url: string
+  }
+  origin: {
+    name: string
+    url: string
+  }
+  species: string
+  status: string
+}
 
 export class CharacterSeeder implements Seeder {
   public async run(dataSource: DataSource, factoryManager: SeederFactoryManager): Promise<void> {

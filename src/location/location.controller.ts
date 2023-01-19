@@ -3,9 +3,9 @@ import { Request } from 'express'
 import { LocationService } from './location.service'
 import { CreateLocationDto } from './dto/create-location.dto'
 import { UpdateLocationDto } from './dto/update-location.dto'
-import { pagination } from '../utils/pagination'
 import { QueryLocationDto } from './dto/query-location.dto'
-import { LocationQueryPipe } from './location-query.pipe'
+import * as _ from 'lodash'
+import { log } from 'console'
 
 @Controller('locations')
 export class LocationController {
@@ -17,18 +17,25 @@ export class LocationController {
   }
 
   @Get()
-  async findAll(@Query(LocationQueryPipe) queryDto: QueryLocationDto, @Req() req: Request) {
-    const { locations, count } = await this.locationService.findAll(queryDto)
-    return pagination(
+  async findAll(@Query() query: QueryLocationDto, @Req() req: Request) {
+    const pageOptionsDto = {
+      take: query.take,
+      page: query.page,
+      order: query.order,
+      skip: query.skip,
+      otherQuery: req.originalUrl
+    }
+    const queryLocationDto: any = _.omitBy(
       {
-        page: Number(req.query.page),
-        otherQuery: req.originalUrl,
-        count: count,
-        take: queryDto.take
+        id: query.id,
+        name: query.name,
+        type: query.type,
+        dimension: query.dimension,
+        resident_name: query.resident_name
       },
-      locations,
-      'locations'
+      _.isNil
     )
+    return await this.locationService.findAll(pageOptionsDto, queryLocationDto as QueryLocationDto)
   }
 
   @Get('/:id')

@@ -1,31 +1,22 @@
-import { IsArray, IsNumber, IsOptional, Max, Min } from 'class-validator'
+import { IsArray, IsNumber, IsOptional, IsString, Max, Min } from 'class-validator'
 import { Transform } from 'class-transformer'
-import { toCorrectId } from '../../common/helper'
+import { toCorrectId } from '../../shared/transforms/to-correct-id.transform'
+import { PageOptionsDto } from 'src/shared/page-info/dto/page-options.dto'
 
-export class QueryEpisodeDto {
-  @IsNumber()
-  @Min(1)
-  @Transform(({ value }) => Number(value))
-  @IsOptional()
-  page: number = 1
-
-  @IsNumber()
-  @Min(1)
-  @Max(100)
-  @Transform(({ value }) => Number(value))
-  take: number = 20
-
-  @IsArray()
+export class QueryEpisodeDto extends PageOptionsDto {
   @Transform(({ value }) => toCorrectId(value))
   @IsOptional()
-  id: string
+  id: number[]
 
   @IsOptional()
+  @IsString()
   name: string
 
   @IsOptional()
-  type: string
+  @IsString()
+  episode: string
 
   @IsOptional()
+  @IsString()
   character_name: string
 }

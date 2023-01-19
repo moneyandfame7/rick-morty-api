@@ -33,8 +33,7 @@ export class Character {
 
   @ManyToMany(() => Episode, episode => episode.characters, {
     cascade: true,
-    onDelete: 'CASCADE',
-    onUpdate: 'CASCADE'
+    onDelete: 'CASCADE'
   })
   @JoinTable()
   episodes: Episode[]

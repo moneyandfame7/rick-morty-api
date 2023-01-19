@@ -1,9 +1,18 @@
-import { CreateLocationDto } from 'src/location/dto/create-location.dto'
-import { Location } from 'src/location/entities/location.entity'
-import { ILocation } from 'src/types'
-import { fetchData } from 'src/utils/fetch-data'
 import { DataSource } from 'typeorm'
 import { Seeder, SeederFactoryManager } from 'typeorm-extension'
+import { CreateLocationDto } from 'src/location/dto/create-location.dto'
+import { Location } from 'src/location/entities/location.entity'
+import { fetchData } from 'src/utils/fetch-data'
+
+export interface ILocation {
+  id: number
+  name: string
+  created: string
+  url: string
+  type: string
+  dimension: string
+  residents: string[]
+}
 
 export class LocationSeeder implements Seeder {
   public async run(dataSource: DataSource, factoryManager: SeederFactoryManager): Promise<void> {

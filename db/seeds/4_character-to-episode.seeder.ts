@@ -1,10 +1,9 @@
-import { CreateEpisodeDto } from 'src/episode/dto/create-episode.dto'
-import { Episode } from 'src/episode/entities/episode.entity'
-import { IEpisode } from 'src/types'
-import { fetchData } from 'src/utils/fetch-data'
-import { getIdFromUrl } from 'src/utils/get-id-from-url'
 import { DataSource } from 'typeorm'
 import { Seeder, SeederFactoryManager } from 'typeorm-extension'
+import { Episode } from 'src/episode/entities/episode.entity'
+import { fetchData } from 'src/utils/fetch-data'
+import { getIdFromUrl } from 'src/utils/get-id-from-url'
+import { IEpisode } from './2_episode.seeder'
 export class CharacterToEpisodeSeeder implements Seeder {
   public async run(dataSource: DataSource, factoryManager: SeederFactoryManager): Promise<void> {
     const episodeRepository = dataSource.getRepository(Episode)
@@ -15,6 +14,7 @@ export class CharacterToEpisodeSeeder implements Seeder {
       for (let j = 0; j < responseEpisode[i].characters.length; j++) {
         const characterId = getIdFromUrl(responseEpisode[i].characters[j])
         await dataSource.createQueryBuilder().relation(Episode, 'characters').of(_episodes[i].id).add(characterId)
+        console.log(`Character ${characterId} was added successfully ✅`)
       }
     }
 
