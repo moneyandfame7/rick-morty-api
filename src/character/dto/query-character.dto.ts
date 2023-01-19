@@ -1,7 +1,7 @@
 import { IsIn, IsOptional, IsString } from 'class-validator'
 import { Transform } from 'class-transformer'
-import { toCorrectId } from '../../common/helper'
-import { PageOptionsDto } from '../../common/page-info/dto/page-options.dto'
+import { toCorrectId } from '../../shared/transforms/to-correct-id.transform'
+import { PageOptionsDto } from '../../shared/page-info/dto/page-options.dto'
 
 export class QueryCharacterDto extends PageOptionsDto {
   @Transform(({ value }) => toCorrectId(value))
@@ -9,11 +9,12 @@ export class QueryCharacterDto extends PageOptionsDto {
   id: number[]
 
   @IsOptional()
+  @IsString()
   name: string
 
   @IsOptional()
-  @Transform(({ value }) => value.toLowerCase())
   @IsIn(['Alive', 'Dead', 'unknown'])
+  @IsString()
   status: string
 
   @IsOptional()
@@ -29,7 +30,7 @@ export class QueryCharacterDto extends PageOptionsDto {
   @IsString()
   gender: string
 
-  @IsString()
   @IsOptional()
+  @IsString()
   episode_name: string
 }

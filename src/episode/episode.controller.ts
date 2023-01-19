@@ -1,34 +1,39 @@
 import { Body, Controller, Delete, Get, Param, ParseIntPipe, Patch, Post, Query, Req } from '@nestjs/common'
+import { Request } from 'express'
+import * as _ from 'lodash'
 import { EpisodeService } from './episode.service'
 import { CreateEpisodeDto } from './dto/create-episode.dto'
 import { UpdateEpisodeDto } from './dto/update-episode.dto'
-import { EpisodeQueryPipe } from './episode-query.pipe'
 import { QueryEpisodeDto } from './dto/query-episode.dto'
-import { Request } from 'express'
-import { pagination } from '../utils/pagination'
 
 @Controller('episodes')
 export class EpisodeController {
   constructor(private readonly episodeService: EpisodeService) {}
 
   @Post()
-  create(@Body() createEpisodeDto: CreateEpisodeDto) {
-    return this.episodeService.create(createEpisodeDto)
+  async create(@Body() createEpisodeDto: CreateEpisodeDto) {
+    return await this.episodeService.create(createEpisodeDto)
   }
 
   @Get()
-  async findAll(@Query(EpisodeQueryPipe) queryDto: QueryEpisodeDto, @Req() req: Request) {
-    const { episodes, count } = await this.episodeService.findAll(queryDto)
-    return pagination(
+  async findAll(@Query() query: QueryEpisodeDto, @Req() req: Request) {
+    const pageOptionsDto = {
+      take: query.take,
+      page: query.page,
+      order: query.order,
+      skip: query.skip,
+      otherQuery: req.originalUrl
+    }
+    const queryEpisodeDto: any = _.omitBy(
       {
-        page: Number(req.query.page),
-        otherQuery: req.originalUrl,
-        count: count,
-        take: queryDto.take
+        id: query.id,
+        name: query.name,
+        episode: query.episode,
+        character_name: query.character_name
       },
-      episodes,
-      'episodes'
+      _.isNil
     )
+    return await this.episodeService.findAll(pageOptionsDto, queryEpisodeDto as QueryEpisodeDto)
   }
 
   @Get(':id')
@@ -37,8 +42,8 @@ export class EpisodeController {
   }
 
   @Patch(':id')
-  update(@Param('id', ParseIntPipe) id: number, @Body() updateEpisodeDto: UpdateEpisodeDto) {
-    return this.episodeService.update(id, updateEpisodeDto)
+  async update(@Param('id', ParseIntPipe) id: number, @Body() updateEpisodeDto: UpdateEpisodeDto) {
+    return await this.episodeService.update(id, updateEpisodeDto)
   }
 
   @Delete(':id')

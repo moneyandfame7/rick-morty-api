@@ -1,4 +1,4 @@
-import { IsIn, IsInt, IsOptional, IsString, Max, Min } from 'class-validator'
+import { IsIn, IsInt, IsNotEmpty, IsOptional, IsString, Max, Min } from 'class-validator'
 import { Type } from 'class-transformer'
 import { Order } from '../../constants/order.constant'
 
@@ -20,6 +20,10 @@ export class PageOptionsDto {
   @Max(50)
   @IsOptional()
   readonly take?: number = 20
+
+  @IsString()
+  @IsOptional()
+  readonly otherQuery: string
 
   get skip(): number {
     return (this.page - 1) * this.take

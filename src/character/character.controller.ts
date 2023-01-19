@@ -1,16 +1,5 @@
-import {
-  Body,
-  ClassSerializerInterceptor,
-  Controller,
-  Delete,
-  Get,
-  Param,
-  ParseIntPipe,
-  Patch,
-  Post,
-  Query,
-  UseInterceptors
-} from '@nestjs/common'
+import { Body, Controller, Delete, Get, Param, ParseIntPipe, Patch, Post, Query, Req } from '@nestjs/common'
+import { Request } from 'express'
 import * as _ from 'lodash'
 import { CharacterService } from './character.service'
 import { CreateCharacterDto } from './dto/create-character.dto'
@@ -18,7 +7,6 @@ import { UpdateCharacterDto } from './dto/update-character.dto'
 import { QueryCharacterDto } from './dto/query-character.dto'
 
 @Controller('characters')
-@UseInterceptors(ClassSerializerInterceptor)
 export class CharacterController {
   constructor(private readonly characterService: CharacterService) {}
 
@@ -28,9 +16,14 @@ export class CharacterController {
   }
 
   @Get()
-  async findAll(@Query() query: QueryCharacterDto) {
-    console.log(query)
-    const pageOptionsDto = { take: query.take, page: query.page, order: query.order, skip: query.skip }
+  async findAll(@Query() query: QueryCharacterDto, @Req() req: Request) {
+    const pageOptionsDto = {
+      take: query.take,
+      page: query.page,
+      order: query.order,
+      skip: query.skip,
+      otherQuery: req.originalUrl
+    }
     const queryCharacterDto: any = _.omitBy(
       {
         id: query.id,
@@ -43,6 +36,7 @@ export class CharacterController {
       },
       _.isNil
     )
+
     return await this.characterService.findAll(pageOptionsDto, queryCharacterDto as QueryCharacterDto)
   }
 

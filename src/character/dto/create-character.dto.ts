@@ -26,9 +26,11 @@ export class CreateCharacterDto {
   image: string
 
   @IsObject()
+  @IsNotEmpty()
   location?: CreateLocationDto
 
   @IsObject()
+  @IsNotEmpty()
   origin?: CreateLocationDto
 
   @IsDate()
