@@ -4,7 +4,9 @@ import { CreateCharacterDto } from './dto/create-character.dto'
 import { UpdateCharacterDto } from './dto/update-character.dto'
 import { Character } from './entities/character.entity'
 import { InjectRepository } from '@nestjs/typeorm'
-import { QueryCharacterDto } from './dto/query-character.dto'
+import { PageOptionsDto } from 'src/common/page-info/dto/page-options.dto'
+import { PageDto } from '../common/page-info/dto/page.dto'
+import { PageInfoDto } from '../common/page-info/dto/page-info.dto'
 
 @Injectable()
 export class CharacterService {
@@ -22,13 +24,28 @@ export class CharacterService {
     return await this.characterRepository.save(character)
   }
 
-  async findAll(query?: QueryCharacterDto) {
-    const [characters, count] = await this.characterRepository.findAndCount({ ...this.relations, ...query })
+  async findAll(pageOptionsDto: PageOptionsDto): Promise<PageDto<CreateCharacterDto>> {
+    /*const [characters, count] = await this.characterRepository.findAndCount({ ...this.relations, ...query })
     console.log(characters)
     if (!characters.length) {
       throw new NotFoundException('Characters not found')
     }
     return { characters, count }
+*/
+    const queryBuilder = this.characterRepository.createQueryBuilder('character')
+    queryBuilder
+      .orderBy('character.id', pageOptionsDto.order)
+      .skip(pageOptionsDto.skip)
+      .take(pageOptionsDto.take)
+      .leftJoinAndSelect('character.origin', 'origin')
+      .leftJoinAndSelect('character.location', 'location')
+      .leftJoinAndSelect('character.episodes', 'episodes')
+      .addOrderBy('episodes.id', 'ASC')
+    const count = await queryBuilder.getCount()
+    const characters = await queryBuilder.getMany()
+    const pageInfoDto = new PageInfoDto({ pageOptionsDto, count })
+
+    return new PageDto(characters, pageInfoDto)
   }
 
   async findOne(id: number) {

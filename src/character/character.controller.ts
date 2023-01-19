@@ -1,13 +1,25 @@
-import { Body, Controller, Delete, Get, Param, ParseIntPipe, Patch, Post, Query, Req } from '@nestjs/common'
+import {
+  Body,
+  ClassSerializerInterceptor,
+  Controller,
+  Delete,
+  Get,
+  HttpCode,
+  HttpStatus,
+  Param,
+  ParseIntPipe,
+  Patch,
+  Post,
+  Query,
+  UseInterceptors
+} from '@nestjs/common'
 import { CharacterService } from './character.service'
 import { CreateCharacterDto } from './dto/create-character.dto'
 import { UpdateCharacterDto } from './dto/update-character.dto'
-import { Request } from 'express'
-import { pagination } from '../utils/pagination'
-import { QueryCharacterDto } from './dto/query-character.dto'
-import { CharacterQueryPipe } from './character-query.pipe'
+import { PageOptionsDto } from '../common/page-info/dto/page-options.dto'
 
 @Controller('characters')
+@UseInterceptors(ClassSerializerInterceptor)
 export class CharacterController {
   constructor(private readonly characterService: CharacterService) {}
 
@@ -16,23 +28,10 @@ export class CharacterController {
     return this.characterService.create(character)
   }
 
-  @Get('/')
-  async findAll(
-    @Query(CharacterQueryPipe)
-    queryDto: QueryCharacterDto,
-    @Req() req: Request
-  ) {
-    const { characters, count } = await this.characterService.findAll(queryDto)
-    return pagination(
-      {
-        page: Number(req.query.page),
-        otherQuery: req.originalUrl,
-        count: count,
-        take: queryDto.take
-      },
-      characters,
-      'characters'
-    )
+  @Get()
+  @HttpCode(HttpStatus.OK)
+  async findAll(@Query() pageOptionsDto: PageOptionsDto) {
+    return await this.characterService.findAll(pageOptionsDto)
   }
 
   @Get('/episode/:id')
