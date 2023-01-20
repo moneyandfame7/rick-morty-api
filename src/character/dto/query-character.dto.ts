@@ -1,7 +1,7 @@
 import { IsIn, IsOptional, IsString } from 'class-validator'
-import { Transform } from 'class-transformer'
-import { toCorrectId } from '../../shared/transforms/to-correct-id.transform'
 import { PageOptionsDto } from '../../shared/page-info/dto/page-options.dto'
+import { toCorrectId } from '../../shared/transforms/to-correct-id.transform'
+import { Transform } from 'class-transformer'
 
 export class QueryCharacterDto extends PageOptionsDto {
   @Transform(({ value }) => toCorrectId(value))

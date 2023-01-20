@@ -3,13 +3,11 @@ import { CreateLocationDto } from './dto/create-location.dto'
 import { UpdateLocationDto } from './dto/update-location.dto'
 import { InjectRepository } from '@nestjs/typeorm'
 import { Location } from './entities/location.entity'
-import { FindManyOptions, Repository, SelectQueryBuilder } from 'typeorm'
+import { Repository, SelectQueryBuilder } from 'typeorm'
 import { QueryLocationDto } from './dto/query-location.dto'
 import { PageOptionsDto } from 'src/shared/page-info/dto/page-options.dto'
-import { filter } from 'lodash'
 import { PageInfoDto } from 'src/shared/page-info/dto/page-info.dto'
 import { PageDto } from 'src/shared/page-info/dto/page.dto'
-import { log } from 'console'
 
 @Injectable()
 export class LocationService {
@@ -24,15 +22,11 @@ export class LocationService {
 
     filters.name ? builder.andWhere('location.name ilike :name', { name: `%${filters.name}%` }) : null
 
-    filters.dimension
-      ? builder.andWhere('location.dimension ilike :dimension', { dimension: `%${filters.dimension}%` })
-      : null
+    filters.dimension ? builder.andWhere('location.dimension ilike :dimension', { dimension: `%${filters.dimension}%` }) : null
 
     filters.type ? builder.andWhere('location.type startswith :type', { type: filters.type }) : null
 
-    filters.resident_name
-      ? builder.andWhere('residents.name ilike :resident_name', { resident_name: `%${filters.resident_name}%` })
-      : null
+    filters.resident_name ? builder.andWhere('residents.name ilike :resident_name', { resident_name: `%${filters.resident_name}%` }) : null
   }
 
   private _buildRelations(builder: SelectQueryBuilder<Location>) {
@@ -45,10 +39,7 @@ export class LocationService {
   }
 
   async findAll(pageOptionsDto: PageOptionsDto, queryLocation: QueryLocationDto) {
-    const queryBuilder = this._builder
-      .skip(pageOptionsDto.skip)
-      .take(pageOptionsDto.take)
-      .addOrderBy('location.id', pageOptionsDto.order)
+    const queryBuilder = this._builder.skip(pageOptionsDto.skip).take(pageOptionsDto.take).addOrderBy('location.id', pageOptionsDto.order)
     this._buildRelations(queryBuilder)
     this._buildSearchFilters(queryBuilder, queryLocation)
 

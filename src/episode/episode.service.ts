@@ -1,6 +1,6 @@
 import { InjectRepository } from '@nestjs/typeorm'
 import { BadRequestException, ConflictException, Injectable, NotFoundException } from '@nestjs/common'
-import { FindManyOptions, Repository, SelectQueryBuilder } from 'typeorm'
+import { Repository, SelectQueryBuilder } from 'typeorm'
 import { CreateEpisodeDto } from './dto/create-episode.dto'
 import { UpdateEpisodeDto } from './dto/update-episode.dto'
 import { Episode } from './entities/episode.entity'
@@ -24,9 +24,7 @@ export class EpisodeService {
 
     filters.episode ? builder.andWhere('episode.episode = :episode', { episode: filters.name }) : null
 
-    filters.character_name
-      ? builder.andWhere('characters.name = :character_name', { character_name: filters.character_name })
-      : null
+    filters.character_name ? builder.andWhere('characters.name = :character_name', { character_name: filters.character_name }) : null
   }
 
   private _buildRelations(builder: SelectQueryBuilder<Episode>) {
@@ -42,10 +40,7 @@ export class EpisodeService {
   }
 
   async findAll(pageOptionsDto: PageOptionsDto, queryEpisode: QueryEpisodeDto): Promise<PageDto<Episode>> {
-    const queryBuilder = this._builder
-      .skip(pageOptionsDto.skip)
-      .take(pageOptionsDto.take)
-      .addOrderBy('episode.id', pageOptionsDto.order)
+    const queryBuilder = this._builder.skip(pageOptionsDto.skip).take(pageOptionsDto.take).addOrderBy('episode.id', pageOptionsDto.order)
     this._buildRelations(queryBuilder)
     this._buildSearchFilters(queryBuilder, queryEpisode)
 

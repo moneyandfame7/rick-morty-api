@@ -1,6 +1,4 @@
-import { BadRequestException, ConflictException, Injectable, NotFoundException } from '@nestjs/common'
-import { InjectRepository } from '@nestjs/typeorm'
-import { Repository, SelectQueryBuilder } from 'typeorm'
+import { BadRequestException, HttpException, HttpStatus, Injectable } from '@nestjs/common'
 import { CreateCharacterDto } from './dto/create-character.dto'
 import { UpdateCharacterDto } from './dto/update-character.dto'
 import { QueryCharacterDto } from './dto/query-character.dto'
@@ -8,82 +6,75 @@ import { Character } from './entities/character.entity'
 import { PageOptionsDto } from 'src/shared/page-info/dto/page-options.dto'
 import { PageDto } from '../shared/page-info/dto/page.dto'
 import { PageInfoDto } from '../shared/page-info/dto/page-info.dto'
+import { CharacterRepository } from './character.repository'
+import * as sharp from 'sharp'
+import { PutObjectCommandInput } from '@aws-sdk/client-s3'
+import { S3Service } from '../s3/s3.service'
 
 @Injectable()
 export class CharacterService {
-  constructor(@InjectRepository(Character) private readonly characterRepository: Repository<Character>) {}
+  constructor(private readonly characterRepository: CharacterRepository, private readonly s3Service: S3Service) {}
 
-  private get _builder() {
-    return this.characterRepository.createQueryBuilder('character')
-  }
+  async createOne(createCharacterDto: CreateCharacterDto, file: Express.Multer.File) {
+    if (!file) throw new HttpException('Field image cannot be empty', HttpStatus.BAD_REQUEST)
+    const fileBuffer = await sharp(file.buffer).resize({ height: 300, width: 300, fit: 'cover' }).toBuffer()
 
-  private _buildSearchFilters(builder: SelectQueryBuilder<Character>, filters: QueryCharacterDto) {
-    filters.id ? builder.where('character.id IN (:...ids)', { ids: filters.id }) : null
+    const characterAttributes: CreateCharacterDto = {
+      id: (await this.getCount()) + 1,
+      name: createCharacterDto.name,
+      type: createCharacterDto.type,
+      status: createCharacterDto.status,
+      gender: createCharacterDto.gender,
+      species: createCharacterDto.species
+    }
+    const [, type] = file.mimetype.split('/')
 
-    filters.name ? builder.andWhere('character.name ilike :name', { name: `%${filters.name}%` }) : null
-
-    filters.gender ? builder.andWhere('character.gender = :gender', { gender: filters.gender }) : null
-
-    filters.episode_name
-      ? builder.andWhere('episodes.name ilike :episode_name', { episode_name: `%${filters.episode_name}%` })
-      : null
-
-    filters.type ? builder.andWhere('character.type = :type', { type: filters.type }) : null
-
-    filters.status ? builder.andWhere('character.status = :status', { status: filters.status }) : null
-
-    filters.species ? builder.andWhere('character.species = :species', { species: filters.species }) : null
-  }
-
-  private _buildRelations(builder: SelectQueryBuilder<Character>) {
-    builder
-      .leftJoinAndSelect('character.origin', 'origin')
-      .leftJoinAndSelect('character.location', 'location')
-      .loadAllRelationIds({ relations: ['episodes'] })
-  }
-
-  async create(createCharacterDto: CreateCharacterDto) {
-    const character = this.characterRepository.create(createCharacterDto)
+    const params: PutObjectCommandInput = {
+      Bucket: this.s3Service.bucketName,
+      Key: `${characterAttributes.id}.${type}`,
+      Body: fileBuffer,
+      ContentType: file.mimetype,
+      ACL: 'public-read'
+    }
+    characterAttributes.image = await this.s3Service.upload(params)
+    const character = await this.characterRepository.createOne(characterAttributes)
     return await this.characterRepository.save(character)
   }
 
-  async findAll(pageOptionsDto: PageOptionsDto, queryCharacter: QueryCharacterDto) {
-    console.log(queryCharacter)
-    const queryBuilder = this._builder
-      .skip(pageOptionsDto.skip)
-      .take(pageOptionsDto.take)
-      .addOrderBy('character.id', pageOptionsDto.order)
-    this._buildRelations(queryBuilder)
-    this._buildSearchFilters(queryBuilder, queryCharacter)
+  async getMany(pageOptionsDto: PageOptionsDto, queryCharacterDto: QueryCharacterDto) {
+    const { characters, count } = await this.characterRepository.getMany(pageOptionsDto, queryCharacterDto)
 
-    const count = await queryBuilder.getCount()
-    const characters = await queryBuilder.getMany()
-
-    if (!characters.length) throw new NotFoundException(`Characters not found.`)
+    if (!count) throw new BadRequestException(`Characters not found.`)
 
     const pageInfoDto = new PageInfoDto({ pageOptionsDto, count })
     return new PageDto(characters, pageInfoDto)
   }
 
-  async findOne(id: number) {
-    const queryBuilder = this._builder
-    this._buildRelations(queryBuilder)
+  async getOne(id: number): Promise<Character> {
+    const character = await this.characterRepository.getOne(id)
 
-    const character = await queryBuilder.where('character.id = :id', { id }).getOne()
     if (!character) throw new BadRequestException(`Character with id ${id}  does not exist.`)
 
     return character
   }
 
-  async update(id: number, updateCharacterDto: UpdateCharacterDto) {
-    return await this.characterRepository.update(id, updateCharacterDto)
+  async updateOne(id: number, updateCharacterDto: UpdateCharacterDto): Promise<Character> {
+    const character = await this.characterRepository.getOne(id)
+
+    if (!character) throw new BadRequestException(`Character with id ${id} does not exist.`)
+
+    return await this.characterRepository.updateOne(id, updateCharacterDto)
   }
 
-  async remove(id: number) {
-    return await this.characterRepository.delete(id)
+  async removeOne(id: number): Promise<Character> {
+    const character = await this.characterRepository.getOne(id)
+
+    if (!character) throw new BadRequestException(`Character with id ${id} does not exist.`)
+
+    return await this.characterRepository.removeOne(id)
   }
 
-  async count() {
-    return await this._builder.getCount()
+  async getCount(): Promise<number> {
+    return await this.characterRepository.getCount()
   }
 }
