@@ -22,7 +22,8 @@ export class EpisodeController {
       page: query.page,
       order: query.order,
       skip: query.skip,
-      otherQuery: req.originalUrl
+      otherQuery: req.originalUrl,
+      endpoint: 'characters'
     }
     const queryEpisodeDto: any = _.omitBy(
       {

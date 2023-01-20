@@ -6,31 +6,31 @@ import { PageOptionsDto } from '../../shared/page-info/dto/page-options.dto'
 export class QueryCharacterDto extends PageOptionsDto {
   @Transform(({ value }) => toCorrectId(value))
   @IsOptional()
-  id: number[]
+  id?: number[]
 
   @IsOptional()
   @IsString()
-  name: string
+  name?: string
 
   @IsOptional()
   @IsIn(['Alive', 'Dead', 'unknown'])
   @IsString()
-  status: string
+  status?: string
 
   @IsOptional()
   @IsString()
-  type: string
+  type?: string
 
   @IsOptional()
   @IsString()
-  species: string
+  species?: string
 
   @IsOptional()
   @IsIn(['Female', 'Male', 'Genderless', 'unknown'])
   @IsString()
-  gender: string
+  gender?: string
 
   @IsOptional()
   @IsString()
-  episode_name: string
+  episode_name?: string
 }

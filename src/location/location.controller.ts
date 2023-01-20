@@ -23,7 +23,8 @@ export class LocationController {
       page: query.page,
       order: query.order,
       skip: query.skip,
-      otherQuery: req.originalUrl
+      otherQuery: req.originalUrl,
+      endpoint: 'locations'
     }
     const queryLocationDto: any = _.omitBy(
       {

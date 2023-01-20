@@ -1,3 +1,4 @@
-export function toCorrectId(id: string): number[] {
-  return typeof id === 'string' ? id.split(',').map(id => parseInt(id)) : id
-}
+import * as _ from 'lodash'
+
+export const toCorrectId = (id: string): number[] =>
+  typeof id === 'string' ? _.compact(id.split(',').map(id => parseInt(id))) : id

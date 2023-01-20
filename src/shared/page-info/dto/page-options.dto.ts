@@ -23,7 +23,11 @@ export class PageOptionsDto {
 
   @IsString()
   @IsOptional()
-  readonly otherQuery: string
+  readonly otherQuery?: string
+
+  @IsString()
+  @IsOptional()
+  endpoint: string
 
   get skip(): number {
     return (this.page - 1) * this.take

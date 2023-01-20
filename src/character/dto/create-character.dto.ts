@@ -1,7 +1,11 @@
-import { IsDate, IsNotEmpty, IsObject, IsOptional, IsString } from 'class-validator'
+import { IsDate, IsNotEmpty, IsNumber, IsObject, IsOptional, IsString } from 'class-validator'
 import { CreateLocationDto } from '../../location/dto/create-location.dto'
 
 export class CreateCharacterDto {
+  @IsNumber()
+  @IsOptional()
+  id?: number
+
   @IsString()
   @IsNotEmpty()
   name: string
@@ -22,15 +26,15 @@ export class CreateCharacterDto {
   species: string
 
   @IsString()
-  @IsNotEmpty()
-  image: string
+  @IsOptional()
+  image?: string
 
   @IsObject()
-  @IsNotEmpty()
+  @IsOptional()
   location?: CreateLocationDto
 
   @IsObject()
-  @IsNotEmpty()
+  @IsOptional()
   origin?: CreateLocationDto
 
   @IsDate()
