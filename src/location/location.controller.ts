@@ -5,7 +5,6 @@ import { CreateLocationDto } from './dto/create-location.dto'
 import { UpdateLocationDto } from './dto/update-location.dto'
 import { QueryLocationDto } from './dto/query-location.dto'
 import * as _ from 'lodash'
-import { log } from 'console'
 
 @Controller('locations')
 export class LocationController {

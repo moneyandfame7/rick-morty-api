@@ -1,4 +1,4 @@
-import { IsArray, IsNumber, IsOptional, IsString, Max, Min } from 'class-validator'
+import { IsOptional, IsString } from 'class-validator'
 import { Transform } from 'class-transformer'
 import { toCorrectId } from '../../shared/transforms/to-correct-id.transform'
 import { PageOptionsDto } from 'src/shared/page-info/dto/page-options.dto'
@@ -6,21 +6,21 @@ import { PageOptionsDto } from 'src/shared/page-info/dto/page-options.dto'
 export class QueryLocationDto extends PageOptionsDto {
   @Transform(({ value }) => toCorrectId(value))
   @IsOptional()
-  id: number[]
+  id?: number[]
 
   @IsOptional()
   @IsString()
-  name: string
+  name?: string
 
   @IsOptional()
   @IsString()
-  type: string
+  type?: string
 
   @IsOptional()
   @IsString()
-  dimension: string
+  dimension?: string
 
   @IsOptional()
   @IsString()
-  resident_name: string
+  resident_name?: string
 }

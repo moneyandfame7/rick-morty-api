@@ -8,14 +8,7 @@ import { S3Module } from './s3/s3.module'
 import { ConfigModule } from '@nestjs/config'
 
 @Module({
-  imports: [
-    ConfigModule.forRoot(),
-    TypeOrmModule.forRoot(dataSourceOptions),
-    CharacterModule,
-    EpisodeModule,
-    LocationModule,
-    S3Module
-  ],
+  imports: [ConfigModule.forRoot(), TypeOrmModule.forRoot(dataSourceOptions), CharacterModule, EpisodeModule, LocationModule, S3Module],
   controllers: [],
   providers: []
 })

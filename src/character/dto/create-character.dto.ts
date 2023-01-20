@@ -1,4 +1,4 @@
-import { IsDate, IsNotEmpty, IsNumber, IsObject, IsOptional, IsString } from 'class-validator'
+import { IsDate, IsIn, IsNotEmpty, IsNumber, IsObject, IsOptional, IsString } from 'class-validator'
 import { CreateLocationDto } from '../../location/dto/create-location.dto'
 
 export class CreateCharacterDto {
@@ -13,12 +13,14 @@ export class CreateCharacterDto {
   @IsString()
   type: string
 
+  @IsIn(['Alive', 'Dead', 'unknown'])
   @IsString()
   @IsNotEmpty()
   status: string
 
+  @IsOptional()
+  @IsIn(['Female', 'Male', 'Genderless', 'unknown'])
   @IsString()
-  @IsNotEmpty()
   gender: string
 
   @IsString()
@@ -39,5 +41,5 @@ export class CreateCharacterDto {
 
   @IsDate()
   @IsOptional()
-  createdAt?: Date
+  createdAt?: Date = new Date()
 }

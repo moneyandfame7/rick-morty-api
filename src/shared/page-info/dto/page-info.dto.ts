@@ -1,7 +1,6 @@
-import { PageInfoParametersDto } from '../interfaces/page-info-parameters.dto'
-import { HttpException, HttpStatus } from '@nestjs/common'
-import * as _ from 'lodash'
 import 'dotenv/config'
+import { PageInfoParametersDto } from '../interfaces/page-info-parameters.dto'
+import { BadRequestException } from '@nestjs/common'
 
 export class PageInfoDto {
   readonly page: number
@@ -16,17 +15,19 @@ export class PageInfoDto {
 
   readonly next: string
 
-  readonly otherQuery: any
+  readonly test: any
+
+  private queryString = (query: string, current: number, page: number, endpoint: string) => {
+    return query.includes('page') ? process.env.BASE_URL + '/api/' + query.replace(`page=${current}`, `page=${page}`) : process.env.BASE_URL + '/api/' + endpoint + `?page=${page}`
+  }
 
   constructor({ pageOptionsDto, count }: PageInfoParametersDto) {
     this.page = pageOptionsDto.page
     this.take = pageOptionsDto.take
-    this.otherQuery = (newPage: string) =>
-      process.env.BASE_URL + _.replace(pageOptionsDto.otherQuery, `page=${this.page}`, `page=${newPage}`)
-
     this.count = count
     this.pages = Math.ceil(this.count / this.take)
-    this.prev = this.page - 1 ? this.otherQuery(this.page - 1) : null
-    this.next = this.page < this.pages ? this.otherQuery(this.page + 1) : null
+    this.prev = this.page - 1 ? this.queryString(pageOptionsDto.otherQuery, this.page, this.page - 1, pageOptionsDto.endpoint) : null
+    this.next = this.page < this.pages ? this.queryString(pageOptionsDto.otherQuery, this.page, this.page + 1, pageOptionsDto.endpoint) : null
+    if (this.page > this.pages) throw new BadRequestException('No such page exists')
   }
 }
