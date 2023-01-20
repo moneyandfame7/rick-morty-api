@@ -1,13 +1,13 @@
 import { BadRequestException, ConflictException, Injectable, NotFoundException } from '@nestjs/common'
+import { InjectRepository } from '@nestjs/typeorm'
 import { Repository, SelectQueryBuilder } from 'typeorm'
 import { CreateCharacterDto } from './dto/create-character.dto'
 import { UpdateCharacterDto } from './dto/update-character.dto'
+import { QueryCharacterDto } from './dto/query-character.dto'
 import { Character } from './entities/character.entity'
-import { InjectRepository } from '@nestjs/typeorm'
 import { PageOptionsDto } from 'src/shared/page-info/dto/page-options.dto'
 import { PageDto } from '../shared/page-info/dto/page.dto'
 import { PageInfoDto } from '../shared/page-info/dto/page-info.dto'
-import { QueryCharacterDto } from './dto/query-character.dto'
 
 @Injectable()
 export class CharacterService {
@@ -43,18 +43,6 @@ export class CharacterService {
   }
 
   async create(createCharacterDto: CreateCharacterDto) {
-    const exist = this.characterRepository.findOne({
-      where: {
-        name: createCharacterDto.name,
-        type: createCharacterDto.type,
-        gender: createCharacterDto.gender,
-        status: createCharacterDto.status,
-        location: {
-          name: createCharacterDto.location.name
-        }
-      }
-    })
-    if (exist) throw new ConflictException('Character already exist.')
     const character = this.characterRepository.create(createCharacterDto)
     return await this.characterRepository.save(character)
   }
@@ -93,5 +81,9 @@ export class CharacterService {
 
   async remove(id: number) {
     return await this.characterRepository.delete(id)
+  }
+
+  async count() {
+    return await this._builder.getCount()
   }
 }

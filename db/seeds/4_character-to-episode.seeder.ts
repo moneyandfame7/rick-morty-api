@@ -14,7 +14,7 @@ export class CharacterToEpisodeSeeder implements Seeder {
       for (let j = 0; j < responseEpisode[i].characters.length; j++) {
         const characterId = getIdFromUrl(responseEpisode[i].characters[j])
         await dataSource.createQueryBuilder().relation(Episode, 'characters').of(_episodes[i].id).add(characterId)
-        console.log(`Character ${characterId} was added successfully ✅`)
+        console.log(`✅ Character ${characterId} was added successfully`)
       }
     }
 
