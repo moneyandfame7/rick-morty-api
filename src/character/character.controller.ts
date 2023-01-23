@@ -13,12 +13,18 @@ import { PageOptionsDto } from '../shared/page-info/dto/page-options.dto'
 export class CharacterController {
   constructor(private readonly characterService: CharacterService) {}
 
+  /**
+   * A new character is created and an image is uploaded to the S3 Bucket.
+   * */
   @Post()
   @UseInterceptors(FileInterceptor('image', { storage: memoryStorage() }))
   async createOne(@Body() character: CreateCharacterDto, @UploadedFile() file: Express.Multer.File) {
     return await this.characterService.createOne(character, file)
   }
 
+  /**
+   * This method returns the characters with the specified query, or returns all if the query is empty.
+   * */
   @Get()
   async getMany(@Query() query: QueryCharacterDto, @Req() req: Request) {
     const pageOptionsDto: PageOptionsDto = {
@@ -44,16 +50,25 @@ export class CharacterController {
     return await this.characterService.getMany(pageOptionsDto, queryCharacterDto as QueryCharacterDto)
   }
 
+  /**
+   * This method returns the character by id.
+   * */
   @Get(':id')
   async getOne(@Param('id', ParseIntPipe) id: number) {
     return await this.characterService.getOne(id)
   }
 
+  /**
+   * This method updates the character with the specified body by id.
+   **/
   @Patch(':id')
   async updateOne(@Param('id', ParseIntPipe) id: number, @Body() updateCharacterDto: UpdateCharacterDto) {
     return this.characterService.updateOne(id, updateCharacterDto)
   }
 
+  /**
+   * This method removes the character by id.
+   **/
   @Delete(':id')
   removeOne(@Param('id', ParseIntPipe) id: number) {
     return this.characterService.removeOne(id)
