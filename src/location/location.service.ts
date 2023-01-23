@@ -1,72 +1,60 @@
-import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common'
+import { BadRequestException, Injectable } from '@nestjs/common'
 import { CreateLocationDto } from './dto/create-location.dto'
 import { UpdateLocationDto } from './dto/update-location.dto'
 import { InjectRepository } from '@nestjs/typeorm'
 import { Location } from './entities/location.entity'
-import { Repository, SelectQueryBuilder } from 'typeorm'
 import { QueryLocationDto } from './dto/query-location.dto'
 import { PageOptionsDto } from 'src/shared/page-info/dto/page-options.dto'
 import { PageInfoDto } from 'src/shared/page-info/dto/page-info.dto'
 import { PageDto } from 'src/shared/page-info/dto/page.dto'
+import { LocationRepository } from './location.repository'
 
 @Injectable()
 export class LocationService {
-  constructor(@InjectRepository(Location) private readonly locationRepository: Repository<Location>) {}
+  constructor(@InjectRepository(Location) private readonly locationRepository: LocationRepository) {}
 
-  private get _builder() {
-    return this.locationRepository.createQueryBuilder('location')
+  async createOne(createLocationDto: CreateLocationDto) {
+    const exist = this.locationRepository.findOneBy({ name: createLocationDto.name })
+    if (exist) throw new BadRequestException('Location already exist.')
+
+    const episode = this.locationRepository.create(createLocationDto)
+    return await this.locationRepository.save(episode)
   }
 
-  private _buildSearchFilters(builder: SelectQueryBuilder<Location>, filters: QueryLocationDto) {
-    filters.id ? builder.where('location.id IN (:...ids)', { ids: filters.id }) : null
+  async getMany(pageOptionsDto: PageOptionsDto, queryLocationDto: QueryLocationDto) {
+    const { locations, count } = await this.locationRepository.getMany(pageOptionsDto, queryLocationDto)
 
-    filters.name ? builder.andWhere('location.name ilike :name', { name: `%${filters.name}%` }) : null
-
-    filters.dimension ? builder.andWhere('location.dimension ilike :dimension', { dimension: `%${filters.dimension}%` }) : null
-
-    filters.type ? builder.andWhere('location.type startswith :type', { type: filters.type }) : null
-
-    filters.resident_name ? builder.andWhere('residents.name ilike :resident_name', { resident_name: `%${filters.resident_name}%` }) : null
-  }
-
-  private _buildRelations(builder: SelectQueryBuilder<Location>) {
-    builder.leftJoinAndSelect('location.residents', 'residents').loadAllRelationIds()
-  }
-
-  async create(createLocationDto: CreateLocationDto) {
-    const location = this.locationRepository.create(createLocationDto)
-    return await this.locationRepository.save(location)
-  }
-
-  async findAll(pageOptionsDto: PageOptionsDto, queryLocation: QueryLocationDto) {
-    const queryBuilder = this._builder.skip(pageOptionsDto.skip).take(pageOptionsDto.take).addOrderBy('location.id', pageOptionsDto.order)
-    this._buildRelations(queryBuilder)
-    this._buildSearchFilters(queryBuilder, queryLocation)
-
-    const count = await queryBuilder.getCount()
-    const locations = await queryBuilder.getMany()
-
-    if (!locations.length) throw new NotFoundException(`Locations not found.`)
+    if (!count) throw new BadRequestException(`Locations not found.`)
 
     const pageInfoDto = new PageInfoDto({ pageOptionsDto, count })
     return new PageDto(locations, pageInfoDto)
   }
 
-  async findOne(id: number) {
-    const queryBuilder = this._builder
-    this._buildRelations(queryBuilder)
+  async getOne(id: number) {
+    const location = await this.locationRepository.getOne(id)
 
-    const location = await queryBuilder.where('location.id = :id', { id }).getOne()
-    if (!location) throw new BadRequestException(`Location with id ${id} doest not exist.`)
+    if (!location) throw new BadRequestException(`Location with id ${id}  does not exist.`)
 
     return location
   }
 
-  async update(id: number, updateLocationDto: UpdateLocationDto) {
-    return await this.locationRepository.update(id, updateLocationDto)
+  async updateOne(id: number, updateLocationDto: UpdateLocationDto) {
+    const location = await this.locationRepository.getOne(id)
+
+    if (!location) throw new BadRequestException(`Location with id ${id} does not exist.`)
+
+    return await this.locationRepository.updateOne(id, updateLocationDto)
   }
 
-  async remove(id: number) {
-    return await this.locationRepository.delete(id)
+  async removeOne(id: number) {
+    const location = await this.locationRepository.getOne(id)
+
+    if (!location) throw new BadRequestException(`Location with id ${id} does not exist.`)
+
+    return await this.locationRepository.removeOne(id)
+  }
+
+  async getCount(): Promise<number> {
+    return await this.locationRepository.getCount()
   }
 }

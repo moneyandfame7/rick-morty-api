@@ -13,7 +13,7 @@ import { EpisodeRepository } from './episode.repository'
 export class EpisodeService {
   constructor(@InjectRepository(Episode) private readonly episodeRepository: EpisodeRepository) {}
 
-  async create(createEpisodeDto: CreateEpisodeDto) {
+  async createOne(createEpisodeDto: CreateEpisodeDto) {
     const exist = this.episodeRepository.findOneBy({ name: createEpisodeDto.name })
     if (exist) throw new BadRequestException('Episode already exist.')
 
