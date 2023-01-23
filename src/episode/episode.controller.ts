@@ -11,12 +11,12 @@ export class EpisodeController {
   constructor(private readonly episodeService: EpisodeService) {}
 
   @Post()
-  async create(@Body() createEpisodeDto: CreateEpisodeDto) {
-    return await this.episodeService.create(createEpisodeDto)
+  async createOne(@Body() createEpisodeDto: CreateEpisodeDto) {
+    return await this.episodeService.createOne(createEpisodeDto)
   }
 
   @Get()
-  async findAll(@Query() query: QueryEpisodeDto, @Req() req: Request) {
+  async getMany(@Query() query: QueryEpisodeDto, @Req() req: Request) {
     const pageOptionsDto = {
       take: query.take,
       page: query.page,
@@ -34,21 +34,21 @@ export class EpisodeController {
       },
       _.isNil
     )
-    return await this.episodeService.findAll(pageOptionsDto, queryEpisodeDto as QueryEpisodeDto)
+    return await this.episodeService.getMany(pageOptionsDto, queryEpisodeDto as QueryEpisodeDto)
   }
 
   @Get(':id')
-  async findOne(@Param('id', ParseIntPipe) id: number) {
-    return await this.episodeService.findOne(id)
+  async getOne(@Param('id', ParseIntPipe) id: number) {
+    return await this.episodeService.getOne(id)
   }
 
   @Patch(':id')
-  async update(@Param('id', ParseIntPipe) id: number, @Body() updateEpisodeDto: UpdateEpisodeDto) {
-    return await this.episodeService.update(id, updateEpisodeDto)
+  async updateOne(@Param('id', ParseIntPipe) id: number, @Body() updateEpisodeDto: UpdateEpisodeDto) {
+    return await this.episodeService.updateOne(id, updateEpisodeDto)
   }
 
   @Delete(':id')
-  async remove(@Param('id', ParseIntPipe) id: number) {
-    return await this.episodeService.remove(id)
+  async removeOne(@Param('id', ParseIntPipe) id: number) {
+    return await this.episodeService.removeOne(id)
   }
 }
