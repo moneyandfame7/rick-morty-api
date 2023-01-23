@@ -15,8 +15,6 @@ export class PageInfoDto {
 
   readonly next: string
 
-  readonly test: any
-
   private queryString = (query: string, current: number, page: number, endpoint: string) => {
     return query.includes('page') ? process.env.BASE_URL + '/api/' + query.replace(`page=${current}`, `page=${page}`) : process.env.BASE_URL + '/api/' + endpoint + `?page=${page}`
   }
