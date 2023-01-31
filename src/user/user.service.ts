@@ -2,17 +2,18 @@ import { BadRequestException, Injectable, NotFoundException } from '@nestjs/comm
 import { CreateUserDto } from './dto/create-user.dto'
 import { UpdateUserDto } from './dto/update-user.dto'
 import { UserRepository } from './user.repository'
+import { RolesService } from '../roles/roles.service'
 
 @Injectable()
 export class UserService {
-  constructor(private readonly userRepository: UserRepository) {}
+  constructor(private readonly userRepository: UserRepository, private readonly rolesService: RolesService) {}
 
   async createOne(createUserDto: CreateUserDto) {
     const existingUser = await this.userRepository.getOneByEmail(createUserDto.email)
-
     if (existingUser) throw new BadRequestException(`User ${createUserDto.email} already exists.`)
-    const user = await this.userRepository.createOne(createUserDto)
 
+    const user = await this.userRepository.createOne(createUserDto)
+    user.roles = await this.rolesService.getRole('user')
     return await this.userRepository.save(user)
   }
 
