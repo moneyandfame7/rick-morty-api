@@ -10,12 +10,7 @@ async function bootstrap() {
   app.setGlobalPrefix('api')
   app.useGlobalPipes(new ValidationPipe({ transform: true, whitelist: true }))
 
-  const config = new DocumentBuilder()
-    .setTitle('The Rick & Morty API')
-    .setDescription('REST API on NestJS, Typescript, TypeOrm.')
-    .setVersion('1.0.0')
-    .addTag('moneyandfame')
-    .build()
+  const config = new DocumentBuilder().setTitle('The Rick & Morty API').setDescription('This is a Rest API on NestJS, TypeOrm, TypeScript.').setVersion('1.0.0').build()
   const document = SwaggerModule.createDocument(app, config)
   SwaggerModule.setup('/api/docs', app, document)
 
