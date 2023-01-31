@@ -8,24 +8,26 @@ import { CreateCharacterDto } from './dto/create-character.dto'
 import { UpdateCharacterDto } from './dto/update-character.dto'
 import { QueryCharacterDto } from './dto/query-character.dto'
 import { PageOptionsDto } from '../shared/page-info/dto/page-options.dto'
-import { ApiOperation, ApiResponse } from '@nestjs/swagger'
+import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger'
 import { Character } from './entities/character.entity'
 
 @Controller('characters')
+@ApiTags('characters')
 export class CharacterController {
   constructor(private readonly characterService: CharacterService) {}
 
-  @ApiOperation({ summary: 'A new character is created and an image is uploaded to the S3 Bucket.' })
-  @ApiResponse({ status: 200, type: Character })
+  //TODO: зробити form data tyt abo ni
   @Post()
+  @ApiOperation({ summary: 'create and save a new character to collection' })
+  @ApiResponse({ status: 200, type: Character })
   @UseInterceptors(FileInterceptor('image', { storage: memoryStorage() }))
   async createOne(@Body() character: CreateCharacterDto, @UploadedFile() file: Express.Multer.File) {
     return await this.characterService.createOne(character, file)
   }
 
-  @ApiOperation({ summary: 'This method returns the characters with the specified query, or returns all if the query is empty.' })
-  @ApiResponse({ status: 200, type: [Character] })
   @Get()
+  @ApiOperation({ summary: 'get all characters by queries' })
+  @ApiResponse({ status: 200, type: [Character] })
   async getMany(@Query() query: QueryCharacterDto, @Req() req: Request) {
     const pageOptionsDto: PageOptionsDto = {
       take: query.take,
@@ -50,23 +52,23 @@ export class CharacterController {
     return await this.characterService.getMany(pageOptionsDto, queryCharacterDto as QueryCharacterDto)
   }
 
-  @ApiOperation({ summary: 'Returns the character by id.' })
-  @ApiResponse({ status: 200, type: Character })
   @Get(':id')
+  @ApiOperation({ summary: 'get one character with specified id' })
+  @ApiResponse({ status: 200, type: Character })
   async getOne(@Param('id', ParseIntPipe) id: number) {
     return await this.characterService.getOne(id)
   }
 
-  @ApiOperation({ summary: 'Updates the character with the specified body by id.' })
-  @ApiResponse({ status: 200, type: Character })
   @Patch(':id')
+  @ApiOperation({ summary: 'update one character with specified id' })
+  @ApiResponse({ status: 200, type: Character })
   async updateOne(@Param('id', ParseIntPipe) id: number, @Body() updateCharacterDto: UpdateCharacterDto) {
     return this.characterService.updateOne(id, updateCharacterDto)
   }
 
-  @ApiOperation({ summary: 'This method removes the character by id.' })
-  @ApiResponse({ status: 200, type: Character })
   @Delete(':id')
+  @ApiOperation({ summary: 'remove one character with specified id' })
+  @ApiResponse({ status: 200, type: Character })
   removeOne(@Param('id', ParseIntPipe) id: number) {
     return this.characterService.removeOne(id)
   }

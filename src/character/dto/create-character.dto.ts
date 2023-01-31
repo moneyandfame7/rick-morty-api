@@ -1,6 +1,6 @@
+import { ApiProperty } from '@nestjs/swagger'
 import { IsArray, IsDate, IsIn, IsNotEmpty, IsNumber, IsObject, IsOptional, IsString } from 'class-validator'
 import { CreateLocationDto } from '../../location/dto/create-location.dto'
-import { ApiProperty } from '@nestjs/swagger'
 import { Episode } from '../../episode/entities/episode.entity'
 
 export class CreateCharacterDto {
@@ -9,7 +9,6 @@ export class CreateCharacterDto {
   id?: number
 
   @ApiProperty({ example: 'Rick Sanchez', description: 'The name of the character.' })
-  @IsString()
   @IsNotEmpty()
   name: string
 
@@ -19,7 +18,6 @@ export class CreateCharacterDto {
 
   @ApiProperty({ example: 'Alive', description: "The status of the character ('Alive', 'Dead' or 'unknown')." })
   @IsIn(['Alive', 'Dead', 'unknown'])
-  @IsString()
   @IsNotEmpty()
   status: string
 

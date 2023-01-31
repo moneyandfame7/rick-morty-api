@@ -20,10 +20,6 @@ export class Location {
   @Column()
   dimension: string
 
-  @ApiProperty({
-    example: [1, 2, 3, 4, 5, 7, 10],
-    description: 'List of character`s id who have been last seen in the location.'
-  })
   @OneToMany(() => Character, character => character.location)
   residents: Character[]
 
