@@ -10,6 +10,7 @@ import { Location } from './entities/location.entity'
 import { JwtGuard } from '../auth/strategies/jwt/jwt.guard'
 
 @Controller('locations')
+@ApiTags('locations')
 export class LocationController {
   constructor(private readonly locationService: LocationService) {}
 

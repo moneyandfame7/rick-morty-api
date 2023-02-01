@@ -16,4 +16,11 @@ export class CreateLocationDto {
   @IsString()
   @IsNotEmpty()
   dimension: string
+
+  // @ApiProperty({
+  //   example: [1, 2, 3, 4, 5, 7, 10],
+  //   description: 'List of character who have been last seen in the location.'
+  // })
+  // @IsArray()
+  // residents?: Character[]
 }
