@@ -1,4 +1,3 @@
-import { InjectRepository } from '@nestjs/typeorm'
 import { BadRequestException, Injectable } from '@nestjs/common'
 import { CreateEpisodeDto } from './dto/create-episode.dto'
 import { UpdateEpisodeDto } from './dto/update-episode.dto'
@@ -11,7 +10,7 @@ import { EpisodeRepository } from './episode.repository'
 
 @Injectable()
 export class EpisodeService {
-  constructor(@InjectRepository(Episode) private readonly episodeRepository: EpisodeRepository) {}
+  constructor(private readonly episodeRepository: EpisodeRepository) {}
 
   async createOne(createEpisodeDto: CreateEpisodeDto) {
     const exist = this.episodeRepository.findOneBy({ name: createEpisodeDto.name })

@@ -1,8 +1,6 @@
 import { BadRequestException, Injectable } from '@nestjs/common'
 import { CreateLocationDto } from './dto/create-location.dto'
 import { UpdateLocationDto } from './dto/update-location.dto'
-import { InjectRepository } from '@nestjs/typeorm'
-import { Location } from './entities/location.entity'
 import { QueryLocationDto } from './dto/query-location.dto'
 import { PageOptionsDto } from 'src/shared/page-info/dto/page-options.dto'
 import { PageInfoDto } from 'src/shared/page-info/dto/page-info.dto'
@@ -11,14 +9,14 @@ import { LocationRepository } from './location.repository'
 
 @Injectable()
 export class LocationService {
-  constructor(@InjectRepository(Location) private readonly locationRepository: LocationRepository) {}
+  constructor(private readonly locationRepository: LocationRepository) {}
 
   async createOne(createLocationDto: CreateLocationDto) {
-    const exist = this.locationRepository.findOneBy({ name: createLocationDto.name })
-    if (exist) throw new BadRequestException('Location already exist.')
+    // const exist = this.locationRepository.findOneBy({ name: createLocationDto.name })
+    // if (exist) throw new BadRequestException('Location already exist.')
 
-    const episode = this.locationRepository.create(createLocationDto)
-    return await this.locationRepository.save(episode)
+    const location = this.locationRepository.create(createLocationDto)
+    return await this.locationRepository.save(location)
   }
 
   async getMany(pageOptionsDto: PageOptionsDto, queryLocationDto: QueryLocationDto) {

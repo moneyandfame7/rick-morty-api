@@ -1,5 +1,6 @@
-import { Column, Entity, PrimaryGeneratedColumn, Unique } from 'typeorm'
+import { Column, Entity, ManyToMany, PrimaryGeneratedColumn, Unique } from 'typeorm'
 import { ApiProperty } from '@nestjs/swagger'
+import { Role } from '../../roles/entities/role.entity'
 
 @Entity('users')
 @Unique(['email', 'id'])
@@ -15,6 +16,10 @@ export class User {
   @ApiProperty({ example: 'user@gmail.com', description: 'The email of the user' })
   @Column({ nullable: false, type: 'varchar' })
   password: string
+
+  @ApiProperty({ example: ['admin'], description: 'The role of the user' })
+  @ManyToMany(() => Role, role => role.users)
+  roles: Role[]
 
   @Column({ type: 'boolean', default: false })
   banned: boolean

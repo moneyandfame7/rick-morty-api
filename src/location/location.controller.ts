@@ -1,5 +1,5 @@
-import { Body, Controller, Delete, Get, Param, ParseIntPipe, Patch, Post, Query, Req } from '@nestjs/common'
-import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger'
+import { Body, Controller, Delete, Get, Param, ParseIntPipe, Patch, Post, Query, Req, UseGuards } from '@nestjs/common'
+import { ApiOperation, ApiResponse } from '@nestjs/swagger'
 import { Request } from 'express'
 import * as _ from 'lodash'
 import { LocationService } from './location.service'
@@ -7,12 +7,14 @@ import { CreateLocationDto } from './dto/create-location.dto'
 import { UpdateLocationDto } from './dto/update-location.dto'
 import { QueryLocationDto } from './dto/query-location.dto'
 import { Location } from './entities/location.entity'
+import { JwtGuard } from '../auth/strategies/jwt/jwt.guard'
 
 @Controller('locations')
 @ApiTags('locations')
 export class LocationController {
   constructor(private readonly locationService: LocationService) {}
 
+  @UseGuards(JwtGuard)
   @ApiOperation({ summary: 'A new location is created.' })
   @ApiResponse({ status: 200, type: Location })
   @Post()
