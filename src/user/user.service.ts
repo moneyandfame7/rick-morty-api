@@ -49,7 +49,13 @@ export class UserService {
     return await this.userRepository.removeOne(id)
   }
 
-  async geCount() {
+  async getCount() {
     return await this.userRepository.getCount()
+  }
+
+  async getOneByEmail(email: string) {
+    const user = await this.userRepository.getOneByEmail(email)
+    console.log(user)
+    return user ? user : null
   }
 }
