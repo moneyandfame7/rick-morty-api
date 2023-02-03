@@ -11,7 +11,7 @@ import { PageOptionsDto } from '../shared/page-info/dto/page-options.dto'
 import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger'
 import { Character } from './entities/character.entity'
 
-@Controller('characters')
+@Controller('api/characters')
 @ApiTags('characters')
 export class CharacterController {
   constructor(private readonly characterService: CharacterService) {}

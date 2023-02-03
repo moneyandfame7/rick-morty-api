@@ -1,5 +1,5 @@
 import { Body, Controller, Delete, Get, Param, ParseIntPipe, Patch, Post, Query, Req, UseGuards } from '@nestjs/common'
-import { ApiOperation, ApiResponse } from '@nestjs/swagger'
+import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger'
 import { Request } from 'express'
 import * as _ from 'lodash'
 import { LocationService } from './location.service'
@@ -9,7 +9,7 @@ import { QueryLocationDto } from './dto/query-location.dto'
 import { Location } from './entities/location.entity'
 import { JwtGuard } from '../auth/strategies/jwt/jwt.guard'
 
-@Controller('locations')
+@Controller('api/locations')
 @ApiTags('locations')
 export class LocationController {
   constructor(private readonly locationService: LocationService) {}

@@ -9,11 +9,12 @@ export class UserService {
   constructor(private readonly userRepository: UserRepository, private readonly rolesService: RolesService) {}
 
   async createOne(createUserDto: CreateUserDto) {
-    const existingUser = await this.userRepository.getOneByEmail(createUserDto.email)
-    if (existingUser) throw new BadRequestException(`User ${createUserDto.email} already exists.`)
+    const emailExists = await this.emailExists(createUserDto.email)
+
+    if (emailExists) throw new BadRequestException(`User ${createUserDto.email} already exists.`)
 
     const user = await this.userRepository.createOne(createUserDto)
-    user.roles = await this.rolesService.getRole('user')
+    user.role = await this.rolesService.getRole('user')
     return await this.userRepository.save(user)
   }
 
@@ -55,7 +56,17 @@ export class UserService {
 
   async getOneByEmail(email: string) {
     const user = await this.userRepository.getOneByEmail(email)
-    console.log(user)
+
     return user ? user : null
+  }
+
+  async removeAll() {
+    return await this.userRepository.clear()
+  }
+
+  private async emailExists(email: string) {
+    const user = await this.userRepository.getOneByEmail(email)
+
+    return !!user
   }
 }

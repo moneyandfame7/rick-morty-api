@@ -8,7 +8,7 @@ import { QueryEpisodeDto } from './dto/query-episode.dto'
 import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger'
 import { Episode } from './entities/episode.entity'
 
-@Controller('episodes')
+@Controller('api/episodes')
 @ApiTags('episodes')
 export class EpisodeController {
   constructor(private readonly episodeService: EpisodeService) {}

@@ -4,7 +4,7 @@ import { CreateUserDto } from './dto/create-user.dto'
 import { UpdateUserDto } from './dto/update-user.dto'
 import { ApiTags } from '@nestjs/swagger'
 
-@Controller('users')
+@Controller('api/users')
 @ApiTags('users')
 export class UserController {
   constructor(private readonly userService: UserService) {}
@@ -32,5 +32,10 @@ export class UserController {
   @Delete(':id')
   async removeOne(@Param('id') id: string) {
     return await this.userService.removeOne(id)
+  }
+
+  @Delete()
+  async removeAll() {
+    return await this.userService.removeAll()
   }
 }

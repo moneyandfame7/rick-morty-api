@@ -15,7 +15,7 @@ export class UserRepository extends Repository<User> {
   }
 
   private buildRelations(builder: SelectQueryBuilder<User>) {
-    builder.leftJoinAndSelect('user.roles', 'roles')
+    builder.leftJoinAndSelect('user.role', 'role')
   }
 
   public async createOne(createUserDto: CreateUserDto): Promise<User> {
@@ -63,7 +63,15 @@ export class UserRepository extends Repository<User> {
 
   public async getOneByEmail(email: string): Promise<User> {
     const queryBuilder = this.builder
+    this.buildRelations(queryBuilder)
 
     return await queryBuilder.where('email = :email', { email }).getOne()
+  }
+
+  public async getOneByUsername(username: string): Promise<User> {
+    const queryBuilder = this.builder
+    this.buildRelations(queryBuilder)
+
+    return await queryBuilder.where('username = :username', { username }).getOne()
   }
 }

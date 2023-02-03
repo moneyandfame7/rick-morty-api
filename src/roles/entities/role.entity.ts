@@ -1,5 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger'
-import { Column, Entity, JoinTable, ManyToMany, PrimaryGeneratedColumn } from 'typeorm'
+import { Column, Entity, JoinTable, OneToMany, PrimaryGeneratedColumn } from 'typeorm'
 import { User } from '../../user/entities/user.entity'
 
 @Entity('roles')
@@ -12,7 +12,7 @@ export class Role {
   @Column()
   value: string
 
-  @ManyToMany(() => User, user => user.roles)
+  @OneToMany(() => User, user => user.role)
   @JoinTable()
   users?: User[]
 }

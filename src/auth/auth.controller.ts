@@ -1,23 +1,22 @@
-import { Body, Controller, Post, Request, UseGuards } from '@nestjs/common'
+import { Body, Controller, Post, Req, Res } from '@nestjs/common'
 import { ApiTags } from '@nestjs/swagger'
+import { Request, Response } from 'express'
 import { CreateUserDto } from '../user/dto/create-user.dto'
-import { LocalGuard } from './strategies/local/local.guard'
 import { AuthService } from './auth.service'
+import { SignInDto } from './dto/sign-in.dto'
 
 @Controller('auth')
 @ApiTags('auth')
 export class AuthController {
   constructor(private readonly authService: AuthService) {}
 
-  @UseGuards(LocalGuard)
-  @Post('login')
-  async login(@Request() req: any) {
-    return this.authService.login(req.user)
+  @Post('/signup')
+  async signup(@Body() userDto: CreateUserDto, @Req() req: Request, @Res({ passthrough: true }) res: Response) {
+    return await this.authService.signup(userDto, req, res)
   }
 
-  @UseGuards(LocalGuard)
-  @Post('local/sign-up')
-  async signUp(@Body() userDto: CreateUserDto) {
-    return await this.authService.signUp(userDto)
+  @Post('/signin')
+  async signin(@Body() userData: SignInDto, @Req() req: Request, @Res({ passthrough: true }) res: Response) {
+    return await this.authService.signin(userData, req, res)
   }
 }

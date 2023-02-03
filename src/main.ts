@@ -1,15 +1,15 @@
 import { NestFactory } from '@nestjs/core'
 import { ValidationPipe } from '@nestjs/common'
-import 'dotenv/config'
-import { AppModule } from './app.module'
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger'
+import 'dotenv/config'
+import * as cookieParser from 'cookie-parser'
+import { AppModule } from './app.module'
 
 async function bootstrap() {
   const PORT = process.env.PORT || 3000
   const app = await NestFactory.create(AppModule)
-  app.setGlobalPrefix('api')
   app.useGlobalPipes(new ValidationPipe({ transform: true, whitelist: true }))
-
+  app.use(cookieParser())
   const config = new DocumentBuilder()
     .setTitle('The Rick & Morty API')
     .setDescription(
