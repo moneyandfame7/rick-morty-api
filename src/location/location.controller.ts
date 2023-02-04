@@ -7,14 +7,14 @@ import { CreateLocationDto } from './dto/create-location.dto'
 import { UpdateLocationDto } from './dto/update-location.dto'
 import { QueryLocationDto } from './dto/query-location.dto'
 import { Location } from './entities/location.entity'
-import { JwtGuard } from '../auth/strategies/jwt/jwt.guard'
+import { JwtAuthGuard } from '../auth/strategies/jwt/jwt.guard'
 
 @Controller('api/locations')
 @ApiTags('locations')
 export class LocationController {
   constructor(private readonly locationService: LocationService) {}
 
-  @UseGuards(JwtGuard)
+  @UseGuards(JwtAuthGuard)
   @ApiOperation({ summary: 'A new location is created.' })
   @ApiResponse({ status: 200, type: Location })
   @Post()
