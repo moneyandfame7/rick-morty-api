@@ -1,63 +1,73 @@
 import { BadRequestException, Injectable, UnauthorizedException } from '@nestjs/common'
-import { JwtService } from '@nestjs/jwt'
-import { ConfigService } from '@nestjs/config'
 import * as bcrypt from 'bcrypt'
 import { CreateUserDto } from '../user/dto/create-user.dto'
 import { UserService } from '../user/user.service'
-import { User } from '../user/entities/user.entity'
 import { SignInDto } from './dto/sign-in.dto'
-import { Request, Response } from 'express'
+import { TokenService } from '../token/token.service'
 
 @Injectable()
 export class AuthService {
-  private readonly ACCESS_SECRET: string
-  private readonly REFRESH_SECRET: string
+  constructor(private readonly userService: UserService, private readonly tokenService: TokenService) {}
 
-  constructor(private readonly userService: UserService, private jwtService: JwtService, private configService: ConfigService) {
-    this.ACCESS_SECRET = this.configService.get('AT_SECRET')
-    this.REFRESH_SECRET = this.configService.get('RT_SECRET')
-  }
-
-  async signup(userDto: CreateUserDto, req: Request, res: Response) {
+  async signup(userDto: CreateUserDto) {
     const candidate = await this.userService.getOneByEmail(userDto.email)
     if (candidate) throw new BadRequestException(`User with email ${userDto.email} already registered`)
 
     const hashedPassword = await this.hashPassword(userDto.password)
     const user = await this.userService.createOne({ ...userDto, password: hashedPassword })
-    const token = await this.generateToken(user)
-    res.cookie('refresh-token', token.refresh_token, { httpOnly: true, maxAge: 30 * 24 * 60 * 60 * 1000 })
+    const tokens = await this.tokenService.generateTokens(user)
 
-    return token
-  }
-
-  async signin(userData: SignInDto, req: Request, res: Response) {
-    const user = await this.validateUser(userData)
-    return this.generateToken(user)
-  }
-
-  async signout(req, res) {}
-
-  private async generateToken(user: User) {
-    const payload = { id: user.id, email: user.email, role: { id: user.role.id, value: user.role.value } }
-
-    const [at, rt] = await Promise.all([
-      this.jwtService.sign(payload, {
-        secret: this.ACCESS_SECRET,
-        expiresIn: '25m'
-      }),
-      this.jwtService.sign(payload, {
-        secret: this.REFRESH_SECRET,
-        expiresIn: '30d'
-      })
-    ])
+    await this.tokenService.saveToken(user.id, tokens.refresh_token)
 
     return {
-      access_token: at,
-      refresh_token: rt
+      ...tokens,
+      user: {
+        id: user.id,
+        email: user.email,
+        password: user.password
+      }
     }
   }
 
-  private async validateUser(userDto: Omit<CreateUserDto, 'username'>) {
+  async login(userDto: SignInDto) {
+    const user = await this.validateUser(userDto)
+
+    const tokens = await this.tokenService.generateTokens(user)
+    await this.tokenService.saveToken(user.id, tokens.refresh_token)
+
+    return {
+      ...tokens,
+      user: {
+        id: user.id,
+        email: user.email
+      }
+    }
+  }
+
+  async logout(refreshToken: string) {
+    return await this.tokenService.removeToken(refreshToken)
+  }
+
+  async refresh(refreshToken: string) {
+    if (!refreshToken) throw new UnauthorizedException()
+
+    const userData = await this.tokenService.validateRefreshToken(refreshToken)
+    const tokenFromDatabase = await this.tokenService.findToken(refreshToken)
+    if (!userData || !tokenFromDatabase) throw new UnauthorizedException()
+    const user = await this.userService.getOne(userData.id)
+    const tokens = await this.tokenService.generateTokens(user)
+    await this.tokenService.saveToken(user.id, tokens.refresh_token)
+
+    return {
+      ...tokens,
+      user: {
+        id: user.id,
+        email: user.email
+      }
+    }
+  }
+
+  private async validateUser(userDto: SignInDto) {
     const user = await this.userService.getOneByEmail(userDto.email)
     if (!user) throw new UnauthorizedException('Invalid email.')
 
@@ -68,7 +78,7 @@ export class AuthService {
   }
 
   private async hashPassword(password: string) {
-    return await bcrypt.hash(password, 10)
+    return await bcrypt.hash(password, 3)
   }
 
   private async comparePassword(password: string, hash: string) {

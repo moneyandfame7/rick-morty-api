@@ -14,15 +14,9 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
     })
   }
 
-  async validate(payload: any) {
-    const user = await this.userService.getOneByEmail(payload.email)
-    return {
-      id: user.id,
-      email: user.email,
-      role: {
-        id: user.role.id,
-        value: user.role.value
-      }
-    }
+  // TODO зробити рефреш, перевірити в відосі як це працює і мб мідлвеер якщоце потрібно
+  // погуглити про extract jwt, cookie, refresh token
+  async validate(payload: { id: string; email: string }) {
+    return { id: payload.id, email: payload.email }
   }
 }
