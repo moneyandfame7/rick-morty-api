@@ -6,18 +6,23 @@ import { TokenRepository } from './token.repository'
 
 @Injectable()
 export class TokenService {
-  constructor(private tokenRepository: TokenRepository, private jwtService: JwtService, private configService: ConfigService) {}
+  private readonly ACCESS_SECRET: string
+  private readonly REFRESH_SECRET: string
+  constructor(private tokenRepository: TokenRepository, private jwtService: JwtService, private configService: ConfigService) {
+    this.ACCESS_SECRET = this.configService.get<string>('AT_SECRET')
+    this.REFRESH_SECRET = this.configService.get<string>('RT_SECRET')
+  }
 
   async generateTokens(user: User) {
     const payload = { id: user.id, email: user.email }
 
     const [access_token, refresh_token] = await Promise.all([
-      this.jwtService.sign(payload, {
-        secret: this.configService.get<string>('AT_SECRET'),
-        expiresIn: '25m'
+      this.jwtService.signAsync(payload, {
+        secret: this.ACCESS_SECRET,
+        expiresIn: '30s'
       }),
-      this.jwtService.sign(payload, {
-        secret: this.configService.get<string>('RT_SECRET'),
+      this.jwtService.signAsync(payload, {
+        secret: this.REFRESH_SECRET,
         expiresIn: '30d'
       })
     ])
@@ -38,5 +43,21 @@ export class TokenService {
 
     const token = await this.tokenRepository.create({ user_id, refreshToken })
     return await this.tokenRepository.save(token)
+  }
+
+  async removeToken(refreshToken: string) {
+    return await this.tokenRepository.deleteByToken(refreshToken)
+  }
+
+  async findToken(refreshToken: string) {
+    return await this.tokenRepository.findByToken(refreshToken)
+  }
+
+  async validateAccessToken(token: string) {
+    return await this.jwtService.verifyAsync(token, { secret: this.ACCESS_SECRET })
+  }
+
+  async validateRefreshToken(token: string) {
+    return await this.jwtService.verifyAsync(token, { secret: this.REFRESH_SECRET })
   }
 }
