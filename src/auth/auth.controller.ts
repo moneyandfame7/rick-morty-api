@@ -8,6 +8,7 @@ import { JwtAuthGuard } from './strategies/jwt/jwt.guard'
 import { Roles } from '../roles/roles.decorator'
 import { RolesGuard } from '../roles/roles.guard'
 import { RolesEnum } from '../roles/roles.enum'
+import { GoogleAuthGuard } from './strategies/google/google.guard'
 
 @Controller('auth')
 @ApiTags('auth')
@@ -52,5 +53,18 @@ export class AuthController {
   @UseGuards(JwtAuthGuard, RolesGuard)
   async roles(@Req() req: Request) {
     return 'access granted'
+  }
+
+  @Get('/google/login')
+  @UseGuards(GoogleAuthGuard)
+  async googleLogin(@Req() req: Request) {
+    console.log(req.user)
+    return { msg: 'Google Authentication' }
+  }
+
+  @Get('/google/redirect')
+  @UseGuards(GoogleAuthGuard)
+  async googleRedirect() {
+    return { msg: 'OK' }
   }
 }
