@@ -3,6 +3,7 @@ import { JwtService } from '@nestjs/jwt'
 import { User } from '../user/entities/user.entity'
 import { ConfigService } from '@nestjs/config'
 import { TokenRepository } from './token.repository'
+import { UserAuthType } from '../auth/types/user-auth.type'
 
 @Injectable()
 export class TokenService {
@@ -14,12 +15,12 @@ export class TokenService {
   }
 
   async generateTokens(user: User) {
-    const payload = { id: user.id, email: user.email }
+    const payload = { id: user.id, email: user.email, role: user.role }
 
     const [access_token, refresh_token] = await Promise.all([
       this.jwtService.signAsync(payload, {
         secret: this.ACCESS_SECRET,
-        expiresIn: '30s'
+        expiresIn: '30m'
       }),
       this.jwtService.signAsync(payload, {
         secret: this.REFRESH_SECRET,
@@ -53,11 +54,11 @@ export class TokenService {
     return await this.tokenRepository.findByToken(refreshToken)
   }
 
-  async validateAccessToken(token: string) {
+  async validateAccessToken(token: string): Promise<UserAuthType> {
     return await this.jwtService.verifyAsync(token, { secret: this.ACCESS_SECRET })
   }
 
-  async validateRefreshToken(token: string) {
+  async validateRefreshToken(token: string): Promise<UserAuthType> {
     return await this.jwtService.verifyAsync(token, { secret: this.REFRESH_SECRET })
   }
 }

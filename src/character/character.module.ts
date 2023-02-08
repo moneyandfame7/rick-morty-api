@@ -5,9 +5,10 @@ import { CharacterService } from './character.service'
 import { CharacterController } from './character.controller'
 import { Character } from './entities/character.entity'
 import { CharacterRepository } from './character.repository'
+import { TokenModule } from '../token/token.module'
 
 @Module({
-  imports: [TypeOrmModule.forFeature([Character]), S3Module],
+  imports: [TypeOrmModule.forFeature([Character]), S3Module, TokenModule],
   controllers: [CharacterController],
   providers: [CharacterService, CharacterRepository]
 })

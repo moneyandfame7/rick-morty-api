@@ -8,16 +8,20 @@ import { UpdateLocationDto } from './dto/update-location.dto'
 import { QueryLocationDto } from './dto/query-location.dto'
 import { Location } from './entities/location.entity'
 import { JwtAuthGuard } from '../auth/strategies/jwt/jwt.guard'
+import { Roles } from '../roles/roles.decorator'
+import { RolesEnum } from '../roles/roles.enum'
+import { RolesGuard } from '../roles/roles.guard'
 
 @Controller('api/locations')
 @ApiTags('locations')
 export class LocationController {
   constructor(private readonly locationService: LocationService) {}
 
-  @UseGuards(JwtAuthGuard)
+  @Post()
   @ApiOperation({ summary: 'A new location is created.' })
   @ApiResponse({ status: 200, type: Location })
-  @Post()
+  @Roles(RolesEnum.ADMIN)
+  @UseGuards(JwtAuthGuard, RolesGuard)
   async createOne(@Body() createLocationDto: CreateLocationDto) {
     return await this.locationService.createOne(createLocationDto)
   }
@@ -54,16 +58,20 @@ export class LocationController {
     return this.locationService.getOne(id)
   }
 
+  @Patch(':id')
   @ApiOperation({ summary: 'Updates the location with the specified body by id.' })
   @ApiResponse({ status: 200, type: Location })
-  @Patch(':id')
+  @Roles(RolesEnum.ADMIN)
+  @UseGuards(JwtAuthGuard, RolesGuard)
   updateOne(@Param('id', ParseIntPipe) id: number, @Body() updateLocationDto: UpdateLocationDto) {
     return this.locationService.updateOne(id, updateLocationDto)
   }
 
+  @Delete(':id')
   @ApiOperation({ summary: 'This method removes the location by id.' })
   @ApiResponse({ status: 200, type: Location })
-  @Delete(':id')
+  @Roles(RolesEnum.ADMIN)
+  @UseGuards(JwtAuthGuard, RolesGuard)
   removeOne(@Param('id', ParseIntPipe) id: number) {
     return this.locationService.removeOne(id)
   }

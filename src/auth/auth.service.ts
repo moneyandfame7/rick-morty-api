@@ -24,7 +24,7 @@ export class AuthService {
       user: {
         id: user.id,
         email: user.email,
-        password: user.password
+        role: user.role
       }
     }
   }
@@ -54,7 +54,7 @@ export class AuthService {
     const userData = await this.tokenService.validateRefreshToken(refreshToken)
     const tokenFromDatabase = await this.tokenService.findToken(refreshToken)
     if (!userData || !tokenFromDatabase) throw new UnauthorizedException()
-    const user = await this.userService.getOne(userData.id)
+    const user = await this.userService.getOneById(userData.id)
     const tokens = await this.tokenService.generateTokens(user)
     await this.tokenService.saveToken(user.id, tokens.refresh_token)
 

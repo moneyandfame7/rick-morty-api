@@ -1,4 +1,4 @@
-import { Body, Controller, Delete, Get, Param, ParseIntPipe, Patch, Post, Query, Req } from '@nestjs/common'
+import { Body, Controller, Delete, Get, Param, ParseIntPipe, Patch, Post, Query, Req, UseGuards } from '@nestjs/common'
 import { Request } from 'express'
 import * as _ from 'lodash'
 import { EpisodeService } from './episode.service'
@@ -7,6 +7,10 @@ import { UpdateEpisodeDto } from './dto/update-episode.dto'
 import { QueryEpisodeDto } from './dto/query-episode.dto'
 import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger'
 import { Episode } from './entities/episode.entity'
+import { Roles } from '../roles/roles.decorator'
+import { RolesEnum } from '../roles/roles.enum'
+import { JwtAuthGuard } from '../auth/strategies/jwt/jwt.guard'
+import { RolesGuard } from '../roles/roles.guard'
 
 @Controller('api/episodes')
 @ApiTags('episodes')
@@ -16,6 +20,8 @@ export class EpisodeController {
   @Post()
   @ApiOperation({ summary: 'create and save a new episode to collection' })
   @ApiResponse({ status: 200, type: Episode })
+  @Roles(RolesEnum.ADMIN)
+  @UseGuards(JwtAuthGuard, RolesGuard)
   async createOne(@Body() createEpisodeDto: CreateEpisodeDto) {
     return await this.episodeService.createOne(createEpisodeDto)
   }
@@ -54,6 +60,8 @@ export class EpisodeController {
   @Patch(':id')
   @ApiOperation({ summary: 'update one episode with specified id' })
   @ApiResponse({ status: 200, type: Episode })
+  @Roles(RolesEnum.ADMIN)
+  @UseGuards(JwtAuthGuard, RolesGuard)
   async updateOne(@Param('id', ParseIntPipe) id: number, @Body() updateEpisodeDto: UpdateEpisodeDto) {
     return await this.episodeService.updateOne(id, updateEpisodeDto)
   }
@@ -61,6 +69,8 @@ export class EpisodeController {
   @Delete(':id')
   @ApiOperation({ summary: 'remove one episode with specified id' })
   @ApiResponse({ status: 200, type: Episode })
+  @Roles(RolesEnum.ADMIN)
+  @UseGuards(JwtAuthGuard, RolesGuard)
   async removeOne(@Param('id', ParseIntPipe) id: number) {
     return await this.episodeService.removeOne(id)
   }

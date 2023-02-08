@@ -25,10 +25,9 @@ export class CreateCharacterDto {
     example: 'Male',
     description: "The gender of the character ('Female', 'Male', 'Genderless' or 'unknown')."
   })
-  @IsOptional()
   @IsIn(['Female', 'Male', 'Genderless', 'unknown'])
   @IsString()
-  gender: string
+  gender: string = 'unknown'
 
   @ApiProperty({ example: 'Human', description: 'The species of the character.' })
   @IsString()
@@ -69,6 +68,7 @@ export class CreateCharacterDto {
     description: "List of episode's id in which this character appeared."
   })
   @IsArray()
+  @IsOptional()
   episodes?: Episode[]
 
   @IsDate()

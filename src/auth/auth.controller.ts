@@ -5,6 +5,9 @@ import { CreateUserDto } from '../user/dto/create-user.dto'
 import { AuthService } from './auth.service'
 import { SignInDto } from './dto/sign-in.dto'
 import { JwtAuthGuard } from './strategies/jwt/jwt.guard'
+import { Roles } from '../roles/roles.decorator'
+import { RolesGuard } from '../roles/roles.guard'
+import { RolesEnum } from '../roles/roles.enum'
 
 @Controller('auth')
 @ApiTags('auth')
@@ -44,11 +47,10 @@ export class AuthController {
     return userData
   }
 
-  @UseGuards(JwtAuthGuard)
-  @Get('/test')
-  async test(@Req() req: Request) {
-    console.log(req.user)
-    console.log('abobaobaoboaobaobao')
-    return 'ok'
+  @Get('/roles')
+  @Roles(RolesEnum.ADMIN)
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  async roles(@Req() req: Request) {
+    return 'access granted'
   }
 }

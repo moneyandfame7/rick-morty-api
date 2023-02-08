@@ -11,7 +11,7 @@ import { JwtAuthGuard } from './strategies/jwt/jwt.guard'
 @Module({
   controllers: [AuthController],
   providers: [AuthService, JwtStrategy, JwtAuthGuard],
-  imports: [JwtModule.register({ secret: process.env.AT_SECRET, signOptions: { expiresIn: '60s' } }), UserModule, PassportModule, TokenModule],
+  imports: [JwtModule.register({ secret: process.env.AT_SECRET }), UserModule, PassportModule, TokenModule],
   exports: [AuthService, JwtAuthGuard]
 })
 export class AuthModule {}

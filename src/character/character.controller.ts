@@ -1,4 +1,4 @@
-import { Body, Controller, Delete, Get, Param, ParseIntPipe, Patch, Post, Query, Req, UploadedFile, UseInterceptors } from '@nestjs/common'
+import { Body, Controller, Delete, Get, Param, ParseIntPipe, Patch, Post, Query, Req, UploadedFile, UseGuards, UseInterceptors } from '@nestjs/common'
 import { FileInterceptor } from '@nestjs/platform-express'
 import { Request } from 'express'
 import * as _ from 'lodash'
@@ -10,6 +10,10 @@ import { QueryCharacterDto } from './dto/query-character.dto'
 import { PageOptionsDto } from '../shared/page-info/dto/page-options.dto'
 import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger'
 import { Character } from './entities/character.entity'
+import { RolesEnum } from '../roles/roles.enum'
+import { JwtAuthGuard } from '../auth/strategies/jwt/jwt.guard'
+import { RolesGuard } from '../roles/roles.guard'
+import { Roles } from '../roles/roles.decorator'
 
 @Controller('api/characters')
 @ApiTags('characters')
@@ -21,6 +25,8 @@ export class CharacterController {
   @ApiOperation({ summary: 'create and save a new character to collection' })
   @ApiResponse({ status: 200, type: Character })
   @UseInterceptors(FileInterceptor('image', { storage: memoryStorage() }))
+  @Roles(RolesEnum.ADMIN)
+  @UseGuards(JwtAuthGuard, RolesGuard)
   async createOne(@Body() character: CreateCharacterDto, @UploadedFile() file: Express.Multer.File) {
     return await this.characterService.createOne(character, file)
   }
@@ -62,6 +68,8 @@ export class CharacterController {
   @Patch(':id')
   @ApiOperation({ summary: 'update one character with specified id' })
   @ApiResponse({ status: 200, type: Character })
+  @Roles(RolesEnum.ADMIN)
+  @UseGuards(JwtAuthGuard, RolesGuard)
   async updateOne(@Param('id', ParseIntPipe) id: number, @Body() updateCharacterDto: UpdateCharacterDto) {
     return this.characterService.updateOne(id, updateCharacterDto)
   }
