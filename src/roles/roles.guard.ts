@@ -1,4 +1,4 @@
-import { CanActivate, ExecutionContext, HttpException, HttpStatus, Injectable, UnauthorizedException } from '@nestjs/common'
+import { CanActivate, ExecutionContext, Injectable, UnauthorizedException } from '@nestjs/common'
 import { Reflector } from '@nestjs/core'
 import { ROLES_KEY } from './roles.decorator'
 import { TokenService } from '../token/token.service'
@@ -15,6 +15,8 @@ export class RolesGuard implements CanActivate {
       }
       const req = context.switchToHttp().getRequest()
       const authHeader = req.headers.authorization
+
+      if (!authHeader) throw new UnauthorizedException()
       const bearer = authHeader.split(' ')[0]
       const token = authHeader.split(' ')[1]
 
@@ -26,7 +28,7 @@ export class RolesGuard implements CanActivate {
       return requiredRoles.includes(user.role.value)
     } catch (e) {
       console.log(e)
-      throw new HttpException('No access', HttpStatus.FORBIDDEN)
+      throw new UnauthorizedException(e.response)
     }
   }
 }

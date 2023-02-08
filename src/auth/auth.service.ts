@@ -1,20 +1,20 @@
 import { BadRequestException, Injectable, UnauthorizedException } from '@nestjs/common'
 import * as bcrypt from 'bcrypt'
-import { CreateUserDto } from '../user/dto/create-user.dto'
 import { UserService } from '../user/user.service'
 import { SignInDto } from './dto/sign-in.dto'
 import { TokenService } from '../token/token.service'
+import { SignUpDto } from './dto/sign-up.dto'
 
 @Injectable()
 export class AuthService {
   constructor(private readonly userService: UserService, private readonly tokenService: TokenService) {}
 
-  async signup(userDto: CreateUserDto) {
+  async signup(userDto: SignUpDto) {
     const candidate = await this.userService.getOneByEmail(userDto.email)
     if (candidate) throw new BadRequestException(`User with email ${userDto.email} already registered`)
 
     const hashedPassword = await this.hashPassword(userDto.password)
-    const user = await this.userService.createOne({ ...userDto, password: hashedPassword })
+    const user = await this.userService.createOne({ ...userDto, password: hashedPassword, authType: 'jwt' })
     const tokens = await this.tokenService.generateTokens(user)
 
     await this.tokenService.saveToken(user.id, tokens.refresh_token)

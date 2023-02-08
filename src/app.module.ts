@@ -10,19 +10,23 @@ import { UserModule } from './user/user.module'
 import { RolesModule } from './roles/roles.module'
 import { AuthModule } from './auth/auth.module'
 import { TokenModule } from './token/token.module'
+import { PassportModule } from '@nestjs/passport'
+import { SessionModule } from './session/session.module'
 
 @Module({
   imports: [
     ConfigModule.forRoot({ isGlobal: true }),
     TypeOrmModule.forRoot(dataSourceOptions),
+    PassportModule.register({ session: true }),
+    AuthModule,
+    UserModule,
+    TokenModule,
+    RolesModule,
+    S3Module,
     CharacterModule,
     EpisodeModule,
     LocationModule,
-    UserModule,
-    RolesModule,
-    S3Module,
-    AuthModule,
-    TokenModule
+    SessionModule
   ],
   controllers: [],
   providers: []

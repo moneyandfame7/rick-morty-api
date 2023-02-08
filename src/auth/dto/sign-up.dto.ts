@@ -1,8 +1,8 @@
-import { IsEmail, IsIn, IsNotEmpty, IsOptional, MaxLength, MinLength } from 'class-validator'
+import { IsEmail, IsNotEmpty, MaxLength, MinLength } from 'class-validator'
 import { ApiProperty } from '@nestjs/swagger'
 import { Type } from 'class-transformer'
 
-export class CreateUserDto {
+export class SignUpDto {
   @ApiProperty({ example: 'User_228', description: 'The username of the user.' })
   @IsNotEmpty()
   @MinLength(2)
@@ -20,13 +20,4 @@ export class CreateUserDto {
   @MaxLength(32)
   @Type(() => String)
   readonly password: string
-
-  @IsIn(['google', 'instagram', 'discord', 'github', 'jwt'])
-  readonly authType: string
-
-  @IsOptional()
-  readonly refreshToken?: string
-
-  @IsOptional()
-  readonly accessToken?: string
 }

@@ -11,7 +11,7 @@ export const dataSourceOptions: DataSourceOptions & SeederOptions = {
   password: process.env.DB_PASSWORD,
   database: process.env.DB_NAME,
   synchronize: false,
-  logging: true,
+  logging: false,
   migrationsTableName: 'migrations_typeorm',
   seeds: [MainSeeder],
   entities: ['dist/**/*.entity.js'],

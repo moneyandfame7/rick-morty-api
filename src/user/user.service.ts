@@ -10,12 +10,12 @@ import { BanUserDto } from './dto/ban-user-dto'
 export class UserService {
   constructor(private readonly userRepository: UserRepository, private readonly rolesService: RolesService) {}
 
-  async createOne(createUserDto: CreateUserDto) {
-    const emailExists = await this.emailExists(createUserDto.email)
+  async createOne(dto: CreateUserDto) {
+    const emailExists = await this.emailExists(dto.email)
 
-    if (emailExists) throw new BadRequestException(`User ${createUserDto.email} already exists.`)
-
-    const user = await this.userRepository.createOne(createUserDto)
+    if (emailExists) throw new BadRequestException(`User ${dto.email} already exists.`)
+    console.log(' <<<<< DTO', dto)
+    const user = await this.userRepository.createOne(dto)
     user.role = await this.rolesService.getRole('user')
     return await this.userRepository.save(user)
   }
@@ -23,9 +23,15 @@ export class UserService {
   async getOneById(id: string) {
     const user = await this.userRepository.getOneById(id)
 
-    if (!user) throw new BadRequestException(`User with id ${id}  does not exist.`)
+    if (!user) throw new BadRequestException(`User with id ${id} does not exist.`)
 
     return user
+  }
+
+  async getOneByEmail(email: string) {
+    const user = await this.userRepository.getOneByEmail(email)
+
+    return user ? user : null
   }
 
   async getMany() {
@@ -34,6 +40,10 @@ export class UserService {
     if (!users.length) throw new NotFoundException('Users not found.')
 
     return users
+  }
+
+  async getCount() {
+    return await this.userRepository.getCount()
   }
 
   async updateOne(id: string, updateUserDto: UpdateUserDto) {
@@ -56,10 +66,6 @@ export class UserService {
     }
   }
 
-  async getCount() {
-    return await this.userRepository.getCount()
-  }
-
   async addRole(dto: AddRoleDto) {
     const user = await this.userRepository.getOneById(dto.userId)
     const role = await this.rolesService.getRole(dto.value)
@@ -78,13 +84,7 @@ export class UserService {
     return await this.userRepository.ban(dto.userId, dto.banReason)
   }
 
-  async getOneByEmail(email: string) {
-    const user = await this.userRepository.getOneByEmail(email)
-
-    return user ? user : null
-  }
-
-  private async emailExists(email: string) {
+  public async emailExists(email: string) {
     const user = await this.userRepository.getOneByEmail(email)
 
     return !!user
