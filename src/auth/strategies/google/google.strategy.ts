@@ -27,15 +27,18 @@ export class GoogleStrategy extends PassportStrategy(Strategy) {
     console.log(refreshToken)
     console.log('________________________________')
     console.log(profile)
-
     // const exist = await this.userService.emailExists(profile.emails[0].value)
     // console.log(exist)
-
     const userInfo = {
       username: profile.displayName,
       email: profile.emails[0].value,
-      password: profile.id
+      password: null,
+      authType: 'google'
     }
+    // TODO: спитати про пароль, шо і як це робиться якщо він знає
+    const userExist = await this.userService.getOneByEmail(userInfo.email)
+    if (userExist) return userExist
+
     const createdUser = await this.userService.createOne(userInfo)
     console.log(' <<< CREATED USER GOOGLE', createdUser)
 
