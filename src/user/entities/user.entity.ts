@@ -18,16 +18,23 @@ export class User {
   email: string
 
   @ApiProperty({ example: 'user@gmail.com', description: 'The email of the user' })
-  @Column({ nullable: false, type: 'varchar' })
+  @Column({ nullable: true, type: 'varchar' })
   password: string
 
   @ApiProperty({ example: 'admin', description: 'The role of the user' })
   @ManyToOne(() => Role, role => role.value)
   role: Role
 
+  @ApiProperty({ example: false, description: 'The ban status of the user' })
   @Column({ type: 'boolean', default: false })
   banned: boolean
 
+  @ApiProperty({ example: 'violation', description: 'The ban reason of the user' })
   @Column({ type: 'varchar', nullable: true })
   banReason: string
+
+  @Column({ name: 'auth_type', type: 'varchar', nullable: false })
+  // 'google', 'discord', 'instagram', 'github', 'jwt'
+  // maybe зробити просто isJwtAuthType: boolean і через це робити
+  authType: string
 }

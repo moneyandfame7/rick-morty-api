@@ -10,12 +10,12 @@ import { BanUserDto } from './dto/ban-user-dto'
 export class UserService {
   constructor(private readonly userRepository: UserRepository, private readonly rolesService: RolesService) {}
 
-  async createOne(createUserDto: CreateUserDto) {
-    const emailExists = await this.emailExists(createUserDto.email)
+  async createOne(dto: CreateUserDto) {
+    const emailExists = await this.emailExists(dto.email)
 
-    if (emailExists) throw new BadRequestException(`User ${createUserDto.email} already exists.`)
-    console.log(' <<<<< DTO', createUserDto)
-    const user = await this.userRepository.createOne(createUserDto)
+    if (emailExists) throw new BadRequestException(`User ${dto.email} already exists.`)
+    console.log(' <<<<< DTO', dto)
+    const user = await this.userRepository.createOne(dto)
     user.role = await this.rolesService.getRole('user')
     return await this.userRepository.save(user)
   }
