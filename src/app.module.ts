@@ -8,10 +8,22 @@ import { S3Module } from './s3/s3.module'
 import { ConfigModule } from '@nestjs/config'
 import { UserModule } from './user/user.module'
 import { RolesModule } from './roles/roles.module'
-import { AuthModule } from './auth/auth.module';
+import { AuthModule } from './auth/auth.module'
+import { TokenModule } from './token/token.module'
 
 @Module({
-  imports: [ConfigModule.forRoot(), TypeOrmModule.forRoot(dataSourceOptions), CharacterModule, EpisodeModule, LocationModule, UserModule, RolesModule, S3Module, AuthModule],
+  imports: [
+    ConfigModule.forRoot({ isGlobal: true }),
+    TypeOrmModule.forRoot(dataSourceOptions),
+    CharacterModule,
+    EpisodeModule,
+    LocationModule,
+    UserModule,
+    RolesModule,
+    S3Module,
+    AuthModule,
+    TokenModule
+  ],
   controllers: [],
   providers: []
 })

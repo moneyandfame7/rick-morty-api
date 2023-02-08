@@ -1,26 +1,87 @@
-import { Injectable } from '@nestjs/common'
-import { JwtService } from '@nestjs/jwt'
+import { BadRequestException, Injectable, UnauthorizedException } from '@nestjs/common'
+import * as bcrypt from 'bcrypt'
 import { CreateUserDto } from '../user/dto/create-user.dto'
 import { UserService } from '../user/user.service'
+import { SignInDto } from './dto/sign-in.dto'
+import { TokenService } from '../token/token.service'
 
 @Injectable()
 export class AuthService {
-  constructor(private readonly userService: UserService, private jwtService: JwtService) {}
+  constructor(private readonly userService: UserService, private readonly tokenService: TokenService) {}
 
-  async validateUser(email: string, password: string) {
-    const user = await this.userService.getOneByEmail(email)
+  async signup(userDto: CreateUserDto) {
+    const candidate = await this.userService.getOneByEmail(userDto.email)
+    if (candidate) throw new BadRequestException(`User with email ${userDto.email} already registered`)
 
-    return user && user.password === password ? user : null
-  }
+    const hashedPassword = await this.hashPassword(userDto.password)
+    const user = await this.userService.createOne({ ...userDto, password: hashedPassword })
+    const tokens = await this.tokenService.generateTokens(user)
 
-  async login(userDto: CreateUserDto) {
-    const user = await this.userService.getOneByEmail(userDto.email)
-    const payload = { id: user.id, email: user.email, password: user.password }
+    await this.tokenService.saveToken(user.id, tokens.refresh_token)
 
     return {
-      access_token: this.jwtService.sign(payload)
+      ...tokens,
+      user: {
+        id: user.id,
+        email: user.email,
+        role: user.role
+      }
     }
   }
 
-  async signUp(userDto: CreateUserDto) {}
+  async login(userDto: SignInDto) {
+    const user = await this.validateUser(userDto)
+
+    const tokens = await this.tokenService.generateTokens(user)
+    await this.tokenService.saveToken(user.id, tokens.refresh_token)
+
+    return {
+      ...tokens,
+      user: {
+        id: user.id,
+        email: user.email
+      }
+    }
+  }
+
+  async logout(refreshToken: string) {
+    return await this.tokenService.removeToken(refreshToken)
+  }
+
+  async refresh(refreshToken: string) {
+    if (!refreshToken) throw new UnauthorizedException()
+
+    const userData = await this.tokenService.validateRefreshToken(refreshToken)
+    const tokenFromDatabase = await this.tokenService.findToken(refreshToken)
+    if (!userData || !tokenFromDatabase) throw new UnauthorizedException()
+    const user = await this.userService.getOneById(userData.id)
+    const tokens = await this.tokenService.generateTokens(user)
+    await this.tokenService.saveToken(user.id, tokens.refresh_token)
+
+    return {
+      ...tokens,
+      user: {
+        id: user.id,
+        email: user.email
+      }
+    }
+  }
+
+  private async validateUser(userDto: SignInDto) {
+    const user = await this.userService.getOneByEmail(userDto.email)
+    if (!user) throw new UnauthorizedException('Invalid email.')
+
+    const passwordEquals = await this.comparePassword(userDto.password, user.password)
+    if (user && passwordEquals) return user
+
+    if (!passwordEquals) throw new UnauthorizedException('Invalid password.')
+  }
+
+  private async hashPassword(password: string) {
+    return await bcrypt.hash(password, 3)
+  }
+
+  private async comparePassword(password: string, hash: string) {
+    return await bcrypt.compare(password, hash)
+  }
 }

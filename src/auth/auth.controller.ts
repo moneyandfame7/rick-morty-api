@@ -1,23 +1,56 @@
-import { Body, Controller, Post, Request, UseGuards } from '@nestjs/common'
+import { Body, Controller, Get, Post, Req, Res, UseGuards } from '@nestjs/common'
 import { ApiTags } from '@nestjs/swagger'
+import { Request, Response } from 'express'
 import { CreateUserDto } from '../user/dto/create-user.dto'
-import { LocalGuard } from './strategies/local/local.guard'
 import { AuthService } from './auth.service'
+import { SignInDto } from './dto/sign-in.dto'
+import { JwtAuthGuard } from './strategies/jwt/jwt.guard'
+import { Roles } from '../roles/roles.decorator'
+import { RolesGuard } from '../roles/roles.guard'
+import { RolesEnum } from '../roles/roles.enum'
 
 @Controller('auth')
 @ApiTags('auth')
 export class AuthController {
   constructor(private readonly authService: AuthService) {}
 
-  @UseGuards(LocalGuard)
-  @Post('login')
-  async login(@Request() req: any) {
-    return this.authService.login(req.user)
+  @Post('/signup')
+  async signup(@Body() userDto: CreateUserDto, @Req() req: Request, @Res({ passthrough: true }) res: Response) {
+    const userData = await this.authService.signup(userDto)
+    res.cookie('refresh-token', userData.refresh_token, { httpOnly: true, maxAge: 30 * 24 * 60 * 60 * 1000 })
+
+    return userData
   }
 
-  @UseGuards(LocalGuard)
-  @Post('local/sign-up')
-  async signUp(@Body() userDto: CreateUserDto) {
-    return await this.authService.signUp(userDto)
+  @Post('/login')
+  async login(@Body() userDto: SignInDto, @Req() req: Request, @Res({ passthrough: true }) res: Response) {
+    const userData = await this.authService.login(userDto)
+    res.cookie('refresh-token', userData.refresh_token, { httpOnly: true, maxAge: 30 * 24 * 60 * 60 * 1000 })
+
+    return userData
+  }
+
+  @Post('/logout')
+  async logout(@Req() req: Request, @Res({ passthrough: true }) res: Response) {
+    const refreshToken = req.cookies['refresh-token']
+    res.clearCookie('refresh-token')
+
+    return await this.authService.logout(refreshToken)
+  }
+
+  @Get('/refresh')
+  async refresh(@Req() req: Request, @Res({ passthrough: true }) res: Response) {
+    const refreshToken = req.cookies['refresh-token']
+    const userData = await this.authService.refresh(refreshToken)
+    res.cookie('refresh-token', userData.refresh_token, { httpOnly: true, maxAge: 30 * 24 * 60 * 60 * 1000 })
+
+    return userData
+  }
+
+  @Get('/roles')
+  @Roles(RolesEnum.ADMIN)
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  async roles(@Req() req: Request) {
+    return 'access granted'
   }
 }

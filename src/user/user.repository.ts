@@ -10,12 +10,12 @@ export class UserRepository extends Repository<User> {
     super(User, dataSource.createEntityManager())
   }
 
-  private get builder(): any {
+  private get builder(): SelectQueryBuilder<User> {
     return this.createQueryBuilder('user')
   }
 
   private buildRelations(builder: SelectQueryBuilder<User>) {
-    builder.leftJoinAndSelect('user.roles', 'roles')
+    builder.leftJoinAndSelect('user.role', 'role')
   }
 
   public async createOne(createUserDto: CreateUserDto): Promise<User> {
@@ -25,7 +25,7 @@ export class UserRepository extends Repository<User> {
     return created.raw[0]
   }
 
-  public async getOne(id: User['id']): Promise<User> {
+  public async getOneById(id: User['id']): Promise<User> {
     const queryBuilder: SelectQueryBuilder<User> = this.builder
     this.buildRelations(queryBuilder)
 
@@ -49,10 +49,18 @@ export class UserRepository extends Repository<User> {
 
   public async removeOne(id: User['id']): Promise<User> {
     const queryBuilder: SelectQueryBuilder<User> = this.builder
+    this.buildRelations(queryBuilder)
 
     const removed = await queryBuilder.delete().from(User).where('id = :id', { id }).returning('*').execute()
 
     return removed.raw[0]
+  }
+
+  public async getOneByUsername(username: string): Promise<User> {
+    const queryBuilder = this.builder
+    this.buildRelations(queryBuilder)
+
+    return await queryBuilder.where('username = :username', { username }).getOne()
   }
 
   public async getCount(): Promise<number> {
@@ -63,7 +71,32 @@ export class UserRepository extends Repository<User> {
 
   public async getOneByEmail(email: string): Promise<User> {
     const queryBuilder = this.builder
+    this.buildRelations(queryBuilder)
 
     return await queryBuilder.where('email = :email', { email }).getOne()
   }
+
+  public async ban(id: string, banReason: string): Promise<User> {
+    const queryBuilder = this.builder
+    this.buildRelations(queryBuilder)
+
+    const banned = await queryBuilder
+      .update(User)
+      .set({
+        banned: true,
+        banReason
+      })
+      .where('id = :id', { id })
+      .returning('*')
+      .execute()
+
+    return banned.raw[0]
+  }
+
+  // public async addRole(addRoleDto: AddRoleDto) {
+  //   const queryBuilder = this.builder
+  //   this.buildRelations(queryBuilder)
+  //
+  //   return await queryBuilder.where('id = :id', { id: addRoleDto.userId }).val
+  // }
 }
