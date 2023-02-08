@@ -37,4 +37,7 @@ export class User {
   // 'google', 'discord', 'instagram', 'github', 'jwt'
   // maybe зробити просто isJwtAuthType: boolean і через це робити
   authType: string
+
+  @Column({ nullable: true })
+  photo?: string
 }

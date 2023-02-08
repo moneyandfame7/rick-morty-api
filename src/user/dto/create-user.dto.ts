@@ -25,8 +25,5 @@ export class CreateUserDto {
   readonly authType: string
 
   @IsOptional()
-  readonly refreshToken?: string
-
-  @IsOptional()
-  readonly accessToken?: string
+  readonly photo?: string
 }
