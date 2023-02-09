@@ -4,6 +4,7 @@ import { UserService } from '../user/user.service'
 import { SignInDto } from './dto/sign-in.dto'
 import { TokenService } from '../token/token.service'
 import { SignUpDto } from './dto/sign-up.dto'
+import { User } from '../user/entities/user.entity'
 
 @Injectable()
 export class AuthService {
@@ -21,11 +22,7 @@ export class AuthService {
 
     return {
       ...tokens,
-      user: {
-        id: user.id,
-        email: user.email,
-        role: user.role
-      }
+      user
     }
   }
 
@@ -37,10 +34,16 @@ export class AuthService {
 
     return {
       ...tokens,
-      user: {
-        id: user.id,
-        email: user.email
-      }
+      user
+    }
+  }
+
+  async googleLogin(user: User) {
+    const tokens = await this.tokenService.generateTokens(user)
+    await this.tokenService.saveToken(user.id, tokens.refresh_token)
+    return {
+      ...tokens,
+      user
     }
   }
 
@@ -60,19 +63,17 @@ export class AuthService {
 
     return {
       ...tokens,
-      user: {
-        id: user.id,
-        email: user.email
-      }
+      user
     }
   }
 
-  async googleLogout(data: Record<string, any>) {
-    return 'Google logout'
-    // return await this.sessionService.removeOneByData(JSON.stringify(data))
+  async googleFinish(user: User, password: string) {
+    const hashedPassword = await this.hashPassword(password)
+
+    return await this.userService.updateOne(user.id, { password: hashedPassword })
   }
 
-  private async validateUser(userDto: SignInDto) {
+  async validateUser(userDto: SignInDto) {
     const user = await this.userService.getOneByEmail(userDto.email)
     if (!user) throw new UnauthorizedException('Invalid email.')
 

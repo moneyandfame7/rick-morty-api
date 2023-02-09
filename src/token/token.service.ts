@@ -16,12 +16,12 @@ export class TokenService {
   }
 
   async generateTokens(user: User) {
-    const payload = { id: user.id, email: user.email, role: user.role }
+    const payload = { ...user }
 
     const [access_token, refresh_token] = await Promise.all([
       this.jwtService.signAsync(payload, {
         secret: this.ACCESS_SECRET,
-        expiresIn: '30m'
+        expiresIn: '25m'
       }),
       this.jwtService.signAsync(payload, {
         secret: this.REFRESH_SECRET,

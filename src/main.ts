@@ -11,7 +11,7 @@ async function bootstrap() {
     cors: { origin: 'http://localhost:3001', credentials: true }
   })
   app.useGlobalPipes(new ValidationPipe({ transform: true, whitelist: true }))
-  app.use(cookieParser())
+  app.use(cookieParser('asdasdasd'))
 
   const config = new DocumentBuilder()
     .setTitle('The Rick & Morty API')

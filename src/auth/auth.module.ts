@@ -12,7 +12,7 @@ import { GoogleStrategy } from './strategies/google/google.strategy'
 @Module({
   controllers: [AuthController],
   providers: [AuthService, JwtStrategy, JwtAuthGuard, GoogleStrategy],
-  imports: [JwtModule.register({ secret: process.env.AT_SECRET }), UserModule, PassportModule, TokenModule],
-  exports: [AuthService, JwtAuthGuard]
+  imports: [JwtModule.register({ secret: process.env.AT_SECRET }), UserModule, PassportModule.register({ session: false }), TokenModule],
+  exports: [AuthService, JwtModule]
 })
 export class AuthModule {}
