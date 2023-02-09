@@ -20,7 +20,6 @@ export class GoogleStrategy extends PassportStrategy(Strategy) {
       access_type: 'offline'
     }
   }
-
   async validate(accessToken: string, refreshToken: string, profile: Profile) {
     console.log(accessToken)
     console.log('________________________________')
