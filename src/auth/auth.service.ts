@@ -4,10 +4,11 @@ import { UserService } from '../user/user.service'
 import { SignInDto } from './dto/sign-in.dto'
 import { TokenService } from '../token/token.service'
 import { SignUpDto } from './dto/sign-up.dto'
+import { SessionService } from '../session/session.service'
 
 @Injectable()
 export class AuthService {
-  constructor(private readonly userService: UserService, private readonly tokenService: TokenService) {}
+  constructor(private readonly userService: UserService, private readonly tokenService: TokenService, private readonly sessionService: SessionService) {}
 
   async signup(userDto: SignUpDto) {
     const candidate = await this.userService.getOneByEmail(userDto.email)
@@ -65,6 +66,12 @@ export class AuthService {
         email: user.email
       }
     }
+  }
+
+  async googleLogout(data: Record<string, any>) {
+    console.log(data)
+
+    return await this.sessionService.removeOneByData(JSON.stringify(data))
   }
 
   private async validateUser(userDto: SignInDto) {
