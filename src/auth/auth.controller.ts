@@ -1,4 +1,4 @@
-import { Body, Controller, Get, Post, Redirect, Req, Res, Session, UseGuards } from '@nestjs/common'
+import { Body, Controller, Get, Post, Redirect, Req, Res, Session, UnauthorizedException, UseGuards } from '@nestjs/common'
 import { ApiTags } from '@nestjs/swagger'
 import { Request, Response } from 'express'
 import { AuthService } from './auth.service'
@@ -99,8 +99,10 @@ export class AuthController {
   }
 
   @Get('/google/logout')
-  async googleLogout(@Session() session: Record<string, any>, @Res({ passthrough: true }) res: Response) {
-    res.clearCookie(this.SESSION_ID_COOKIE)
+  async googleLogout(@Session() session: Record<string, any>, @Req() req: Request, @Res({ passthrough: true }) res: Response) {
+    const sessionId = req.cookies[this.SESSION_ID_COOKIE]
+    if (!sessionId) throw new UnauthorizedException('User unauthenticated')
+    res.clearCookie(sessionId)
     const data = await this.authService.googleLogout(session)
     if (session) return data
     return 'log out'
