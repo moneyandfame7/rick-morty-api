@@ -33,7 +33,8 @@ export class GoogleStrategy extends PassportStrategy(Strategy) {
       username: profile.displayName,
       email: profile.emails[0].value,
       password: null,
-      authType: 'google'
+      authType: 'google',
+      photo: profile.photos[0].value
     }
     // TODO: спитати про пароль, шо і як це робиться якщо він знає
     const userExist = await this.userService.getOneByEmail(userInfo.email)
