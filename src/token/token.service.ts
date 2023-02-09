@@ -9,6 +9,7 @@ import { UserAuthType } from '../auth/types/user-auth.type'
 export class TokenService {
   private readonly ACCESS_SECRET: string
   private readonly REFRESH_SECRET: string
+
   constructor(private tokenRepository: TokenRepository, private jwtService: JwtService, private configService: ConfigService) {
     this.ACCESS_SECRET = this.configService.get<string>('AT_SECRET')
     this.REFRESH_SECRET = this.configService.get<string>('RT_SECRET')
@@ -55,7 +56,11 @@ export class TokenService {
   }
 
   async validateAccessToken(token: string): Promise<UserAuthType> {
-    return await this.jwtService.verifyAsync(token, { secret: this.ACCESS_SECRET })
+    try {
+      return await this.jwtService.verifyAsync(token, { secret: this.ACCESS_SECRET })
+    } catch (e) {
+      console.log(e)
+    }
   }
 
   async validateRefreshToken(token: string): Promise<UserAuthType> {

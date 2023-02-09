@@ -21,11 +21,6 @@ export class GoogleStrategy extends PassportStrategy(Strategy) {
     }
   }
   async validate(accessToken: string, refreshToken: string, profile: Profile) {
-    console.log(accessToken)
-    console.log('________________________________')
-    console.log(refreshToken)
-    console.log('________________________________')
-    console.log(profile)
     // const exist = await this.userService.emailExists(profile.emails[0].value)
     // console.log(exist)
     const userInfo = {
@@ -40,7 +35,6 @@ export class GoogleStrategy extends PassportStrategy(Strategy) {
     if (userExist) return userExist
 
     const createdUser = await this.userService.createOne(userInfo)
-    console.log(' <<< CREATED USER GOOGLE', createdUser)
 
     return createdUser || null
   }

@@ -14,7 +14,6 @@ export class UserService {
     const emailExists = await this.emailExists(dto.email)
 
     if (emailExists) throw new BadRequestException(`User ${dto.email} already exists.`)
-    console.log(' <<<<< DTO', dto)
     const user = await this.userRepository.createOne(dto)
     user.role = await this.rolesService.getRole('user')
     return await this.userRepository.save(user)

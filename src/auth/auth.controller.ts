@@ -37,12 +37,23 @@ export class AuthController {
     return userData
   }
 
-  @Post('/logout')
-  async logout(@Req() req: Request, @Res({ passthrough: true }) res: Response) {
+  @Get('/logout')
+  async logout(@Req() req: Request, @Res({ passthrough: true }) res: Response, @Session() session: Record<string, any>) {
     const refreshToken = req.cookies[this.REFRESH_TOKEN_COOKIE]
-    res.clearCookie(this.REFRESH_TOKEN_COOKIE)
+    const sessionId = req.cookies[this.SESSION_ID_COOKIE]
 
-    return await this.authService.logout(refreshToken)
+    if (refreshToken) {
+      console.log('JWT LOGOUT')
+      res.clearCookie(this.REFRESH_TOKEN_COOKIE)
+      return await this.authService.logout(refreshToken)
+    }
+    if (sessionId && session) {
+      console.log('GOOGLE LOGOUT')
+      res.clearCookie(this.SESSION_ID_COOKIE)
+      return await this.authService.googleLogout(session)
+    }
+
+    throw new UnauthorizedException('User unauthorized')
   }
 
   @Get('/refresh')
@@ -64,47 +75,30 @@ export class AuthController {
   @Get('/google/login')
   @UseGuards(GoogleAuthGuard)
   async googleLogin(@Req() req: Request) {
+    console.log('google auth <<<<<<< <<< << < < << ')
     return { msg: 'Google Authentication' }
   }
 
   @Get('/google/redirect')
-  @Redirect('/auth/success')
+  @Redirect('/auth/status')
   @UseGuards(GoogleAuthGuard)
   async googleRedirect(@Req() req: Request) {
-    console.log(req.user, ' <<<< GOOGLE REQ USER')
-
     return req.user
   }
 
   @Get('/status')
   user(@Req() req: Request) {
+    console.log(req.isAuthenticated())
+    console.log(req.headers.authorization)
+    // todo зробити перевірку на валідність токену
     if (req.user)
       return {
         status: 'social login',
         data: req.user
       }
-
-    if (req.headers.authorization) return { status: 'jwt-token', data: req.headers.authorization }
+    const accessToken = req.headers.authorization
+    if (accessToken) return { status: 'jwt-token', data: accessToken }
 
     return 'unauthorized'
-  }
-
-  @Get('/success')
-  success(@Req() req: Request, @Session() session: Record<string, any>) {
-    console.log('success')
-    return {
-      user: req.user,
-      session
-    }
-  }
-
-  @Get('/google/logout')
-  async googleLogout(@Session() session: Record<string, any>, @Req() req: Request, @Res({ passthrough: true }) res: Response) {
-    const sessionId = req.cookies[this.SESSION_ID_COOKIE]
-    if (!sessionId) throw new UnauthorizedException('User unauthenticated')
-    res.clearCookie(sessionId)
-    const data = await this.authService.googleLogout(session)
-    if (session) return data
-    return 'log out'
   }
 }
