@@ -29,12 +29,10 @@ export class User {
   banned: boolean
 
   @ApiProperty({ example: 'violation', description: 'The ban reason of the user' })
-  @Column({ type: 'varchar', nullable: true })
+  @Column({ name: 'ban_reason', type: 'varchar', nullable: true })
   banReason: string
 
   @Column({ name: 'auth_type', type: 'varchar', nullable: false })
-  // 'google', 'discord', 'instagram', 'github', 'jwt'
-  // maybe зробити просто isJwtAuthType: boolean і через це робити
   authType: string
 
   @Column({ nullable: true })

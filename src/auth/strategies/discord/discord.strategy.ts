@@ -1,17 +1,18 @@
-import { Injectable } from '@nestjs/common'
 import { ConfigService } from '@nestjs/config'
+import { Injectable } from '@nestjs/common'
 import { PassportStrategy } from '@nestjs/passport'
-import { Profile, Strategy } from 'passport-github2'
+import { Profile, Strategy } from 'passport-discord'
 import { UserService } from '../../../user/user.service'
 
 @Injectable()
-export class GithubStrategy extends PassportStrategy(Strategy, 'github') {
+export class DiscordStrategy extends PassportStrategy(Strategy, 'discord') {
+  private readonly DISCORD_AVATARS_URL = 'https://cdn.discordapp.com/avatars'
   constructor(private readonly configService: ConfigService, private readonly userService: UserService) {
     super({
-      clientID: configService.get<string>('GITHUB_CLIENT_ID'),
-      clientSecret: configService.get<string>('GITHUB_CLIENT_SECRET'),
-      callbackURL: configService.get<string>('GITHUB_CALLBACK_URL'),
-      scope: ['public_profile', 'user:email']
+      clientID: configService.get<string>('DISCORD_CLIENT_ID'),
+      clientSecret: configService.get<string>('DISCORD_CLIENT_SECRET'),
+      callbackURL: configService.get<string>('DISCORD_CALLBACK_URL'),
+      scope: ['identify', 'email']
     })
   }
 
@@ -20,10 +21,11 @@ export class GithubStrategy extends PassportStrategy(Strategy, 'github') {
 
     const userInfo = {
       username: profile.username,
-      email: profile.emails[0].value,
+      email: profile.email,
       password: null,
       authType: profile.provider,
-      photo: profile.photos[0].value
+      /* https://stackoverflow.com/questions/65450055/how-to-get-avatar-from-discord-api */
+      photo: `${this.DISCORD_AVATARS_URL}/${profile.id}/${profile.avatar}`
     }
 
     const userWithSameAuthType = await this.userService.getOneByAuthType(userInfo.email, userInfo.authType)

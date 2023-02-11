@@ -10,13 +10,14 @@ export class GoogleStrategy extends PassportStrategy(Strategy, 'google') {
     super({
       clientID: configService.get<string>('GOOGLE_CLIENT_ID'),
       clientSecret: configService.get<string>('GOOGLE_CLIENT_SECRET'),
-      callbackURL: 'http://localhost:3000/auth/google/redirect',
+      callbackURL: configService.get<string>('GOOGLE_CALLBACK_URL'),
       scope: ['profile', 'email']
     })
   }
 
   async validate(accessToken: string, refreshToken: string, profile: Profile, done: VerifyCallback) {
     console.log(profile)
+
     const userInfo = {
       username: profile.displayName,
       email: profile.emails[0].value,
@@ -25,14 +26,11 @@ export class GoogleStrategy extends PassportStrategy(Strategy, 'google') {
       photo: profile.photos[0].value
     }
 
-    const userExist = await this.userService.getOneByEmail(userInfo.email)
-    if (userExist) {
-      console.log('already exist')
-      return userExist
-    }
+    const userWithSameAuthType = await this.userService.getOneByAuthType(userInfo.email, userInfo.authType)
+
+    if (userWithSameAuthType) return userWithSameAuthType
 
     const createdUser = await this.userService.createOne(userInfo)
-    console.log('was created')
     done(null, createdUser)
   }
 }

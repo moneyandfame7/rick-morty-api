@@ -13,6 +13,7 @@ import { SignUpDto } from './dto/sign-up.dto'
 import { JwtAuthGuard } from './strategies/jwt/jwt.guard'
 import { User } from '../user/entities/user.entity'
 import { GithubAuthGuard } from './strategies/github/github.guard'
+import { DiscordAuthGuard } from './strategies/discord/discord.guard'
 
 @Controller('auth')
 @ApiTags('auth')
@@ -133,19 +134,36 @@ export class AuthController {
   async githubLogin(@Req() req: Request) {}
 
   @Get('/github/redirect')
-  // @Redirect('/auth/finish')
+  @Redirect('/auth/finish')
   @UseGuards(GithubAuthGuard)
   async githubRedirect(@Req() req: Request, @Res({ passthrough: true }) res: Response) {
-    // const jwt = await this.authService.socialLogin(req.user as User)
-    // res.cookie(this.REFRESH_TOKEN_COOKIE, jwt.refresh_token, {
-    //   httpOnly: true,
-    //   maxAge: 30 * 24 * 60 * 60 * 1000
-    // })
-    // res.cookie(this.ACCESS_TOKEN_COOKIE, jwt.access_token, {
-    //   httpOnly: true,
-    //   maxAge: 1800000
-    // })
-    console.log(req.user)
-    return req.user
+    const jwt = await this.authService.socialLogin(req.user as User)
+    res.cookie(this.REFRESH_TOKEN_COOKIE, jwt.refresh_token, {
+      httpOnly: true,
+      maxAge: 30 * 24 * 60 * 60 * 1000
+    })
+    res.cookie(this.ACCESS_TOKEN_COOKIE, jwt.access_token, {
+      httpOnly: true,
+      maxAge: 1800000
+    })
+  }
+
+  @Get('/discord/login')
+  @UseGuards(DiscordAuthGuard)
+  async discordLogin(@Req() req: Request) {}
+
+  @Get('/discord/redirect')
+  @Redirect('/auth/finish')
+  @UseGuards(DiscordAuthGuard)
+  async discordRedirect(@Req() req: Request, @Res({ passthrough: true }) res: Response) {
+    const jwt = await this.authService.socialLogin(req.user as User)
+    res.cookie(this.REFRESH_TOKEN_COOKIE, jwt.refresh_token, {
+      httpOnly: true,
+      maxAge: 30 * 24 * 60 * 60 * 1000
+    })
+    res.cookie(this.ACCESS_TOKEN_COOKIE, jwt.access_token, {
+      httpOnly: true,
+      maxAge: 1800000
+    })
   }
 }
