@@ -18,12 +18,10 @@ import { User } from '../user/entities/user.entity'
 export class AuthController {
   private readonly REFRESH_TOKEN_COOKIE: string
   private readonly ACCESS_TOKEN_COOKIE: string
-  private readonly SESSION_ID_COOKIE: string
 
   constructor(private readonly authService: AuthService, private readonly configService: ConfigService) {
     this.REFRESH_TOKEN_COOKIE = configService.get<string>('REFRESH_TOKEN_COOKIE')
     this.ACCESS_TOKEN_COOKIE = configService.get<string>('ACCESS_TOKEN_COOKIE')
-    this.SESSION_ID_COOKIE = configService.get<string>('SESSION_ID_COOKIE')
   }
 
   @Post('/signup')
@@ -70,10 +68,8 @@ export class AuthController {
 
   @Get('/refresh')
   async refresh(@Req() req: Request, @Res({ passthrough: true }) res: Response) {
-    console.log('refresh <<<< ')
     const refreshToken = req.cookies[this.REFRESH_TOKEN_COOKIE]
     const userData = await this.authService.refresh(refreshToken)
-    console.log(userData, ' <<< REFRESH USER DATA')
     res.cookie(this.REFRESH_TOKEN_COOKIE, userData.refresh_token, {
       httpOnly: true,
       maxAge: 30 * 24 * 60 * 60 * 1000
@@ -122,12 +118,12 @@ export class AuthController {
   @UseGuards(JwtAuthGuard)
   async finish(@Req() req: Request) {
     const user = req.user as User
-    // перевіряти чи новий юзер чи ні ( показати google.strategy.ts )
-    // робити тут редірект щоб юзер встановив пароль, якщо це новий юзер, якщо ні то просто виводити success
-    // const finishedData = await this.authService.googleFinish(user, password)
-    // console.log(await bcrypt.compare(password, finishedData.password))
-    // return finishedData
-
-    return user
+    const refreshToken = req.cookies[this.REFRESH_TOKEN_COOKIE]
+    const accessToken = req.cookies[this.ACCESS_TOKEN_COOKIE]
+    return {
+      refreshToken,
+      accessToken,
+      user
+    }
   }
 }

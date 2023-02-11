@@ -18,6 +18,7 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
 
   private static extractJwtFromCookie(req: Request) {
     /* ця функція достає токен з cookie */
+    console.log('Extract JWT from cookie.')
     if (req.cookies && 'ACCESS_TOKEN' in req.cookies) {
       return req.cookies['ACCESS_TOKEN']
     }
@@ -25,7 +26,7 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
   }
 
   async validate(payload) {
-    console.log(payload, '<<< VALIDATE PAYLOAD')
+    // console.log(payload, '<<< VALIDATE PAYLOAD')
 
     /* це передається в req.user */
     return { ...payload, iat: undefined, exp: undefined }

@@ -22,7 +22,10 @@ export class AuthService {
 
     return {
       ...tokens,
-      user
+      user: {
+        ...user,
+        password: undefined
+      }
     }
   }
 
@@ -34,7 +37,10 @@ export class AuthService {
 
     return {
       ...tokens,
-      user
+      user: {
+        ...user,
+        password: undefined
+      }
     }
   }
 
@@ -43,7 +49,10 @@ export class AuthService {
     await this.tokenService.saveToken(user.id, tokens.refresh_token)
     return {
       ...tokens,
-      user
+      user: {
+        ...user,
+        password: undefined
+      }
     }
   }
 
@@ -63,7 +72,10 @@ export class AuthService {
 
     return {
       ...tokens,
-      user
+      user: {
+        ...user,
+        password: undefined
+      }
     }
   }
 
