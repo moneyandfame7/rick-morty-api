@@ -5,10 +5,11 @@ import { UserRepository } from './user.repository'
 import { RolesService } from '../roles/roles.service'
 import { AddRoleDto } from './dto/add-role.dto'
 import { BanUserDto } from './dto/ban-user-dto'
+import { TokenService } from '../token/token.service'
 
 @Injectable()
 export class UserService {
-  constructor(private readonly userRepository: UserRepository, private readonly rolesService: RolesService) {}
+  constructor(private readonly userRepository: UserRepository, private readonly rolesService: RolesService, private readonly tokenService: TokenService) {}
 
   async createOne(dto: CreateUserDto) {
     const emailExists = await this.emailExists(dto.email)
@@ -56,7 +57,7 @@ export class UserService {
   async removeOne(id: string) {
     try {
       const user = await this.userRepository.getOneById(id)
-
+      await this.tokenService.removeByUserId(user.id)
       if (!user) throw new BadRequestException(`User with id ${id} does not exist.`)
 
       return await this.userRepository.removeOne(id)

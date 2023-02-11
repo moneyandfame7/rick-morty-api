@@ -3,7 +3,6 @@ import { JwtService } from '@nestjs/jwt'
 import { User } from '../user/entities/user.entity'
 import { ConfigService } from '@nestjs/config'
 import { TokenRepository } from './token.repository'
-import { UserAuthType } from '../auth/types/user-auth.type'
 
 @Injectable()
 export class TokenService {
@@ -47,23 +46,23 @@ export class TokenService {
     return await this.tokenRepository.save(token)
   }
 
-  async removeToken(refreshToken: string) {
+  async removeByToken(refreshToken: string) {
     return await this.tokenRepository.deleteByToken(refreshToken)
+  }
+
+  async removeByUserId(user_id: string) {
+    return await this.tokenRepository.delete({ user_id })
   }
 
   async findToken(refreshToken: string) {
     return await this.tokenRepository.findByToken(refreshToken)
   }
 
-  async validateAccessToken(token: string): Promise<UserAuthType> {
-    try {
-      return await this.jwtService.verifyAsync(token, { secret: this.ACCESS_SECRET })
-    } catch (e) {
-      console.log(e)
-    }
+  async validateAccessToken(token: string): Promise<User> {
+    return await this.jwtService.verifyAsync(token, { secret: this.ACCESS_SECRET })
   }
 
-  async validateRefreshToken(token: string): Promise<UserAuthType> {
+  async validateRefreshToken(token: string): Promise<User> {
     return await this.jwtService.verifyAsync(token, { secret: this.REFRESH_SECRET })
   }
 }

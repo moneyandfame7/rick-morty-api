@@ -1,8 +1,7 @@
-import { Body, Controller, Get, Post, Query, Redirect, Req, Res, UnauthorizedException, UseGuards } from '@nestjs/common'
+import { Body, Controller, Get, Post, Redirect, Req, Res, UnauthorizedException, UseGuards } from '@nestjs/common'
 import { ApiTags } from '@nestjs/swagger'
 import { ConfigService } from '@nestjs/config'
 import { Request, Response } from 'express'
-import * as bcrypt from 'bcrypt'
 
 import { AuthService } from './auth.service'
 import { SignInDto } from './dto/sign-in.dto'
@@ -44,19 +43,16 @@ export class AuthController {
 
   @Post('/login')
   async login(@Body() userDto: SignInDto, @Req() req: Request, @Res({ passthrough: true }) res: Response) {
-    if (!req.cookies[this.REFRESH_TOKEN_COOKIE]) {
-      const userData = await this.authService.login(userDto)
-      res.cookie(this.REFRESH_TOKEN_COOKIE, userData.refresh_token, {
-        httpOnly: true,
-        maxAge: 30 * 24 * 60 * 60 * 1000
-      })
-      res.cookie(this.ACCESS_TOKEN_COOKIE, userData.access_token, {
-        httpOnly: true,
-        maxAge: 1800000
-      })
-      return userData
-    }
-    return 'User already logged in'
+    const userData = await this.authService.login(userDto)
+    res.cookie(this.REFRESH_TOKEN_COOKIE, userData.refresh_token, {
+      httpOnly: true,
+      maxAge: 30 * 24 * 60 * 60 * 1000 // 30 days
+    })
+    res.cookie(this.ACCESS_TOKEN_COOKIE, userData.access_token, {
+      httpOnly: true,
+      maxAge: 1800000 // 25 m
+    })
+    return userData
   }
 
   @Get('/logout')
@@ -124,10 +120,14 @@ export class AuthController {
 
   @Get('/google/finish')
   @UseGuards(JwtAuthGuard)
-  async finish(@Req() req: Request, @Query('password') password: string) {
+  async finish(@Req() req: Request) {
     const user = req.user as User
-    const finishedData = await this.authService.googleFinish(user, password)
-    console.log(await bcrypt.compare(password, finishedData.password))
-    return finishedData
+    // перевіряти чи новий юзер чи ні ( показати google.strategy.ts )
+    // робити тут редірект щоб юзер встановив пароль, якщо це новий юзер, якщо ні то просто виводити success
+    // const finishedData = await this.authService.googleFinish(user, password)
+    // console.log(await bcrypt.compare(password, finishedData.password))
+    // return finishedData
+
+    return user
   }
 }

@@ -14,7 +14,6 @@ import { RolesEnum } from '../roles/roles.enum'
 import { JwtAuthGuard } from '../auth/strategies/jwt/jwt.guard'
 import { RolesGuard } from '../roles/roles.guard'
 import { Roles } from '../roles/roles.decorator'
-import { AuthGuard } from '../auth/auth.guard'
 
 @Controller('api/characters')
 @ApiTags('characters')
@@ -33,7 +32,7 @@ export class CharacterController {
   }
 
   @Get()
-  @UseGuards(AuthGuard)
+  @UseGuards(JwtAuthGuard)
   @ApiOperation({ summary: 'get all characters by queries' })
   @ApiResponse({ status: 200, type: [Character] })
   async getMany(@Query() query: QueryCharacterDto, @Req() req: Request) {

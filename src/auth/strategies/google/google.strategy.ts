@@ -15,14 +15,7 @@ export class GoogleStrategy extends PassportStrategy(Strategy, 'google') {
     })
   }
 
-  authorizationParams(): { [key: string]: string } {
-    return {
-      access_type: 'offline'
-    }
-  }
   async validate(accessToken: string, refreshToken: string, profile: Profile, done: VerifyCallback) {
-    // const exist = await this.userService.emailExists(profile.emails[0].value)
-    // console.log(exist)
     const userInfo = {
       username: profile.displayName,
       email: profile.emails[0].value,
@@ -30,12 +23,15 @@ export class GoogleStrategy extends PassportStrategy(Strategy, 'google') {
       authType: 'google',
       photo: profile.photos[0].value
     }
-    // TODO: спитати про пароль, шо і як це робиться якщо він знає
+
     const userExist = await this.userService.getOneByEmail(userInfo.email)
-    if (userExist) return userExist
+    if (userExist) {
+      console.log('already exist')
+      return userExist
+    }
 
     const createdUser = await this.userService.createOne(userInfo)
-
+    console.log('was created')
     done(null, createdUser)
   }
 }

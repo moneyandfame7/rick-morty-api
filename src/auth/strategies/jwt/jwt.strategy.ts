@@ -9,6 +9,7 @@ import { Request } from 'express'
 export class JwtStrategy extends PassportStrategy(Strategy) {
   constructor(private readonly authService: AuthService, private readonly configService: ConfigService) {
     super({
+      /*  це поле для cookie або з Headers "Authorization" */
       jwtFromRequest: ExtractJwt.fromExtractors([ExtractJwt.fromAuthHeaderAsBearerToken(), JwtStrategy.extractJwtFromCookie]),
       ignoreExpiration: false,
       secretOrKey: configService.get('AT_SECRET')
@@ -16,7 +17,7 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
   }
 
   private static extractJwtFromCookie(req: Request) {
-    console.log('abobaoobaoboaoba')
+    /* ця функція достає токен з cookie */
     if (req.cookies && 'ACCESS_TOKEN' in req.cookies) {
       return req.cookies['ACCESS_TOKEN']
     }
@@ -26,6 +27,7 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
   async validate(payload) {
     console.log(payload, '<<< VALIDATE PAYLOAD')
 
+    /* це передається в req.user */
     return { ...payload, iat: undefined, exp: undefined }
   }
 }
