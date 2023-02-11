@@ -12,6 +12,7 @@ import { GoogleAuthGuard } from './strategies/google/google.guard'
 import { SignUpDto } from './dto/sign-up.dto'
 import { JwtAuthGuard } from './strategies/jwt/jwt.guard'
 import { User } from '../user/entities/user.entity'
+import { GithubAuthGuard } from './strategies/github/github.guard'
 
 @Controller('auth')
 @ApiTags('auth')
@@ -104,10 +105,10 @@ export class AuthController {
   async googleLogin(@Req() req: Request) {}
 
   @Get('/google/redirect')
-  @Redirect('finish')
+  @Redirect('/auth/finish')
   @UseGuards(GoogleAuthGuard)
   async googleRedirect(@Req() req: Request, @Res({ passthrough: true }) res: Response) {
-    const jwt = await this.authService.googleLogin(req.user as User)
+    const jwt = await this.authService.socialLogin(req.user as User)
     res.cookie(this.REFRESH_TOKEN_COOKIE, jwt.refresh_token, {
       httpOnly: true,
       maxAge: 30 * 24 * 60 * 60 * 1000
@@ -118,7 +119,7 @@ export class AuthController {
     })
   }
 
-  @Get('/google/finish')
+  @Get('/finish')
   @UseGuards(JwtAuthGuard)
   async finish(@Req() req: Request) {
     const user = req.user as User
@@ -129,5 +130,26 @@ export class AuthController {
     // return finishedData
 
     return user
+  }
+
+  @Get('/github/login')
+  @UseGuards(GithubAuthGuard)
+  async githubLogin(@Req() req: Request) {}
+
+  @Get('/github/redirect')
+  // @Redirect('/auth/finish')
+  @UseGuards(GithubAuthGuard)
+  async githubRedirect(@Req() req: Request, @Res({ passthrough: true }) res: Response) {
+    // const jwt = await this.authService.socialLogin(req.user as User)
+    // res.cookie(this.REFRESH_TOKEN_COOKIE, jwt.refresh_token, {
+    //   httpOnly: true,
+    //   maxAge: 30 * 24 * 60 * 60 * 1000
+    // })
+    // res.cookie(this.ACCESS_TOKEN_COOKIE, jwt.access_token, {
+    //   httpOnly: true,
+    //   maxAge: 1800000
+    // })
+    console.log(req.user)
+    return req.user
   }
 }

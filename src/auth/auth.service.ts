@@ -11,8 +11,11 @@ export class AuthService {
   constructor(private readonly userService: UserService, private readonly tokenService: TokenService) {}
 
   async signup(userDto: SignUpDto) {
-    const candidate = await this.userService.getOneByEmail(userDto.email)
-    if (candidate) throw new BadRequestException(`User with email ${userDto.email} already registered`)
+    const withSameEmail = await this.userService.getOneByAuthType(userDto.email, 'jwt')
+    if (withSameEmail) throw new BadRequestException(`User with email ${userDto.email} already registered`)
+
+    const withSameUsername = await this.userService.getOneByUsername(userDto.username)
+    if (withSameUsername) throw new BadRequestException(`Username ${userDto.username} already use`)
 
     const hashedPassword = await this.hashPassword(userDto.password)
     const user = await this.userService.createOne({ ...userDto, password: hashedPassword, authType: 'jwt' })
@@ -38,7 +41,7 @@ export class AuthService {
     }
   }
 
-  async googleLogin(user: User) {
+  async socialLogin(user: User) {
     const tokens = await this.tokenService.generateTokens(user)
     await this.tokenService.saveToken(user.id, tokens.refresh_token)
     return {

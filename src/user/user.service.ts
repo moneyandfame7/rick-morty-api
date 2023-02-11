@@ -9,12 +9,18 @@ import { TokenService } from '../token/token.service'
 
 @Injectable()
 export class UserService {
-  constructor(private readonly userRepository: UserRepository, private readonly rolesService: RolesService, private readonly tokenService: TokenService) {}
+  constructor(
+    private readonly userRepository: UserRepository,
+    private readonly rolesService: RolesService,
+    private readonly tokenService: TokenService
+  ) {}
 
   async createOne(dto: CreateUserDto) {
-    const emailExists = await this.emailExists(dto.email)
+    const userWithSameEmail = await this.getOneByEmail(dto.email)
 
-    if (emailExists) throw new BadRequestException(`User ${dto.email} already exists.`)
+    if (userWithSameEmail && userWithSameEmail.authType === 'jwt')
+      throw new BadRequestException(`User ${dto.email} already exists.`)
+
     const user = await this.userRepository.createOne(dto)
     user.role = await this.rolesService.getRole('user')
     return await this.userRepository.save(user)
@@ -30,6 +36,18 @@ export class UserService {
 
   async getOneByEmail(email: string) {
     const user = await this.userRepository.getOneByEmail(email)
+
+    return user ? user : null
+  }
+
+  async getOneByAuthType(email: string, authType: string) {
+    const user = await this.userRepository.getOneByAuthType(email, authType)
+
+    return user ? user : null
+  }
+
+  async getOneByUsername(username: string) {
+    const user = await this.userRepository.getOneByUsername(username)
 
     return user ? user : null
   }
