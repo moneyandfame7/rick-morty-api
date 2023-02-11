@@ -26,7 +26,6 @@ export class RolesRepository extends Repository<Role> {
 
   public async getOne(value: string): Promise<Role> {
     const queryBuilder: SelectQueryBuilder<Role> = this.builder
-    this.buildRelations(queryBuilder)
 
     return await queryBuilder.where('role.value = :value', { value }).getOne()
   }
