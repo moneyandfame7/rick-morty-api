@@ -2,21 +2,32 @@ import { PassportStrategy } from '@nestjs/passport'
 import { Injectable } from '@nestjs/common'
 import { ConfigService } from '@nestjs/config'
 import { ExtractJwt, Strategy } from 'passport-jwt'
-import { UserService } from '../../../user/user.service'
+import { AuthService } from '../../auth.service'
+import { Request } from 'express'
 
 @Injectable()
 export class JwtStrategy extends PassportStrategy(Strategy) {
-  constructor(private readonly userService: UserService, private readonly configService: ConfigService) {
+  constructor(private readonly authService: AuthService, private readonly configService: ConfigService) {
     super({
-      jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
+      /*  це поле для cookie або з Headers "Authorization" */
+      jwtFromRequest: ExtractJwt.fromExtractors([ExtractJwt.fromAuthHeaderAsBearerToken(), JwtStrategy.extractJwtFromCookie]),
       ignoreExpiration: false,
       secretOrKey: configService.get('AT_SECRET')
     })
   }
 
-  // TODO зробити рефреш, перевірити в відосі як це працює і мб мідлвеер якщоце потрібно
-  // погуглити про extract jwt, cookie, refresh token
-  async validate(payload: { id: string; email: string }) {
-    return { id: payload.id, email: payload.email }
+  private static extractJwtFromCookie(req: Request) {
+    /* ця функція достає токен з cookie */
+    if (req.cookies && 'ACCESS_TOKEN' in req.cookies) {
+      return req.cookies['ACCESS_TOKEN']
+    }
+    return null
+  }
+
+  async validate(payload) {
+    console.log(payload, '<<< VALIDATE PAYLOAD')
+
+    /* це передається в req.user */
+    return { ...payload, iat: undefined, exp: undefined }
   }
 }

@@ -8,13 +8,11 @@ import { JwtStrategy } from './strategies/jwt/jwt.strategy'
 import { JwtModule } from '@nestjs/jwt'
 import { JwtAuthGuard } from './strategies/jwt/jwt.guard'
 import { GoogleStrategy } from './strategies/google/google.strategy'
-import { SessionSerializer } from './utils/session.serializer'
-import { SessionModule } from '../session/session.module'
 
 @Module({
   controllers: [AuthController],
-  providers: [AuthService, JwtStrategy, JwtAuthGuard, GoogleStrategy, SessionSerializer],
-  imports: [JwtModule.register({ secret: process.env.AT_SECRET }), UserModule, PassportModule, TokenModule, SessionModule],
-  exports: [AuthService, JwtAuthGuard]
+  providers: [AuthService, JwtStrategy, JwtAuthGuard, GoogleStrategy],
+  imports: [JwtModule.register({ secret: process.env.AT_SECRET }), UserModule, PassportModule.register({ session: false }), TokenModule],
+  exports: [AuthService, JwtModule]
 })
 export class AuthModule {}

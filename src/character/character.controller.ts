@@ -32,6 +32,7 @@ export class CharacterController {
   }
 
   @Get()
+  @UseGuards(JwtAuthGuard)
   @ApiOperation({ summary: 'get all characters by queries' })
   @ApiResponse({ status: 200, type: [Character] })
   async getMany(@Query() query: QueryCharacterDto, @Req() req: Request) {

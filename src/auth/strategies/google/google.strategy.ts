@@ -1,11 +1,11 @@
 import { PassportStrategy } from '@nestjs/passport'
-import { Profile, Strategy } from 'passport-google-oauth20'
+import { Profile, Strategy, VerifyCallback } from 'passport-google-oauth20'
 import { ConfigService } from '@nestjs/config'
 import { Injectable } from '@nestjs/common'
 import { UserService } from '../../../user/user.service'
 
 @Injectable()
-export class GoogleStrategy extends PassportStrategy(Strategy) {
+export class GoogleStrategy extends PassportStrategy(Strategy, 'google') {
   constructor(private readonly configService: ConfigService, private readonly userService: UserService) {
     super({
       clientID: configService.get<string>('CLIENT_ID'),
@@ -15,19 +15,7 @@ export class GoogleStrategy extends PassportStrategy(Strategy) {
     })
   }
 
-  authorizationParams(): { [key: string]: string } {
-    return {
-      access_type: 'offline'
-    }
-  }
-  async validate(accessToken: string, refreshToken: string, profile: Profile) {
-    console.log(accessToken)
-    console.log('________________________________')
-    console.log(refreshToken)
-    console.log('________________________________')
-    console.log(profile)
-    // const exist = await this.userService.emailExists(profile.emails[0].value)
-    // console.log(exist)
+  async validate(accessToken: string, refreshToken: string, profile: Profile, done: VerifyCallback) {
     const userInfo = {
       username: profile.displayName,
       email: profile.emails[0].value,
@@ -35,13 +23,15 @@ export class GoogleStrategy extends PassportStrategy(Strategy) {
       authType: 'google',
       photo: profile.photos[0].value
     }
-    // TODO: спитати про пароль, шо і як це робиться якщо він знає
+
     const userExist = await this.userService.getOneByEmail(userInfo.email)
-    if (userExist) return userExist
+    if (userExist) {
+      console.log('already exist')
+      return userExist
+    }
 
     const createdUser = await this.userService.createOne(userInfo)
-    console.log(' <<< CREATED USER GOOGLE', createdUser)
-
-    return createdUser || null
+    console.log('was created')
+    done(null, createdUser)
   }
 }

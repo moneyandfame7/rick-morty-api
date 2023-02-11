@@ -35,8 +35,8 @@ export class UserController {
   }
 
   @Delete(':id')
-  @Roles(RolesEnum.ADMIN)
-  @UseGuards(RolesGuard)
+  // @Roles(RolesEnum.ADMIN)
+  // @UseGuards(RolesGuard)
   async removeOne(@Param('id') id: string) {
     return await this.userService.removeOne(id)
   }

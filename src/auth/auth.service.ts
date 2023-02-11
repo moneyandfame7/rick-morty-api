@@ -4,11 +4,11 @@ import { UserService } from '../user/user.service'
 import { SignInDto } from './dto/sign-in.dto'
 import { TokenService } from '../token/token.service'
 import { SignUpDto } from './dto/sign-up.dto'
-import { SessionService } from '../session/session.service'
+import { User } from '../user/entities/user.entity'
 
 @Injectable()
 export class AuthService {
-  constructor(private readonly userService: UserService, private readonly tokenService: TokenService, private readonly sessionService: SessionService) {}
+  constructor(private readonly userService: UserService, private readonly tokenService: TokenService) {}
 
   async signup(userDto: SignUpDto) {
     const candidate = await this.userService.getOneByEmail(userDto.email)
@@ -22,11 +22,7 @@ export class AuthService {
 
     return {
       ...tokens,
-      user: {
-        id: user.id,
-        email: user.email,
-        role: user.role
-      }
+      user
     }
   }
 
@@ -38,15 +34,21 @@ export class AuthService {
 
     return {
       ...tokens,
-      user: {
-        id: user.id,
-        email: user.email
-      }
+      user
+    }
+  }
+
+  async googleLogin(user: User) {
+    const tokens = await this.tokenService.generateTokens(user)
+    await this.tokenService.saveToken(user.id, tokens.refresh_token)
+    return {
+      ...tokens,
+      user
     }
   }
 
   async logout(refreshToken: string) {
-    return await this.tokenService.removeToken(refreshToken)
+    return await this.tokenService.removeByToken(refreshToken)
   }
 
   async refresh(refreshToken: string) {
@@ -61,20 +63,17 @@ export class AuthService {
 
     return {
       ...tokens,
-      user: {
-        id: user.id,
-        email: user.email
-      }
+      user
     }
   }
 
-  async googleLogout(data: Record<string, any>) {
-    console.log(data)
+  async googleFinish(user: User, password: string) {
+    const hashedPassword = await this.hashPassword(password)
 
-    return await this.sessionService.removeOneByData(JSON.stringify(data))
+    return await this.userService.updateOne(user.id, { password: hashedPassword })
   }
 
-  private async validateUser(userDto: SignInDto) {
+  async validateUser(userDto: SignInDto) {
     const user = await this.userService.getOneByEmail(userDto.email)
     if (!user) throw new UnauthorizedException('Invalid email.')
 
