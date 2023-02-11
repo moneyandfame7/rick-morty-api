@@ -27,7 +27,8 @@ export class AuthService {
       ...tokens,
       user: {
         ...user,
-        password: undefined
+        password: undefined,
+        roleId: undefined
       }
     }
   }
@@ -47,6 +48,7 @@ export class AuthService {
     }
   }
 
+  // todo: зробити buildUserInfo куди винести generateTokens, saveToken і return ...tokens, user
   async socialLogin(user: User) {
     const tokens = await this.tokenService.generateTokens(user)
     await this.tokenService.saveToken(user.id, tokens.refresh_token)
