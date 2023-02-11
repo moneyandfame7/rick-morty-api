@@ -8,19 +8,20 @@ import { UserService } from '../../../user/user.service'
 export class GoogleStrategy extends PassportStrategy(Strategy, 'google') {
   constructor(private readonly configService: ConfigService, private readonly userService: UserService) {
     super({
-      clientID: configService.get<string>('CLIENT_ID'),
-      clientSecret: configService.get<string>('CLIENT_SECRET'),
+      clientID: configService.get<string>('GOOGLE_CLIENT_ID'),
+      clientSecret: configService.get<string>('GOOGLE_CLIENT_SECRET'),
       callbackURL: 'http://localhost:3000/auth/google/redirect',
       scope: ['profile', 'email']
     })
   }
 
   async validate(accessToken: string, refreshToken: string, profile: Profile, done: VerifyCallback) {
+    console.log(profile)
     const userInfo = {
       username: profile.displayName,
       email: profile.emails[0].value,
       password: null,
-      authType: 'google',
+      authType: profile.provider,
       photo: profile.photos[0].value
     }
 
