@@ -14,6 +14,7 @@ import { JwtAuthGuard } from './strategies/jwt/jwt.guard'
 import { User } from '../user/entities/user.entity'
 import { GithubAuthGuard } from './strategies/github/github.guard'
 import { DiscordAuthGuard } from './strategies/discord/discord.guard'
+import { SpotifyAuthGuard } from './strategies/spotify/spotify.guard'
 
 @Controller('auth')
 @ApiTags('auth')
@@ -156,6 +157,25 @@ export class AuthController {
   @Redirect('/auth/finish')
   @UseGuards(DiscordAuthGuard)
   async discordRedirect(@Req() req: Request, @Res({ passthrough: true }) res: Response) {
+    const jwt = await this.authService.socialLogin(req.user as User)
+    res.cookie(this.REFRESH_TOKEN_COOKIE, jwt.refresh_token, {
+      httpOnly: true,
+      maxAge: 30 * 24 * 60 * 60 * 1000
+    })
+    res.cookie(this.ACCESS_TOKEN_COOKIE, jwt.access_token, {
+      httpOnly: true,
+      maxAge: 1800000
+    })
+  }
+
+  @Get('/spotify/login')
+  @UseGuards(SpotifyAuthGuard)
+  async spotifyLogin(@Req() req: Request) {}
+
+  @Get('/spotify/redirect')
+  @Redirect('/auth/finish')
+  @UseGuards(SpotifyAuthGuard)
+  async spotifyRedirect(@Req() req: Request, @Res({ passthrough: true }) res: Response) {
     const jwt = await this.authService.socialLogin(req.user as User)
     res.cookie(this.REFRESH_TOKEN_COOKIE, jwt.refresh_token, {
       httpOnly: true,

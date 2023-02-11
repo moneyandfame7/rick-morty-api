@@ -81,13 +81,12 @@ export class UserRepository extends Repository<User> {
     return await queryBuilder.where('email = :email', { email }).getOne()
   }
 
-  public async getOneByAuthType(email: string, authType: string) {
+  public async getOneByAuthType(email: string, auth_type: string) {
     const queryBuilder = this.builder
     this.buildRelations(queryBuilder)
-
     return await queryBuilder
       .where('email = :email', { email })
-      .andWhere('auth_type = :auth_type', { auth_type: authType })
+      .andWhere('auth_type = :auth_type', { auth_type })
       .getOne()
   }
 
