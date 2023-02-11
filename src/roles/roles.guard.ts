@@ -2,6 +2,7 @@ import { CanActivate, ExecutionContext, Injectable, UnauthorizedException } from
 import { Reflector } from '@nestjs/core'
 import { ROLES_KEY } from './roles.decorator'
 import { TokenService } from '../token/token.service'
+import { Request } from 'express'
 
 @Injectable()
 export class RolesGuard implements CanActivate {
@@ -13,20 +14,29 @@ export class RolesGuard implements CanActivate {
       if (!requiredRoles) {
         return true
       }
-      const req = context.switchToHttp().getRequest()
+      console.log('role guard')
+      const req: Request = context.switchToHttp().getRequest()
       const authHeader = req.headers.authorization
+      const authCookie = req.cookies['ACCESS_TOKEN']
 
-      if (!authHeader) throw new UnauthorizedException()
-      const bearer = authHeader.split(' ')[0]
-      const token = authHeader.split(' ')[1]
-
-      if (bearer !== 'Bearer' || !token) {
-        throw new UnauthorizedException()
+      if (authHeader) {
+        const bearer = authHeader.split(' ')[0]
+        const token = authHeader.split(' ')[1]
+        if (bearer !== 'Bearer' || !token) {
+          throw new UnauthorizedException()
+        }
+        const user = await this.tokenService.validateAccessToken(token)
+        req.user = user
+        return requiredRoles.includes(user.role.value)
       }
-      const user = await this.tokenService.validateAccessToken(token)
-      req.user = user
-      return requiredRoles.includes(user.role.value)
+      if (authCookie) {
+        const user = await this.tokenService.validateAccessToken(authCookie)
+        req.user = user
+        return requiredRoles.includes(user.role.value)
+      }
+      throw new UnauthorizedException()
     } catch (e) {
+      console.log(e)
       throw new UnauthorizedException(e.response)
     }
   }
