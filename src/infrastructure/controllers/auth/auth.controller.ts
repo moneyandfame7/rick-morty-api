@@ -36,6 +36,7 @@ export class AuthController extends BaseController {
   }
 
   @Get('/logout')
+  @UseGuards(JwtAuthGuard)
   private async logout(@Req() req: Request, @Res({ passthrough: true }) res: Response) {
     const refreshToken = req.cookies[this.REFRESH_TOKEN_COOKIE]
     const accessToken = req.cookies[this.ACCESS_TOKEN_COOKIE]
@@ -49,6 +50,7 @@ export class AuthController extends BaseController {
   }
 
   @Get('/refresh')
+  @UseGuards(JwtAuthGuard)
   private async refresh(@Req() req: Request, @Res({ passthrough: true }) res: Response) {
     const refreshToken = req.cookies[this.REFRESH_TOKEN_COOKIE]
     const userData = await this.authService.refresh(refreshToken)

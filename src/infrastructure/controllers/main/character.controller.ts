@@ -29,7 +29,7 @@ export class CharacterController {
   }
 
   @Get()
-  // @UseGuards(JwtAuthGuard)
+  @UseGuards(JwtAuthGuard)
   @ApiOperation({ summary: 'get all characters by queries' })
   @ApiResponse({ status: 200, type: [Character] })
   async getMany(@Query() query: QueryCharacterDto, @Req() req: Request) {
@@ -59,6 +59,7 @@ export class CharacterController {
   @Get(':id')
   @ApiOperation({ summary: 'get one character with specified id' })
   @ApiResponse({ status: 200, type: Character })
+  @UseGuards(JwtAuthGuard)
   async getOne(@Param('id', ParseIntPipe) id: number) {
     return await this.characterService.getOne(id)
   }
@@ -75,6 +76,8 @@ export class CharacterController {
   @Delete(':id')
   @ApiOperation({ summary: 'remove one character with specified id' })
   @ApiResponse({ status: 200, type: Character })
+  @Roles(RolesEnum.ADMIN)
+  @UseGuards(JwtAuthGuard, RolesGuard)
   removeOne(@Param('id', ParseIntPipe) id: number) {
     return this.characterService.removeOne(id)
   }

@@ -5,6 +5,7 @@ import { Roles } from '../../common/decorators/roles.decorator'
 import { RolesGuard } from '../../common/guards/roles.guard'
 import { AddRoleDto, BanUserDto, CreateUserDto, UpdateUserDto } from '../../dto/common/user.dto'
 import { RolesEnum } from '../../common/constants/roles.enum'
+import { JwtAuthGuard } from '../../common/guards/auth/jwt.guard'
 
 @Controller('api/users')
 @ApiTags('users')
@@ -12,27 +13,32 @@ export class UserController {
   constructor(private readonly userService: UserService) {}
 
   @Post()
+  @UseGuards(JwtAuthGuard)
   async createOne(@Body() createUserDto: CreateUserDto) {
     return await this.userService.createOne(createUserDto)
   }
 
   @Get()
+  @UseGuards(JwtAuthGuard)
   async getMany() {
     return await this.userService.getMany()
   }
 
   @Get(':id')
+  @UseGuards(JwtAuthGuard)
   async getOne(@Param('id') id: string) {
     return await this.userService.getOneById(id)
   }
 
   @Patch(':id')
+  @UseGuards(JwtAuthGuard)
   async updateOne(@Param('id') id: string, @Body() updateUserDto: UpdateUserDto) {
     return await this.userService.updateOne(id, updateUserDto)
   }
 
   @Delete(':id')
-  // @Roles(RolesEnum.ADMIN)
+  @Roles(RolesEnum.ADMIN)
+  @UseGuards(JwtAuthGuard, RolesGuard)
   // @UseGuards(RolesGuard)
   async removeOne(@Param('id') id: string) {
     return await this.userService.removeOne(id)
@@ -41,7 +47,7 @@ export class UserController {
   @ApiOperation({ summary: 'Give a role' })
   @ApiResponse({ status: 200 })
   @Roles(RolesEnum.ADMIN)
-  @UseGuards(RolesGuard)
+  @UseGuards(JwtAuthGuard, RolesGuard)
   @Post('/role')
   async addRole(@Body() addRoleDto: AddRoleDto) {
     return await this.userService.addRole(addRoleDto)
@@ -50,7 +56,7 @@ export class UserController {
   @ApiOperation({ summary: 'Ban a user' })
   @ApiResponse({ status: 200 })
   @Roles(RolesEnum.ADMIN)
-  @UseGuards(RolesGuard)
+  @UseGuards(JwtAuthGuard, RolesGuard)
   @Post('/ban')
   async ban(@Body() banUserDto: BanUserDto) {
     return await this.userService.ban(banUserDto)

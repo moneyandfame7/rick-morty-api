@@ -24,11 +24,12 @@ export class LocationController {
     return await this.locationService.createOne(createLocationDto)
   }
 
+  @Get()
   @ApiOperation({
     summary: 'This method returns the locations with the specified query, or returns all if the query is empty.'
   })
   @ApiResponse({ status: 200, type: [Location] })
-  @Get()
+  @UseGuards(JwtAuthGuard)
   async getMany(@Query() query: QueryLocationDto, @Req() req: Request) {
     const queryPaginationDto = {
       take: query.take,
@@ -51,9 +52,10 @@ export class LocationController {
     return await this.locationService.getMany(queryPaginationDto, queryLocationDto as QueryLocationDto)
   }
 
+  @Get(':id')
   @ApiOperation({ summary: 'Returns the location by id.' })
   @ApiResponse({ status: 200, type: Location })
-  @Get(':id')
+  @UseGuards(JwtAuthGuard)
   getOne(@Param('id', ParseIntPipe) id: number) {
     return this.locationService.getOne(id)
   }
