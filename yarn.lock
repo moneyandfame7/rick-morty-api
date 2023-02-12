@@ -1778,6 +1778,14 @@
   dependencies:
     uuid "8.3.2"
 
+"@nestjsplus/redirect@^1.0.0":
+  version "1.0.0"
+  resolved "https://registry.yarnpkg.com/@nestjsplus/redirect/-/redirect-1.0.0.tgz#c50ea1cdbab3c186865ffff97ebcb37a47cc36cd"
+  integrity sha512-KvgPQC1jt9jIB29xY2yrSRZDGSUw0AJAT43EzXCv3fmwgsD7pq+fx7pRZQKbkKggIasvDydyEzPunULF9vDXHg==
+  dependencies:
+    reflect-metadata "^0.1.12"
+    rxjs "^6.3.3"
+
 "@nodelib/fs.scandir@2.1.5":
   version "2.1.5"
   resolved "https://registry.yarnpkg.com/@nodelib/fs.scandir/-/fs.scandir-2.1.5.tgz#7619c2eb21b25483f6d167548b4cfd5a7488c3d5"
@@ -5912,7 +5920,7 @@ rechoir@^0.6.2:
   dependencies:
     resolve "^1.1.6"
 
-reflect-metadata@^0.1.13:
+reflect-metadata@^0.1.12, reflect-metadata@^0.1.13:
   version "0.1.13"
   resolved "https://registry.yarnpkg.com/reflect-metadata/-/reflect-metadata-0.1.13.tgz#67ae3ca57c972a2aa1642b10fe363fe32d49dc08"
   integrity sha512-Ts1Y/anZELhSsjMcU605fU9RE4Oi3p5ORujwbIKXfWa+0Zxs510Qrmrce5/Jowq3cHSZSJqBjypxmHarc+vEWg==
@@ -5995,7 +6003,7 @@ run-parallel@^1.1.9:
   dependencies:
     queue-microtask "^1.2.2"
 
-rxjs@6.6.7, rxjs@^6.6.0:
+rxjs@6.6.7, rxjs@^6.3.3, rxjs@^6.6.0:
   version "6.6.7"
   resolved "https://registry.yarnpkg.com/rxjs/-/rxjs-6.6.7.tgz#90ac018acabf491bf65044235d5863c4dab804c9"
   integrity sha512-hTdwr+7yYNIT5n4AMYp85KA6yw2Va0FLa3Rguvbpa4W3I5xynaBZo41cM3XM+4Q6fRMj3sBYIR1VAmZMXYJvRQ==

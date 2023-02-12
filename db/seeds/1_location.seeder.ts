@@ -1,8 +1,8 @@
 import { DataSource } from 'typeorm'
 import { Seeder, SeederFactoryManager } from 'typeorm-extension'
-import { CreateLocationDto } from 'src/location/dto/create-location.dto'
-import { Location } from 'src/location/entities/location.entity'
-import { fetchData } from 'src/utils/fetch-data'
+import { CreateLocationDto } from 'src/infrastructure/dto/main/location.dto'
+import { Location } from 'src/infrastructure/entities/main/location.entity'
+import { fetchData } from 'src/infrastructure/common/utils/fetch-data'
 
 export interface ILocation {
   id: number
