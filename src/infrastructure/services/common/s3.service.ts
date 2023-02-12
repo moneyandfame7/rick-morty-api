@@ -22,6 +22,9 @@ export class S3Service {
 
   public async upload(params: PutObjectCommandInput) {
     const command = new PutObjectCommand(params)
-    return await this.s3.send(command).then(() => `${this.bucketUrl}/${params.Key}`)
+    const url = await this.s3.send(command).then(() => `${this.bucketUrl}/${params.Key}`)
+
+    console.log(`Image was uploaded to ${url}`)
+    return url
   }
 }
