@@ -51,6 +51,7 @@ export class EpisodeController {
   @Get(':id')
   @ApiOperation({ summary: 'get one episode with specified id' })
   @ApiResponse({ status: 200, type: Episode })
+  @UseGuards(JwtAuthGuard)
   async getOne(@Param('id', ParseIntPipe) id: number) {
     return await this.episodeService.getOne(id)
   }
