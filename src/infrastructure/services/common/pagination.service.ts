@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common'
 import { QueryPaginationDto } from '../../dto/common/pagination.dto'
 import { EnvironmentConfigService } from '../../config/environment-config.service'
-import { PageDoesNotExistException } from '../../../domain/exceptions/common/pagination.exception'
+import { PageDoesNotExistException } from 'src/domain/exceptions/common/pagination.exception'
 
 export interface PaginationOptions {
   queryPaginationDto: QueryPaginationDto

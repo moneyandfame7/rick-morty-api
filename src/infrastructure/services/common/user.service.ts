@@ -3,7 +3,7 @@ import { AddRoleDto, BanUserDto, CreateUserDto, UpdateUserDto } from '../../dto/
 import { UserRepository } from '../../repositories/common/user.repository'
 import { RolesService } from './roles.service'
 import { TokenService } from './token.service'
-import { UsersNotFoundException, UserWithEmailAlreadyExistsException, UserWithIdNotFoundException } from '../../../domain/exceptions/common/user.exception'
+import { UsersNotFoundException, UserWithEmailAlreadyExistsException, UserWithIdNotFoundException } from 'src/domain/exceptions/common/user.exception'
 
 @Injectable()
 export class UserService {

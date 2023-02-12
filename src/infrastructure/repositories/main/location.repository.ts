@@ -3,8 +3,8 @@ import { Injectable } from '@nestjs/common'
 import { Location } from '../../entities/main/location.entity'
 import { QueryPaginationDto } from '../../dto/common/pagination.dto'
 import { CreateLocationDto, QueryLocationDto, UpdateLocationDto } from 'src/infrastructure/dto/main/location.dto'
-import { BaseRepository } from '../../../domain/repositories/base-repository.abstract'
-import { GetManyLocations } from '../../../domain/models/main/location.model'
+import { BaseRepository } from 'src/domain/repositories/base-repository.abstract'
+import { GetManyLocations } from 'src/domain/models/main/location.model'
 
 @Injectable()
 export class LocationRepository extends BaseRepository<Location, QueryLocationDto, CreateLocationDto, UpdateLocationDto, GetManyLocations> {

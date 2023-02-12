@@ -4,7 +4,7 @@ import { CreateEpisodeDto, QueryEpisodeDto, UpdateEpisodeDto } from 'src/infrast
 import { EpisodeRepository } from '../../repositories/main/episode.repository'
 import { PaginationService } from '../common/pagination.service'
 import { Episode } from '../../entities/main/episode.entity'
-import { EpisodeAlreadyExistException, EpisodesNotFoundException, EpisodeWithIdNotFoundException } from '../../../domain/exceptions/main/episode.exception'
+import { EpisodeAlreadyExistException, EpisodesNotFoundException, EpisodeWithIdNotFoundException } from 'src/domain/exceptions/main/episode.exception'
 
 @Injectable()
 export class EpisodeService {

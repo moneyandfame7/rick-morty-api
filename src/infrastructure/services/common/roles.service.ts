@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common'
 import { CreateRoleDto } from '../../dto/common/roles.dto'
 import { RolesRepository } from '../../repositories/common/roles.repository'
-import { RoleAlreadyExistException, RoleDoesNotExistException, RolesNotFoundExcetion } from '../../../domain/exceptions/common/role.exception'
+import { RoleAlreadyExistException, RoleDoesNotExistException, RolesNotFoundExcetion } from 'src/domain/exceptions/common/role.exception'
 
 @Injectable()
 export class RolesService {

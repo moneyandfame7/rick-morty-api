@@ -4,7 +4,7 @@ import { Request, Response } from 'express'
 import { User } from '../../entities/common/user.entity'
 import { EnvironmentConfigService } from '../../config/environment-config.service'
 import { AuthService } from '../../services/auth/auth.service'
-import { BaseController } from '../../../domain/controllers/auth/base-controller.abstract'
+import { BaseController } from 'src/domain/controllers/auth/base-controller.abstract'
 import { HttpExceptionFilter } from '../../common/filters/http-exception.filter'
 
 @Controller('/auth/spotify')
@@ -22,7 +22,7 @@ export class SpotifyController extends BaseController {
   @UseFilters(new HttpExceptionFilter())
   @UseGuards(SpotifyAuthGuard)
   async redirect(@Req() req: Request, @Res({ passthrough: true }) res: Response) {
-    const jwt = await this.authService.socialLogin(req.user as User)
+    const jwt = await this.authService.buildUserInfoAndTokens(req.user as User)
     this.setCookies(res, jwt.refresh_token, jwt.access_token)
   }
 }
