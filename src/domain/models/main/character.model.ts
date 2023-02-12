@@ -1,4 +1,4 @@
-import { Character } from '../../../infrastructure/entities/main/character.entity'
+import { Character } from 'src/infrastructure/entities/main/character.entity'
 
 export interface CharacterModel {}
 

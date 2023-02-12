@@ -7,7 +7,7 @@ import { CharacterRepository } from '../../repositories/main/character.repositor
 import { QueryPaginationDto } from 'src/infrastructure/dto/common/pagination.dto'
 import { PaginationService } from '../common/pagination.service'
 import { S3Service } from '../common/s3.service'
-import { CharactersNotFoundException, CharacterWithIdNotFoundException } from '../../../domain/exceptions/main/characters.exception'
+import { CharactersNotFoundException, CharacterWithIdNotFoundException } from 'src/domain/exceptions/main/characters.exception'
 
 @Injectable()
 export class CharacterService {

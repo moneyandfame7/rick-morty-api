@@ -4,7 +4,7 @@ import { QueryPaginationDto } from 'src/infrastructure/dto/common/pagination.dto
 import { LocationRepository } from '../../repositories/main/location.repository'
 import { PaginationService } from '../common/pagination.service'
 import { Location } from '../../entities/main/location.entity'
-import { LocationAlreadyExistsException, LocationsNotFoundException, LocationWithIdNotFoundException } from '../../../domain/exceptions/main/location.exception'
+import { LocationAlreadyExistsException, LocationsNotFoundException, LocationWithIdNotFoundException } from 'src/domain/exceptions/main/location.exception'
 
 @Injectable()
 export class LocationService {

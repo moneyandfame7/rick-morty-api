@@ -1,4 +1,4 @@
-import { Episode } from '../../../infrastructure/entities/main/episode.entity'
+import { Episode } from 'src/infrastructure/entities/main/episode.entity'
 
 export interface EpisodeModel {}
 
