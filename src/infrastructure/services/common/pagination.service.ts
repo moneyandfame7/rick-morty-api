@@ -1,6 +1,7 @@
 import { Injectable } from '@nestjs/common'
 import { QueryPaginationDto } from '../../dto/common/pagination.dto'
 import { EnvironmentConfigService } from '../../config/environment-config.service'
+import { PageDoesNotExistException } from '../../../domain/exceptions/common/pagination.exception'
 
 export interface PaginationOptions {
   queryPaginationDto: QueryPaginationDto
@@ -37,6 +38,8 @@ export class PaginationService<Entity> {
     const endpoint = queryPaginationDto.endpoint
     const otherQuery = queryPaginationDto.otherQuery
     const take = queryPaginationDto.take
+
+    if (page > pages) throw new PageDoesNotExistException(page)
     return {
       page,
       take,
@@ -49,8 +52,8 @@ export class PaginationService<Entity> {
 
   public wrapEntityWithPaginationInfo(results: Array<Entity>, info: BuildPaginationOptions): Payload<Entity> {
     return {
-      results,
-      info
+      info,
+      results
     }
   }
 }

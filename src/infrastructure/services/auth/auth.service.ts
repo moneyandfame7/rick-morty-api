@@ -1,9 +1,11 @@
-import { BadRequestException, Injectable, UnauthorizedException } from '@nestjs/common'
+import { Injectable, UnauthorizedException } from '@nestjs/common'
 import * as bcrypt from 'bcrypt'
 import { UserService } from '../common/user.service'
 import { TokenService } from '../common/token.service'
 import { SignInDto, SignUpDto } from '../../dto/auth/auth.dto'
 import { User } from '../../entities/common/user.entity'
+import { UserWithEmailAlreadyExistsException, UserWithUsernameAlreadyExistsException } from '../../../domain/exceptions/common/user.exception'
+import { AuthIncorrectEmailException, AuthIncorrectPasswordException } from '../../../domain/exceptions/common/auth.exception'
 
 @Injectable()
 export class AuthService {
@@ -11,10 +13,10 @@ export class AuthService {
 
   async signup(userDto: SignUpDto) {
     const withSameEmail = await this.userService.getOneByAuthType(userDto.email, 'jwt')
-    if (withSameEmail) throw new BadRequestException(`User with email ${userDto.email} already registered`)
+    if (withSameEmail) throw new UserWithEmailAlreadyExistsException(userDto.email)
 
     const withSameUsername = await this.userService.getOneByUsername(userDto.username)
-    if (withSameUsername) throw new BadRequestException(`Username ${userDto.username} already use`)
+    if (withSameUsername) throw new UserWithUsernameAlreadyExistsException(userDto.username)
 
     const hashedPassword = await this.hashPassword(userDto.password)
     const user = await this.userService.createOne({ ...userDto, password: hashedPassword, authType: 'jwt' })
@@ -83,21 +85,17 @@ export class AuthService {
     }
   }
 
-  async googleFinish(user: User, password: string) {
-    const hashedPassword = await this.hashPassword(password)
-
-    return await this.userService.updateOne(user.id, { password: hashedPassword })
-  }
-
   async validateUser(userDto: SignInDto) {
     const user = await this.userService.getOneByEmail(userDto.email)
-    if (!user) throw new UnauthorizedException('Invalid email.')
+    if (!user) throw new AuthIncorrectEmailException()
 
     const passwordEquals = await this.comparePassword(userDto.password, user.password)
     if (user && passwordEquals) return user
 
-    if (!passwordEquals) throw new UnauthorizedException('Invalid password.')
+    if (!passwordEquals) throw new AuthIncorrectPasswordException()
   }
+
+  private userInfoAndTokens() {}
 
   private async hashPassword(password: string) {
     return await bcrypt.hash(password, 3)

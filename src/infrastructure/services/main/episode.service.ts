@@ -1,9 +1,10 @@
-import { BadRequestException, Injectable } from '@nestjs/common'
+import { Injectable } from '@nestjs/common'
 import { QueryPaginationDto } from 'src/infrastructure/dto/common/pagination.dto'
 import { CreateEpisodeDto, QueryEpisodeDto, UpdateEpisodeDto } from 'src/infrastructure/dto/main/episode.dto'
 import { EpisodeRepository } from '../../repositories/main/episode.repository'
 import { PaginationService } from '../common/pagination.service'
 import { Episode } from '../../entities/main/episode.entity'
+import { EpisodeAlreadyExistException, EpisodesNotFoundException, EpisodeWithIdNotFoundException } from '../../../domain/exceptions/main/episode.exception'
 
 @Injectable()
 export class EpisodeService {
@@ -11,7 +12,7 @@ export class EpisodeService {
 
   async createOne(createEpisodeDto: CreateEpisodeDto) {
     const exist = this.episodeRepository.findOneBy({ name: createEpisodeDto.name })
-    if (exist) throw new BadRequestException('Episode already exist.')
+    if (exist) throw new EpisodeAlreadyExistException(createEpisodeDto.name)
 
     const episode = this.episodeRepository.create(createEpisodeDto)
     return await this.episodeRepository.save(episode)
@@ -20,7 +21,7 @@ export class EpisodeService {
   async getMany(queryPaginationDto: QueryPaginationDto, queryEpisodeDto: QueryEpisodeDto) {
     const { episodes, count } = await this.episodeRepository.getMany(queryPaginationDto, queryEpisodeDto)
 
-    if (!count) throw new BadRequestException(`Episodes not found.`)
+    if (!count) throw new EpisodesNotFoundException()
 
     const buildPaginationInfo = this.paginationService.buildPaginationInfo({ queryPaginationDto, count })
     return this.paginationService.wrapEntityWithPaginationInfo(episodes, buildPaginationInfo)
@@ -29,7 +30,7 @@ export class EpisodeService {
   async getOne(id: number) {
     const episode = await this.episodeRepository.getOne(id)
 
-    if (!episode) throw new BadRequestException(`Episode with id ${id}  does not exist.`)
+    if (!episode) throw new EpisodeWithIdNotFoundException(id)
 
     return episode
   }
@@ -37,7 +38,7 @@ export class EpisodeService {
   async updateOne(id: number, updateEpisodeDto: Partial<UpdateEpisodeDto>) {
     const episode = await this.episodeRepository.getOne(id)
 
-    if (!episode) throw new BadRequestException(`Episode with id ${id} does not exist.`)
+    if (!episode) throw new EpisodeWithIdNotFoundException(id)
 
     return await this.episodeRepository.updateOne(id, updateEpisodeDto)
   }
@@ -45,7 +46,7 @@ export class EpisodeService {
   async removeOne(id: number) {
     const episode = await this.episodeRepository.getOne(id)
 
-    if (!episode) throw new BadRequestException(`Episode with id ${id} does not exist.`)
+    if (!episode) throw new EpisodeWithIdNotFoundException(id)
 
     return await this.episodeRepository.removeOne(id)
   }

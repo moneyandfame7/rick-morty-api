@@ -4,9 +4,9 @@ import { EnvironmentConfigService } from '../../config/environment-config.servic
 
 @Injectable()
 export class S3Service {
-  public readonly s3: S3Client
-  public readonly bucketName: string
+  private readonly s3: S3Client
   private readonly bucketUrl: string
+  public readonly bucketName: string
 
   constructor(private config: EnvironmentConfigService) {
     this.s3 = new S3Client({
