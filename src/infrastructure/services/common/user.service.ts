@@ -1,8 +1,9 @@
-import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common'
+import { BadRequestException, Injectable } from '@nestjs/common'
 import { AddRoleDto, BanUserDto, CreateUserDto, UpdateUserDto } from '../../dto/common/user.dto'
 import { UserRepository } from '../../repositories/common/user.repository'
 import { RolesService } from './roles.service'
 import { TokenService } from './token.service'
+import { UsersNotFoundException, UserWithEmailAlreadyExistsException, UserWithIdNotFoundException } from '../../../domain/exceptions/common/user.exception'
 
 @Injectable()
 export class UserService {
@@ -11,7 +12,7 @@ export class UserService {
   async createOne(dto: CreateUserDto) {
     const userWithSameEmail = await this.getOneByEmail(dto.email)
 
-    if (userWithSameEmail && userWithSameEmail.authType === 'jwt') throw new BadRequestException(`User ${dto.email} already exists.`)
+    if (userWithSameEmail && userWithSameEmail.authType === 'jwt') throw new UserWithEmailAlreadyExistsException(dto.email)
 
     const user = await this.userRepository.createOne(dto)
     user.role = await this.rolesService.getRole('user')
@@ -21,7 +22,7 @@ export class UserService {
   async getOneById(id: string) {
     const user = await this.userRepository.getOneById(id)
 
-    if (!user) throw new BadRequestException(`User with id ${id} does not exist.`)
+    if (!user) throw new UserWithIdNotFoundException(id)
 
     return user
   }
@@ -47,7 +48,7 @@ export class UserService {
   async getMany() {
     const users = await this.userRepository.getMany()
 
-    if (!users.length) throw new NotFoundException('Users not found.')
+    if (!users.length) throw new UsersNotFoundException()
 
     return users
   }
@@ -59,21 +60,17 @@ export class UserService {
   async updateOne(id: string, updateUserDto: UpdateUserDto) {
     const user = await this.userRepository.getOneById(id)
 
-    if (!user) throw new BadRequestException(`User with id ${id} does not exist.`)
+    if (!user) throw new UserWithIdNotFoundException(id)
 
     return await this.userRepository.updateOne(id, updateUserDto)
   }
 
   async removeOne(id: string) {
-    try {
-      const user = await this.userRepository.getOneById(id)
-      await this.tokenService.removeByUserId(user.id)
-      if (!user) throw new BadRequestException(`User with id ${id} does not exist.`)
+    const user = await this.userRepository.getOneById(id)
+    await this.tokenService.removeByUserId(user.id)
+    if (!user) throw new UserWithIdNotFoundException(id)
 
-      return await this.userRepository.removeOne(id)
-    } catch (e) {
-      throw new BadRequestException('Invalid id')
-    }
+    return await this.userRepository.removeOne(id)
   }
 
   async addRole(dto: AddRoleDto) {
@@ -89,7 +86,7 @@ export class UserService {
 
   async ban(dto: BanUserDto) {
     const user = await this.userRepository.getOneById(dto.userId)
-    if (!user) throw new BadRequestException(`User with id ${dto.userId} does not exist.`)
+    if (!user) throw new UserWithIdNotFoundException(dto.userId)
 
     return await this.userRepository.ban(dto.userId, dto.banReason)
   }

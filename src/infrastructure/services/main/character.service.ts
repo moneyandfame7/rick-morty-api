@@ -1,4 +1,4 @@
-import { BadRequestException, HttpException, HttpStatus, Injectable } from '@nestjs/common'
+import { HttpException, HttpStatus, Injectable } from '@nestjs/common'
 import * as sharp from 'sharp'
 import { PutObjectCommandInput } from '@aws-sdk/client-s3'
 import { CreateCharacterDto, QueryCharacterDto, UpdateCharacterDto } from '../../dto/main/character.dto'
@@ -7,6 +7,7 @@ import { CharacterRepository } from '../../repositories/main/character.repositor
 import { QueryPaginationDto } from 'src/infrastructure/dto/common/pagination.dto'
 import { PaginationService } from '../common/pagination.service'
 import { S3Service } from '../common/s3.service'
+import { CharactersNotFoundException, CharacterWithIdNotFoundException } from '../../../domain/exceptions/main/characters.exception'
 
 @Injectable()
 export class CharacterService {
@@ -41,7 +42,7 @@ export class CharacterService {
   async getMany(queryPaginationDto: QueryPaginationDto, queryCharacterDto: QueryCharacterDto) {
     const { characters, count } = await this.characterRepository.getMany(queryPaginationDto, queryCharacterDto)
 
-    if (!count) throw new BadRequestException(`Characters not found.`)
+    if (!count) throw new CharactersNotFoundException()
 
     const buildPaginationInfo = this.paginationService.buildPaginationInfo({ queryPaginationDto, count })
     return this.paginationService.wrapEntityWithPaginationInfo(characters, buildPaginationInfo)
@@ -50,7 +51,7 @@ export class CharacterService {
   async getOne(id: number) {
     const character = await this.characterRepository.getOne(id)
 
-    if (!character) throw new BadRequestException(`Character with id ${id}  does not exist.`)
+    if (!character) throw new CharacterWithIdNotFoundException(id)
 
     return character
   }
@@ -58,7 +59,7 @@ export class CharacterService {
   async updateOne(id: number, updateCharacterDto: UpdateCharacterDto) {
     const character = await this.characterRepository.getOne(id)
 
-    if (!character) throw new BadRequestException(`Character with id ${id} does not exist.`)
+    if (!character) throw new CharacterWithIdNotFoundException(id)
 
     return await this.characterRepository.updateOne(id, updateCharacterDto)
   }
@@ -66,7 +67,7 @@ export class CharacterService {
   async removeOne(id: number) {
     const character = await this.characterRepository.getOne(id)
 
-    if (!character) throw new BadRequestException(`Character with id ${id} does not exist.`)
+    if (!character) throw new CharacterWithIdNotFoundException(id)
 
     return await this.characterRepository.removeOne(id)
   }
