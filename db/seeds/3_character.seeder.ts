@@ -1,9 +1,9 @@
 import { DataSource } from 'typeorm'
 import { Seeder, SeederFactoryManager } from 'typeorm-extension'
-import { CreateCharacterDto } from 'src/character/dto/create-character.dto'
-import { Character } from 'src/character/entities/character.entity'
-import { fetchData } from 'src/utils/fetch-data'
-import { getIdFromUrl } from 'src/utils/get-id-from-url'
+import { CreateCharacterDto } from 'src/infrastructure/dto/main/character.dto'
+import { Character } from 'src/infrastructure/entities/main/character.entity'
+import { fetchData } from 'src/infrastructure/common/utils/fetch-data'
+import { getIdFromUrl } from 'src/infrastructure/common/utils/get-id-from-url'
 import { ILocation } from './1_location.seeder'
 
 export interface ICharacter {
@@ -42,7 +42,7 @@ export class CharacterSeeder implements Seeder {
           name: character.name,
           gender: character.gender,
           status: character.status,
-          image: `${process.env.BUCKET_URL}/${character.id}.jpeg`,
+          image: `${process.env.S3BUCKET_URL}/${character.id}.jpeg`,
           species: character.species,
           location: responseLocation[getIdFromUrl(character.location.url) - 1],
           origin: responseLocation[getIdFromUrl(character.origin.url) - 1],
