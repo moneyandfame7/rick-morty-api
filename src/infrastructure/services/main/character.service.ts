@@ -28,7 +28,7 @@ export class CharacterService {
 
     const params: PutObjectCommandInput = {
       Bucket: this.s3Service.bucketName,
-      Key: `${characterAttributes.id}.${type}`,
+      Key: `characters/${characterAttributes.id}.${type}`,
       Body: fileBuffer,
       ContentType: file.mimetype,
       ACL: 'public-read'
