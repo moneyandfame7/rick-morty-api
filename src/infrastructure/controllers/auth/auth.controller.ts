@@ -46,7 +46,6 @@ export class AuthController extends BaseController {
   }
 
   @Get('/refresh')
-  @UseGuards(JwtAuthGuard)
   private async refresh(@Req() req: Request, @Res({ passthrough: true }) res: Response) {
     const { refresh_token } = this.getCookies(req)
     const userData = await this.authService.refresh(refresh_token)

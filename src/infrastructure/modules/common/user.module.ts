@@ -6,9 +6,10 @@ import { Character } from '../../entities/main/character.entity'
 import { UserRepository } from '../../repositories/common/user.repository'
 import { RolesModule } from './roles.module'
 import { TokenModule } from './token.module'
+import { S3Module } from './s3.module'
 
 @Module({
-  imports: [TypeOrmModule.forFeature([Character]), RolesModule, TokenModule],
+  imports: [TypeOrmModule.forFeature([Character]), RolesModule, TokenModule, S3Module],
   controllers: [UserController],
   providers: [UserService, UserRepository],
   exports: [UserService]

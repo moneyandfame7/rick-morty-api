@@ -1,4 +1,4 @@
-import { HttpException, HttpStatus, Injectable } from '@nestjs/common'
+import { BadRequestException, Injectable } from '@nestjs/common'
 import * as sharp from 'sharp'
 import { PutObjectCommandInput } from '@aws-sdk/client-s3'
 import { CreateCharacterDto, QueryCharacterDto, UpdateCharacterDto } from '../../dto/main/character.dto'
@@ -14,7 +14,7 @@ export class CharacterService {
   constructor(private readonly characterRepository: CharacterRepository, private readonly s3Service: S3Service, private readonly paginationService: PaginationService<Character>) {}
 
   async createOne(createCharacterDto: CreateCharacterDto, file: Express.Multer.File) {
-    if (!file) throw new HttpException('Field image cannot be empty', HttpStatus.BAD_REQUEST)
+    if (!file) throw new BadRequestException('You must provide an image')
     const fileBuffer = await sharp(file.buffer).resize({ height: 300, width: 300, fit: 'cover' }).toBuffer()
 
     const characterAttributes: CreateCharacterDto = {
