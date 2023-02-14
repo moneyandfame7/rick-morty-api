@@ -80,8 +80,6 @@ export class CreateCharacterDto {
   createdAt?: Date = new Date()
 }
 
-export class UpdateCharacterDto extends PartialType(CreateCharacterDto) {}
-
 export class QueryCharacterDto extends QueryPaginationDto {
   @ApiProperty({ example: [1], description: 'The id of the character.', required: false })
   @Transform(({ value }) => toCorrectId(value))
@@ -132,3 +130,5 @@ export class QueryCharacterDto extends QueryPaginationDto {
   @IsString()
   episode_name?: string
 }
+
+export class UpdateCharacterDto extends PartialType(CreateCharacterDto) {}

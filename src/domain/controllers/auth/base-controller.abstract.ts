@@ -1,11 +1,10 @@
+import { Injectable } from '@nestjs/common'
 import { Response } from 'express'
 import { EnvironmentConfigService } from 'src/infrastructure/config/environment-config.service'
 import { AuthService } from 'src/infrastructure/services/auth/auth.service'
-import { IBaseController } from './base-controller.interface'
-import { Injectable } from '@nestjs/common'
 
 @Injectable()
-export abstract class BaseController implements IBaseController {
+export abstract class BaseController {
   readonly REFRESH_TOKEN_COOKIE: string
   readonly ACCESS_TOKEN_COOKIE: string
   readonly REFRESH_TOKEN_EXPIRE_COOKIE: number = 30 * 24 * 60 * 60 * 1000 // 30 days

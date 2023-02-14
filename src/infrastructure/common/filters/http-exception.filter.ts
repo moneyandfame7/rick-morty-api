@@ -9,7 +9,7 @@ export class HttpExceptionFilter implements ExceptionFilter {
     const req = ctx.getRequest<Request>()
     const status = exception.getStatus()
 
-    res.redirect('http://localhost:3000/api/characters')
-    // res.status(status).json({ aboba: exception.message })
+    // res.redirect('http://localhost:3000/api/characters')
+    res.status(status).json({ aboba: exception.message })
   }
 }

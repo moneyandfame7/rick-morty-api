@@ -1,5 +1,5 @@
-import { Column, CreateDateColumn, Entity, JoinTable, ManyToMany, ManyToOne, PrimaryGeneratedColumn } from 'typeorm'
 import { ApiProperty } from '@nestjs/swagger'
+import { Column, CreateDateColumn, Entity, JoinTable, ManyToMany, ManyToOne, PrimaryGeneratedColumn } from 'typeorm'
 import { Episode } from 'src/infrastructure/entities/main/episode.entity'
 import { Location } from 'src/infrastructure/entities/main/location.entity'
 

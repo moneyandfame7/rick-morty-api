@@ -3,22 +3,6 @@ import { IsEmail, IsEnum, IsIn, IsNotEmpty, IsOptional, IsUUID, MaxLength, MinLe
 import { Type } from 'class-transformer'
 import { RolesEnum } from '../../common/constants/roles.enum'
 
-export class AddRoleDto {
-  @IsEnum(RolesEnum)
-  readonly value: RolesEnum
-
-  @IsUUID()
-  readonly userId: string
-}
-
-export class BanUserDto {
-  @IsUUID()
-  readonly userId: string
-
-  @IsNotEmpty()
-  readonly banReason: string
-}
-
 export class CreateUserDto {
   @ApiProperty({ example: 'User_228', description: 'The username of the user.' })
   @IsNotEmpty()
@@ -49,6 +33,22 @@ export class CreateUserDto {
 }
 
 export class UpdateUserDto extends PartialType(CreateUserDto) {}
+
+export class AddRoleDto {
+  @IsEnum(RolesEnum)
+  readonly value: RolesEnum
+
+  @IsUUID()
+  readonly userId: string
+}
+
+export class BanUserDto {
+  @IsUUID()
+  readonly userId: string
+
+  @IsNotEmpty()
+  readonly banReason: string
+}
 
 export class SetUsernameDto {
   @MinLength(2)

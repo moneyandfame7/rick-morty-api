@@ -1,7 +1,7 @@
 import { PartialType } from '@nestjs/mapped-types'
 import { ApiProperty } from '@nestjs/swagger'
-import { IsNotEmpty, IsOptional, IsString } from 'class-validator'
 import { Transform } from 'class-transformer'
+import { IsNotEmpty, IsOptional, IsString } from 'class-validator'
 import { QueryPaginationDto } from '../common/pagination.dto'
 import { toCorrectId } from '../../common/transforms/to-correct-id.transform'
 
@@ -30,8 +30,6 @@ export class CreateEpisodeDto {
   createdAt?: Date
 }
 
-export class UpdateEpisodeDto extends PartialType(CreateEpisodeDto) {}
-
 export class QueryEpisodeDto extends QueryPaginationDto {
   @ApiProperty({ example: 1, description: 'The id of the episode.' })
   @Transform(({ value }) => toCorrectId(value))
@@ -53,3 +51,5 @@ export class QueryEpisodeDto extends QueryPaginationDto {
   @IsString()
   character_name?: string
 }
+
+export class UpdateEpisodeDto extends PartialType(CreateEpisodeDto) {}

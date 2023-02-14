@@ -1,5 +1,5 @@
-import { IsIn } from 'class-validator'
 import { PartialType } from '@nestjs/swagger'
+import { IsIn } from 'class-validator'
 
 export class CreateRoleDto {
   @IsIn(['admin', 'user'])

@@ -1,17 +1,23 @@
 import { Injectable } from '@nestjs/common'
-import { AuthConfig } from '../../domain/config/auth.interface'
-import { S3BucketConfig } from '../../domain/config/s3-bucket.interface'
-import { DatabaseConfig } from '../../domain/config/database.interface'
 import { ConfigService } from '@nestjs/config'
+import { AuthConfig } from 'src/domain/config/auth.interface'
+import { S3BucketConfig } from 'src/domain/config/s3-bucket.interface'
+import { DatabaseConfig } from 'src/domain/config/database.interface'
 
 @Injectable()
 export class EnvironmentConfigService implements AuthConfig, S3BucketConfig, DatabaseConfig {
   constructor(private readonly configService: ConfigService) {}
 
+  /**
+   * Common configurations
+   **/
   getBaseUrl(): string {
     return this.configService.get<string>('BASE_URL')
   }
 
+  /**
+   * Database credentials
+   **/
   getDatabaseHost(): string {
     return this.configService.get<string>('DB_HOST')
   }
@@ -28,6 +34,9 @@ export class EnvironmentConfigService implements AuthConfig, S3BucketConfig, Dat
     return this.configService.get<string>('DB_USERNAME')
   }
 
+  /**
+   * S3Bucket credentials
+   **/
   getS3BucketAccessKey(): string {
     return this.configService.get<string>('S3BUCKET_ACCESS_KEY')
   }
@@ -44,6 +53,9 @@ export class EnvironmentConfigService implements AuthConfig, S3BucketConfig, Dat
     return this.configService.get<string>('S3BUCKET_URL')
   }
 
+  /**
+   * JWT credentials
+   **/
   getJwtAccessCookie(): string {
     return this.configService.get<string>('JWT_ACCESS_COOKIE')
   }
@@ -57,6 +69,9 @@ export class EnvironmentConfigService implements AuthConfig, S3BucketConfig, Dat
     return this.configService.get<string>('JWT_REFRESH_SECRET')
   }
 
+  /**
+   * Google credentials
+   **/
   getGoogleCallbackUrl(): string {
     return this.configService.get<string>('GOOGLE_CALLBACK_URL')
   }
@@ -67,6 +82,9 @@ export class EnvironmentConfigService implements AuthConfig, S3BucketConfig, Dat
     return this.configService.get<string>('GOOGLE_CLIENT_SECRET')
   }
 
+  /**
+   * Discord credentials
+   **/
   getDiscordCallbackUrl(): string {
     return this.configService.get<string>('DISCORD_CALLBACK_URL')
   }
@@ -77,6 +95,9 @@ export class EnvironmentConfigService implements AuthConfig, S3BucketConfig, Dat
     return this.configService.get<string>('DISCORD_CLIENT_SECRET')
   }
 
+  /**
+   * GitHub credentials
+   **/
   getGithubCallbackUrl(): string {
     return this.configService.get<string>('GITHUB_CALLBACK_URL')
   }
@@ -87,6 +108,9 @@ export class EnvironmentConfigService implements AuthConfig, S3BucketConfig, Dat
     return this.configService.get<string>('GITHUB_CLIENT_SECRET')
   }
 
+  /**
+   * Spotify credentials
+   **/
   getSpotifyCallbackUrl(): string {
     return this.configService.get<string>('SPOTIFY_CALLBACK_URL')
   }

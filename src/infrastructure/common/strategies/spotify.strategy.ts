@@ -1,8 +1,9 @@
 import { PassportStrategy } from '@nestjs/passport'
 import { Profile, Strategy, VerifyCallback } from 'passport-spotify'
 import { ConfigService } from '@nestjs/config'
-import { BadRequestException, Injectable } from '@nestjs/common'
+import { Injectable } from '@nestjs/common'
 import { UserService } from '../../services/common/user.service'
+import { UserWithUsernameAlreadyExistsException } from 'src/domain/exceptions/common/user.exception'
 
 @Injectable()
 export class SpotifyStrategy extends PassportStrategy(Strategy, 'spotify') {
@@ -27,7 +28,7 @@ export class SpotifyStrategy extends PassportStrategy(Strategy, 'spotify') {
     console.log(userInfo)
 
     const userWithSameUserName = await this.userService.getOneByUsername(userInfo.username)
-    if (userWithSameUserName) throw new BadRequestException(`Username ${userWithSameUserName.username} already use`)
+    if (userWithSameUserName) throw new UserWithUsernameAlreadyExistsException(userInfo.username)
 
     const userWithSameAuthType = await this.userService.getOneByAuthType(userInfo.email, userInfo.authType)
 
