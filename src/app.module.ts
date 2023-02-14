@@ -16,10 +16,11 @@ import { DiscordModule } from './infrastructure/modules/auth/discord.module'
 import { GoogleModule } from './infrastructure/modules/auth/google.module'
 import { SpotifyModule } from './infrastructure/modules/auth/spotify.module'
 import { GithubModule } from './infrastructure/modules/auth/github.module'
+import { MailModule } from './infrastructure/modules/common/mail.module'
 
 const configs = [EnvironmentConfigModule, ConfigModule.forRoot({ isGlobal: true }), TypeOrmModule.forRoot(dataSourceOptions)]
 const auth = [PassportModule, AuthModule, DiscordModule, GoogleModule, GithubModule, SpotifyModule]
-const commons = [UserModule, TokenModule, RolesModule, S3Module]
+const commons = [UserModule, TokenModule, RolesModule, S3Module, MailModule]
 const main = [CharacterModule, EpisodeModule, LocationModule]
 
 @Module({

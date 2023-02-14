@@ -12,11 +12,18 @@ export class UserWithIdNotFoundException extends NotFoundException {
   }
 }
 
+export class UserDoesNotExistException extends UnprocessableEntityException {
+  constructor() {
+    super('User does not exist')
+  }
+}
+
 export class UserWithEmailAlreadyExistsException extends UnprocessableEntityException {
   constructor(email: string) {
     super(`User with email ${email} already exists`)
   }
 }
+
 export class UserWithUsernameAlreadyExistsException extends UnprocessableEntityException {
   constructor(username: string) {
     super(`User with username ${username} already exists`)

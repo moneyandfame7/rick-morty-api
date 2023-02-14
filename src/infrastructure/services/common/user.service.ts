@@ -4,6 +4,7 @@ import { UserRepository } from '../../repositories/common/user.repository'
 import { RolesService } from './roles.service'
 import { TokenService } from './token.service'
 import {
+  UserDoesNotExistException,
   UsersNotFoundException,
   UserWithEmailAlreadyExistsException,
   UserWithIdNotFoundException,
@@ -12,6 +13,7 @@ import {
 import * as sharp from 'sharp'
 import { PutObjectCommandInput } from '@aws-sdk/client-s3'
 import { S3Service } from './s3.service'
+import { User } from '../../entities/common/user.entity'
 
 @Injectable()
 export class UserService {
@@ -24,8 +26,8 @@ export class UserService {
 
   async createOne(dto: CreateUserDto) {
     const userWithSameEmail = await this.getOneByEmail(dto.email)
-
-    if (userWithSameEmail && userWithSameEmail.authType === 'jwt') throw new UserWithEmailAlreadyExistsException(dto.email)
+    console.log('puk')
+    if (userWithSameEmail && dto.auth_type === 'jwt') throw new UserWithEmailAlreadyExistsException(dto.email)
 
     const user = await this.userRepository.createOne(dto)
     user.role = await this.rolesService.getRole('user')
@@ -58,6 +60,13 @@ export class UserService {
     return user ? user : null
   }
 
+  async getOneByVerifyLink(link: string) {
+    const user = await this.userRepository.getOneByVerifyLink(link)
+    if (!user) throw new UserDoesNotExistException()
+
+    return user
+  }
+
   async getMany() {
     const users = await this.userRepository.getMany()
 
@@ -83,6 +92,10 @@ export class UserService {
     if (user) throw new UserWithUsernameAlreadyExistsException(username)
 
     return await this.updateOne(id, { username })
+  }
+
+  async save(user: User) {
+    return await this.userRepository.save(user)
   }
 
   async changePhoto(id: string, file: Express.Multer.File) {

@@ -1,14 +1,14 @@
 import { Body, Controller, Delete, Get, Param, Patch, Post, Req, UploadedFile, UseGuards, UseInterceptors } from '@nestjs/common'
 import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger'
+import { FileInterceptor } from '@nestjs/platform-express'
+import { memoryStorage } from 'multer'
+import { Request } from 'express'
 import { UserService } from '../../services/common/user.service'
 import { Roles } from '../../common/decorators/roles.decorator'
 import { RolesGuard } from '../../common/guards/roles.guard'
 import { AddRoleDto, BanUserDto, CreateUserDto, UpdateUserDto } from '../../dto/common/user.dto'
 import { RolesEnum } from '../../common/constants/roles.enum'
 import { JwtAuthGuard } from '../../common/guards/auth/jwt.guard'
-import { FileInterceptor } from '@nestjs/platform-express'
-import { memoryStorage } from 'multer'
-import { Request } from 'express'
 import { User } from '../../entities/common/user.entity'
 
 @Controller('api/users')

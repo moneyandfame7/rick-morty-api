@@ -1,4 +1,4 @@
-import { Body, Controller, Get, Post, Req, Res, UnauthorizedException, UseGuards } from '@nestjs/common'
+import { Body, Controller, Get, Param, Post, Redirect, Req, Res, UnauthorizedException, UseGuards } from '@nestjs/common'
 import { ApiTags } from '@nestjs/swagger'
 import { Request, Response } from 'express'
 import { JwtAuthGuard } from '../../common/guards/auth/jwt.guard'
@@ -51,6 +51,16 @@ export class AuthController extends BaseController {
     const userData = await this.authService.refresh(refresh_token)
     this.setCookies(res, userData.refresh_token, userData.access_token)
     return userData
+  }
+
+  @Get('/verify/:link')
+  @Redirect('', 302)
+  private async verify(@Param('link') link: string, @Res({ passthrough: true }) res: Response) {
+    const userData = await this.authService.verify(link)
+    this.setCookies(res, userData.refresh_token, userData.access_token)
+    return {
+      url: this.CLIENT_URL
+    }
   }
 
   @Get('/finish')

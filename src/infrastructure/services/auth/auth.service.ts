@@ -1,4 +1,4 @@
-import { Injectable, UnauthorizedException } from '@nestjs/common'
+import { BadRequestException, Injectable, UnauthorizedException } from '@nestjs/common'
 import * as bcrypt from 'bcrypt'
 import { UserService } from '../common/user.service'
 import { TokenService } from '../common/token.service'
@@ -6,10 +6,18 @@ import { SignInDto, SignUpDto } from '../../dto/auth/auth.dto'
 import { User } from '../../entities/common/user.entity'
 import { UserWithEmailAlreadyExistsException, UserWithUsernameAlreadyExistsException } from 'src/domain/exceptions/common/user.exception'
 import { AuthIncorrectEmailException, AuthIncorrectPasswordException } from 'src/domain/exceptions/common/auth.exception'
+import { MailService } from '../common/mail.service'
+import { v4 as uuid } from 'uuid'
+import { EnvironmentConfigService } from '../../config/environment-config.service'
 
 @Injectable()
 export class AuthService {
-  constructor(private readonly userService: UserService, private readonly tokenService: TokenService) {}
+  constructor(
+    private readonly config: EnvironmentConfigService,
+    private readonly userService: UserService,
+    private readonly tokenService: TokenService,
+    private readonly mailService: MailService
+  ) {}
 
   async signup(userDto: SignUpDto) {
     const withSameEmail = await this.userService.getOneByAuthType(userDto.email, 'jwt')
@@ -19,8 +27,10 @@ export class AuthService {
     if (withSameUsername) throw new UserWithUsernameAlreadyExistsException(userDto.username)
 
     const hashedPassword = await this.hashPassword(userDto.password)
-    const user = await this.userService.createOne({ ...userDto, password: hashedPassword, authType: 'jwt' })
+    const verify_link = uuid()
 
+    const user = await this.userService.createOne({ ...userDto, password: hashedPassword, auth_type: 'jwt', verify_link })
+    await this.mailService.sendVerifyMail(user.email, `${this.config.getBaseUrl()}/auth/verify/${verify_link}`)
     return this.buildUserInfoAndTokens(user)
   }
 
@@ -42,6 +52,16 @@ export class AuthService {
     if (!userData || !tokenFromDatabase) throw new UnauthorizedException()
     const user = await this.userService.getOneById(userData.id)
 
+    return await this.buildUserInfoAndTokens(user)
+  }
+
+  public async verify(link: string) {
+    const user = await this.userService.getOneByVerifyLink(link)
+
+    if (!user) throw new BadRequestException('Incorrect verification link')
+
+    user.is_verified = true
+    await this.userService.save(user)
     return await this.buildUserInfoAndTokens(user)
   }
 

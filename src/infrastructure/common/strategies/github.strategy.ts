@@ -20,11 +20,12 @@ export class GithubStrategy extends PassportStrategy(Strategy, 'github') {
       username: profile.username,
       email: profile.emails[0].value,
       password: null,
-      authType: profile.provider,
-      photo: profile.photos[0].value
+      auth_type: profile.provider,
+      photo: profile.photos[0].value,
+      is_verified: true
     }
 
-    const userWithSameAuthType = await this.userService.getOneByAuthType(userInfo.email, userInfo.authType)
+    const userWithSameAuthType = await this.userService.getOneByAuthType(userInfo.email, userInfo.auth_type)
     if (userWithSameAuthType) return userWithSameAuthType
 
     const userWithSameUserName = await this.userService.getOneByUsername(userInfo.username)

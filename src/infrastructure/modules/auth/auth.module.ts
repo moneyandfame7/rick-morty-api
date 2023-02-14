@@ -11,9 +11,10 @@ import { GithubStrategy } from '../../common/strategies/github.strategy'
 import { DiscordStrategy } from '../../common/strategies/discord.strategy'
 import { SpotifyStrategy } from '../../common/strategies/spotify.strategy'
 import { EnvironmentConfigModule } from '../../config/environment-config.module'
+import { MailModule } from '../common/mail.module'
 
 @Module({
-  imports: [JwtModule.register({ secret: process.env.AT_SECRET }), EnvironmentConfigModule, UserModule, PassportModule, TokenModule],
+  imports: [JwtModule.register({ secret: process.env.AT_SECRET }), EnvironmentConfigModule, UserModule, PassportModule, TokenModule, MailModule],
   controllers: [AuthController],
   providers: [AuthService, JwtStrategy, GoogleStrategy, GithubStrategy, DiscordStrategy, SpotifyStrategy],
   exports: [AuthService, JwtModule]

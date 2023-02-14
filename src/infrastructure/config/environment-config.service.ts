@@ -14,6 +14,22 @@ export class EnvironmentConfigService implements AuthConfig, S3BucketConfig, Dat
   getBaseUrl(): string {
     return this.configService.get<string>('BASE_URL')
   }
+  getClientUrl(): string {
+    return this.configService.get<string>('CLIENT_URL')
+  }
+  /* Mailer credentials */
+  getMailerHost(): string {
+    return this.configService.get<string>('MAILER_HOST')
+  }
+  getMailerPort(): number {
+    return this.configService.get<number>('MAILER_PORT')
+  }
+  getMailerUser(): string {
+    return this.configService.get<string>('MAILER_USER')
+  }
+  getMailerPassword(): string {
+    return this.configService.get<string>('MAILER_PASSWORD')
+  }
 
   /**
    * Database credentials

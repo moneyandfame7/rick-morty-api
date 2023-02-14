@@ -1,5 +1,5 @@
 import { ApiProperty, PartialType } from '@nestjs/swagger'
-import { IsEmail, IsEnum, IsIn, IsNotEmpty, IsOptional, IsUUID, MaxLength, MinLength } from 'class-validator'
+import { IsBoolean, IsEmail, IsEnum, IsIn, IsNotEmpty, IsOptional, IsUUID, MaxLength, MinLength } from 'class-validator'
 import { Type } from 'class-transformer'
 import { RolesEnum } from '../../common/constants/roles.enum'
 
@@ -26,10 +26,17 @@ export class CreateUserDto {
   readonly password: string
 
   @IsIn(['google', 'instagram', 'discord', 'github', 'jwt'])
-  readonly authType: string
+  readonly auth_type: string
 
   @IsOptional()
   readonly photo?: string
+
+  @IsUUID()
+  @IsOptional()
+  readonly verify_link?: string
+
+  @IsBoolean()
+  readonly is_verified?: boolean = false
 }
 
 export class UpdateUserDto extends PartialType(CreateUserDto) {}

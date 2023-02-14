@@ -41,12 +41,7 @@ export class UserRepository extends Repository<User> {
   public async updateOne(id: User['id'], updateUserDto: UpdateUserDto): Promise<User> {
     const queryBuilder: SelectQueryBuilder<User> = this.builder
 
-    const updated = await queryBuilder
-      .update(User)
-      .set(updateUserDto)
-      .where('id = :id', { id })
-      .returning('*')
-      .execute()
+    const updated = await queryBuilder.update(User).set(updateUserDto).where('id = :id', { id }).returning('*').execute()
 
     return updated.raw[0]
   }
@@ -67,10 +62,11 @@ export class UserRepository extends Repository<User> {
     return await queryBuilder.where('username = :username', { username }).getOne()
   }
 
-  public async getCount(): Promise<number> {
+  public async getOneByVerifyLink(verify_link: string): Promise<User> {
     const queryBuilder = this.builder
+    this.buildRelations(queryBuilder)
 
-    return await queryBuilder.getCount()
+    return await queryBuilder.where('verify_link = :verify_link', { verify_link }).getOne()
   }
 
   public async getOneByEmail(email: string): Promise<User> {
@@ -83,13 +79,10 @@ export class UserRepository extends Repository<User> {
   public async getOneByAuthType(email: string, auth_type: string) {
     const queryBuilder = this.builder
     this.buildRelations(queryBuilder)
-    return await queryBuilder
-      .where('email = :email', { email })
-      .andWhere('auth_type = :auth_type', { auth_type })
-      .getOne()
+    return await queryBuilder.where('email = :email', { email }).andWhere('auth_type = :auth_type', { auth_type }).getOne()
   }
 
-  public async ban(id: string, banReason: string): Promise<User> {
+  public async ban(id: string, ban_reason: string): Promise<User> {
     const queryBuilder = this.builder
     this.buildRelations(queryBuilder)
 
@@ -97,13 +90,19 @@ export class UserRepository extends Repository<User> {
       .update(User)
       .set({
         banned: true,
-        banReason
+        ban_reason
       })
       .where('id = :id', { id })
       .returning('*')
       .execute()
 
     return banned.raw[0]
+  }
+
+  public async getCount(): Promise<number> {
+    const queryBuilder = this.builder
+
+    return await queryBuilder.getCount()
   }
 
   // public async addRole(addRoleDto: AddRoleDto) {
