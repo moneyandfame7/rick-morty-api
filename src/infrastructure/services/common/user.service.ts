@@ -9,10 +9,18 @@ import {
   UserWithIdNotFoundException,
   UserWithUsernameAlreadyExistsException
 } from 'src/domain/exceptions/common/user.exception'
+import * as sharp from 'sharp'
+import { PutObjectCommandInput } from '@aws-sdk/client-s3'
+import { S3Service } from './s3.service'
 
 @Injectable()
 export class UserService {
-  constructor(private readonly userRepository: UserRepository, private readonly rolesService: RolesService, private readonly tokenService: TokenService) {}
+  constructor(
+    private readonly userRepository: UserRepository,
+    private readonly rolesService: RolesService,
+    private readonly tokenService: TokenService,
+    private readonly s3Service: S3Service
+  ) {}
 
   async createOne(dto: CreateUserDto) {
     const userWithSameEmail = await this.getOneByEmail(dto.email)
@@ -75,6 +83,23 @@ export class UserService {
     if (user) throw new UserWithUsernameAlreadyExistsException(username)
 
     return await this.updateOne(id, { username })
+  }
+
+  async changePhoto(id: string, file: Express.Multer.File) {
+    if (!file) throw new BadRequestException('You must provide a photo')
+    const fileBuffer = await sharp(file.buffer).resize({ height: 128, width: 128, fit: 'cover' }).toBuffer()
+    const [, type] = file.mimetype.split('/')
+    const params: PutObjectCommandInput = {
+      Bucket: this.s3Service.bucketName,
+      Key: `users/${id}.${type}`,
+      Body: fileBuffer,
+      ContentType: file.mimetype,
+      ACL: 'public-read'
+    }
+    const user = await this.getOneById(id)
+    user.photo = await this.s3Service.upload(params)
+
+    return await this.userRepository.save(user)
   }
 
   async removeOne(id: string) {

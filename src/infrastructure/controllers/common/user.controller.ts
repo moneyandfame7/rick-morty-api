@@ -1,4 +1,4 @@
-import { Body, Controller, Delete, Get, Param, Patch, Post, UseGuards } from '@nestjs/common'
+import { Body, Controller, Delete, Get, Param, Patch, Post, Req, UploadedFile, UseGuards, UseInterceptors } from '@nestjs/common'
 import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger'
 import { UserService } from '../../services/common/user.service'
 import { Roles } from '../../common/decorators/roles.decorator'
@@ -6,6 +6,10 @@ import { RolesGuard } from '../../common/guards/roles.guard'
 import { AddRoleDto, BanUserDto, CreateUserDto, UpdateUserDto } from '../../dto/common/user.dto'
 import { RolesEnum } from '../../common/constants/roles.enum'
 import { JwtAuthGuard } from '../../common/guards/auth/jwt.guard'
+import { FileInterceptor } from '@nestjs/platform-express'
+import { memoryStorage } from 'multer'
+import { Request } from 'express'
+import { User } from '../../entities/common/user.entity'
 
 @Controller('api/users')
 @ApiTags('users')
@@ -39,7 +43,6 @@ export class UserController {
   @Delete(':id')
   @Roles(RolesEnum.ADMIN)
   @UseGuards(JwtAuthGuard, RolesGuard)
-  // @UseGuards(RolesGuard)
   async removeOne(@Param('id') id: string) {
     return await this.userService.removeOne(id)
   }
@@ -60,5 +63,13 @@ export class UserController {
   @Post('/ban')
   async ban(@Body() banUserDto: BanUserDto) {
     return await this.userService.ban(banUserDto)
+  }
+
+  @Post('/photo')
+  @UseGuards(JwtAuthGuard)
+  @UseInterceptors(FileInterceptor('photo', { storage: memoryStorage() }))
+  async changeImage(@Req() req: Request, @UploadedFile() file: Express.Multer.File) {
+    const id = (req.user as User).id
+    return await this.userService.changePhoto(id, file)
   }
 }

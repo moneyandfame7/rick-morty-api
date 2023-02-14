@@ -15,7 +15,7 @@ export abstract class BaseController {
     this.ACCESS_TOKEN_COOKIE = this.config.getJwtAccessCookie()
   }
 
-  setCookies(res: Response, refresh_token, access_token) {
+  setCookies(res: Response, refresh_token: string, access_token: string) {
     res.cookie(this.REFRESH_TOKEN_COOKIE, refresh_token, {
       httpOnly: true,
       maxAge: this.REFRESH_TOKEN_EXPIRE_COOKIE
