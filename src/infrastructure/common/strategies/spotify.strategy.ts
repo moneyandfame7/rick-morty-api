@@ -30,7 +30,7 @@ export class SpotifyStrategy extends PassportStrategy(Strategy, 'spotify') {
 
     const userWithSameUserName = await this.userService.getOneByUsername(userInfo.username)
     if (userWithSameUserName) {
-      userInfo.username = 'NEED TO CHANGE'
+      userInfo.username = '$N33d t0 Ch@ng3'
       const createdUser = await this.userService.createOne(userInfo)
       done(null, createdUser)
     }

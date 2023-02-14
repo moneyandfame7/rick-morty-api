@@ -7,6 +7,7 @@ import { EnvironmentConfigService } from '../../config/environment-config.servic
 @Injectable()
 export class DiscordStrategy extends PassportStrategy(Strategy, 'discord') {
   private readonly DISCORD_AVATARS_URL = 'https://cdn.discordapp.com/avatars'
+
   constructor(private readonly config: EnvironmentConfigService, private readonly userService: UserService) {
     super({
       clientID: config.getDiscordClientId(),
@@ -29,8 +30,13 @@ export class DiscordStrategy extends PassportStrategy(Strategy, 'discord') {
     }
 
     const userWithSameAuthType = await this.userService.getOneByAuthType(userInfo.email, userInfo.authType)
-
     if (userWithSameAuthType) return userWithSameAuthType
+
+    const userWithSameUserName = await this.userService.getOneByUsername(userInfo.username)
+    if (userWithSameUserName) {
+      userInfo.username = '$N33d t0 Ch@ng3'
+      return await this.userService.createOne(userInfo)
+    }
 
     return await this.userService.createOne(userInfo)
   }

@@ -27,8 +27,14 @@ export class GoogleStrategy extends PassportStrategy(Strategy, 'google') {
     }
 
     const userWithSameAuthType = await this.userService.getOneByAuthType(userInfo.email, userInfo.authType)
-
     if (userWithSameAuthType) return userWithSameAuthType
+
+    const userWithSameUserName = await this.userService.getOneByUsername(userInfo.username)
+    if (userWithSameUserName) {
+      userInfo.username = '$N33d t0 Ch@ng3'
+      const createdUser = await this.userService.createOne(userInfo)
+      done(null, createdUser)
+    }
 
     const createdUser = await this.userService.createOne(userInfo)
     done(null, createdUser)

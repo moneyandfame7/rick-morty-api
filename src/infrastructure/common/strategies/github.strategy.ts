@@ -16,8 +16,6 @@ export class GithubStrategy extends PassportStrategy(Strategy, 'github') {
   }
 
   async validate(accessToken: string, refreshToken: string, profile: Profile) {
-    console.log(profile)
-
     const userInfo = {
       username: profile.username,
       email: profile.emails[0].value,
@@ -27,8 +25,13 @@ export class GithubStrategy extends PassportStrategy(Strategy, 'github') {
     }
 
     const userWithSameAuthType = await this.userService.getOneByAuthType(userInfo.email, userInfo.authType)
-
     if (userWithSameAuthType) return userWithSameAuthType
+
+    const userWithSameUserName = await this.userService.getOneByUsername(userInfo.username)
+    if (userWithSameUserName) {
+      userInfo.username = '$N33d t0 Ch@ng3'
+      return await this.userService.createOne(userInfo)
+    }
 
     return await this.userService.createOne(userInfo)
   }

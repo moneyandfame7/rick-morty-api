@@ -25,11 +25,20 @@ export abstract class BaseController {
       maxAge: this.ACCESS_TOKEN_EXPIRE_COOKIE
     })
   }
-
+  getCookies(req: Request) {
+    return {
+      refresh_token: req.cookies[this.REFRESH_TOKEN_COOKIE],
+      access_token: req.cookies[this.ACCESS_TOKEN_COOKIE]
+    }
+  }
+  clearCookies(res: Response) {
+    res.clearCookie(this.REFRESH_TOKEN_COOKIE)
+    res.clearCookie(this.ACCESS_TOKEN_COOKIE)
+  }
   async socialRedirect(req: Request, res: Response) {
     const jwt = await this.authService.buildUserInfoAndTokens(req.user as User)
     this.setCookies(res, jwt.refresh_token, jwt.access_token)
-    if (jwt.user.username === 'NEED TO CHANGE') return { url: '/auth/change-username' }
+    if (jwt.user.username === '$N33d t0 Ch@ng3') return { url: '/auth/change-username' }
 
     return { url: '/auth/finish' }
   }

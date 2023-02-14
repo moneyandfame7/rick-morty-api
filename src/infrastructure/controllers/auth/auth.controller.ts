@@ -36,22 +36,20 @@ export class AuthController extends BaseController {
   @Get('/logout')
   @UseGuards(JwtAuthGuard)
   private async logout(@Req() req: Request, @Res({ passthrough: true }) res: Response) {
-    const refreshToken = req.cookies[this.REFRESH_TOKEN_COOKIE]
-    const accessToken = req.cookies[this.ACCESS_TOKEN_COOKIE]
-    if (refreshToken && accessToken) {
-      res.clearCookie(this.REFRESH_TOKEN_COOKIE)
-      res.clearCookie(this.ACCESS_TOKEN_COOKIE)
-      return await this.authService.logout(refreshToken)
+    const { access_token, refresh_token } = this.getCookies(req)
+    if (access_token && refresh_token) {
+      this.clearCookies(res)
+      return await this.authService.logout(refresh_token)
     }
 
-    throw new UnauthorizedException('User unauthorized')
+    throw new UnauthorizedException()
   }
 
   @Get('/refresh')
   @UseGuards(JwtAuthGuard)
   private async refresh(@Req() req: Request, @Res({ passthrough: true }) res: Response) {
-    const refreshToken = req.cookies[this.REFRESH_TOKEN_COOKIE]
-    const userData = await this.authService.refresh(refreshToken)
+    const { refresh_token } = this.getCookies(req)
+    const userData = await this.authService.refresh(refresh_token)
     this.setCookies(res, userData.refresh_token, userData.access_token)
     return userData
   }
@@ -60,12 +58,14 @@ export class AuthController extends BaseController {
   @UseGuards(JwtAuthGuard)
   async finish(@Req() req: Request, @Res({ passthrough: true }) res: Response) {
     const user = req.user as User
-    const refreshToken = req.cookies[this.REFRESH_TOKEN_COOKIE]
-    const accessToken = req.cookies[this.ACCESS_TOKEN_COOKIE]
+    const { refresh_token, access_token } = this.getCookies(req)
     return {
-      refreshToken,
-      accessToken,
-      user
+      refresh_token,
+      access_token,
+      user: {
+        ...user,
+        password: undefined
+      }
     }
   }
 
@@ -74,14 +74,10 @@ export class AuthController extends BaseController {
   async changeUsername(@Req() req: Request, @Body() dto: SetUsernameDto, @Res({ passthrough: true }) res: Response) {
     const id = (req.user as User).id
     const user = await this.userService.changeUsername(id, dto.username)
-    const jwt = await this.authService.buildUserInfoAndTokens(user)
-    this.setCookies(res, jwt.refresh_token, jwt.access_token)
+    const userData = await this.authService.buildUserInfoAndTokens(user)
+    this.setCookies(res, userData.refresh_token, userData.access_token)
 
-    return {
-      refresh_token: jwt.refresh_token,
-      access_token: jwt.access_token,
-      user
-    }
+    return userData
   }
 
   @Get('/reset-password')
