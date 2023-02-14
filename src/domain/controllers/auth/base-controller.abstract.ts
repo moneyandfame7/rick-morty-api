@@ -1,7 +1,8 @@
 import { Injectable } from '@nestjs/common'
-import { Response } from 'express'
+import { Request, Response } from 'express'
 import { EnvironmentConfigService } from 'src/infrastructure/config/environment-config.service'
 import { AuthService } from 'src/infrastructure/services/auth/auth.service'
+import { User } from 'src/infrastructure/entities/common/user.entity'
 
 @Injectable()
 export abstract class BaseController {
@@ -23,5 +24,13 @@ export abstract class BaseController {
       httpOnly: true,
       maxAge: this.ACCESS_TOKEN_EXPIRE_COOKIE
     })
+  }
+
+  async socialRedirect(req: Request, res: Response) {
+    const jwt = await this.authService.buildUserInfoAndTokens(req.user as User)
+    this.setCookies(res, jwt.refresh_token, jwt.access_token)
+    if (jwt.user.username === 'NEED TO CHANGE') return { url: '/auth/change-username' }
+
+    return { url: '/auth/finish' }
   }
 }

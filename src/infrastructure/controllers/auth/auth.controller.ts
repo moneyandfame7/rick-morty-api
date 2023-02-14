@@ -1,16 +1,14 @@
 import { Body, Controller, Get, Post, Req, Res, UnauthorizedException, UseGuards } from '@nestjs/common'
 import { ApiTags } from '@nestjs/swagger'
 import { Request, Response } from 'express'
-import { Roles } from '../../common/decorators/roles.decorator'
-import { RolesGuard } from '../../common/guards/roles.guard'
 import { JwtAuthGuard } from '../../common/guards/auth/jwt.guard'
-import { RolesEnum } from '../../common/constants/roles.enum'
 import { SignInDto, SignUpDto } from '../../dto/auth/auth.dto'
 import { User } from '../../entities/common/user.entity'
 import { BaseController } from 'src/domain/controllers/auth/base-controller.abstract'
 import { EnvironmentConfigService } from '../../config/environment-config.service'
 import { AuthService } from '../../services/auth/auth.service'
 import { UserService } from '../../services/common/user.service'
+import { ResetPasswordDto, SetUsernameDto } from '../../dto/common/user.dto'
 
 @Controller('auth')
 @ApiTags('auth')
@@ -58,17 +56,9 @@ export class AuthController extends BaseController {
     return userData
   }
 
-  @Get('/protected')
-  @Roles(RolesEnum.ADMIN)
-  @UseGuards(RolesGuard)
-  async protected(@Req() req: Request) {
-    console.log(req.user)
-    return 'access granted'
-  }
-
   @Get('/finish')
   @UseGuards(JwtAuthGuard)
-  private async finish(@Req() req: Request) {
+  async finish(@Req() req: Request, @Res({ passthrough: true }) res: Response) {
     const user = req.user as User
     const refreshToken = req.cookies[this.REFRESH_TOKEN_COOKIE]
     const accessToken = req.cookies[this.ACCESS_TOKEN_COOKIE]
@@ -78,4 +68,22 @@ export class AuthController extends BaseController {
       user
     }
   }
+
+  @Post('/change-username')
+  @UseGuards(JwtAuthGuard)
+  async changeUsername(@Req() req: Request, @Body() dto: SetUsernameDto, @Res({ passthrough: true }) res: Response) {
+    const id = (req.user as User).id
+    const user = await this.userService.changeUsername(id, dto.username)
+    const jwt = await this.authService.buildUserInfoAndTokens(user)
+    this.setCookies(res, jwt.refresh_token, jwt.access_token)
+
+    return {
+      refresh_token: jwt.refresh_token,
+      access_token: jwt.access_token,
+      user
+    }
+  }
+
+  @Get('/reset-password')
+  async resetPassword(@Req() req: Request, @Body() dto: ResetPasswordDto) {}
 }

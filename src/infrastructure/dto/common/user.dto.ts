@@ -57,3 +57,8 @@ export class SetUsernameDto {
   @IsNotEmpty()
   username: string
 }
+
+export class ResetPasswordDto {
+  @IsEmail()
+  email: string
+}

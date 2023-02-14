@@ -2,7 +2,6 @@ import { Controller, Get, Redirect, Req, Res, UseGuards } from '@nestjs/common'
 import { AuthService } from '../../services/auth/auth.service'
 import { DiscordAuthGuard } from '../../common/guards/auth/discord.guard'
 import { Request, Response } from 'express'
-import { User } from '../../entities/common/user.entity'
 import { EnvironmentConfigService } from '../../config/environment-config.service'
 import { BaseController } from 'src/domain/controllers/auth/base-controller.abstract'
 
@@ -17,10 +16,9 @@ export class DiscordController extends BaseController {
   async login(@Req() req: Request) {}
 
   @Get('/redirect')
-  @Redirect('/auth/finish')
+  @Redirect('/auth/finish', 302)
   @UseGuards(DiscordAuthGuard)
   async redirect(@Req() req: Request, @Res({ passthrough: true }) res: Response) {
-    const jwt = await this.authService.buildUserInfoAndTokens(req.user as User)
-    this.setCookies(res, jwt.refresh_token, jwt.access_token)
+    return await this.socialRedirect(req, res)
   }
 }
