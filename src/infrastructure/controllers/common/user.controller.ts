@@ -65,7 +65,7 @@ export class UserController {
     return await this.userService.ban(banUserDto)
   }
 
-  @Post('/photo')
+  @Post(':id/photo')
   @UseGuards(JwtAuthGuard)
   @UseInterceptors(FileInterceptor('photo', { storage: memoryStorage() }))
   async changeImage(@Req() req: Request, @UploadedFile() file: Express.Multer.File) {
