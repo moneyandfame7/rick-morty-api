@@ -3,7 +3,12 @@ import { AddRoleDto, BanUserDto, CreateUserDto, UpdateUserDto } from '../../dto/
 import { UserRepository } from '../../repositories/common/user.repository'
 import { RolesService } from './roles.service'
 import { TokenService } from './token.service'
-import { UsersNotFoundException, UserWithEmailAlreadyExistsException, UserWithIdNotFoundException } from 'src/domain/exceptions/common/user.exception'
+import {
+  UsersNotFoundException,
+  UserWithEmailAlreadyExistsException,
+  UserWithIdNotFoundException,
+  UserWithUsernameAlreadyExistsException
+} from 'src/domain/exceptions/common/user.exception'
 
 @Injectable()
 export class UserService {
@@ -63,6 +68,13 @@ export class UserService {
     if (!user) throw new UserWithIdNotFoundException(id)
 
     return await this.userRepository.updateOne(id, updateUserDto)
+  }
+
+  async changeUsername(id: string, username: string) {
+    const user = await this.userRepository.getOneByUsername(username)
+    if (user) throw new UserWithUsernameAlreadyExistsException(username)
+
+    return await this.updateOne(id, { username })
   }
 
   async removeOne(id: string) {

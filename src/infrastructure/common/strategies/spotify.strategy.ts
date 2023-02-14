@@ -3,7 +3,6 @@ import { Profile, Strategy, VerifyCallback } from 'passport-spotify'
 import { ConfigService } from '@nestjs/config'
 import { Injectable } from '@nestjs/common'
 import { UserService } from '../../services/common/user.service'
-import { UserWithUsernameAlreadyExistsException } from 'src/domain/exceptions/common/user.exception'
 
 @Injectable()
 export class SpotifyStrategy extends PassportStrategy(Strategy, 'spotify') {
@@ -25,14 +24,16 @@ export class SpotifyStrategy extends PassportStrategy(Strategy, 'spotify') {
       authType: profile.provider,
       photo: (profile.photos[0] as any).value
     }
-    console.log(userInfo)
-
-    const userWithSameUserName = await this.userService.getOneByUsername(userInfo.username)
-    if (userWithSameUserName) throw new UserWithUsernameAlreadyExistsException(userInfo.username)
 
     const userWithSameAuthType = await this.userService.getOneByAuthType(userInfo.email, userInfo.authType)
-
     if (userWithSameAuthType) return userWithSameAuthType
+
+    const userWithSameUserName = await this.userService.getOneByUsername(userInfo.username)
+    if (userWithSameUserName) {
+      userInfo.username = 'NEED TO CHANGE'
+      const createdUser = await this.userService.createOne(userInfo)
+      done(null, createdUser)
+    }
 
     const createdUser = await this.userService.createOne(userInfo)
     done(null, createdUser)
