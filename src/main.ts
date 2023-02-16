@@ -1,9 +1,9 @@
 import { NestFactory } from '@nestjs/core'
 import { ValidationPipe } from '@nestjs/common'
-import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger'
 import 'dotenv/config'
 import * as cookieParser from 'cookie-parser'
 import { AppModule } from './app.module'
+import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger'
 
 async function bootstrap() {
   const PORT = process.env.PORT || 3000

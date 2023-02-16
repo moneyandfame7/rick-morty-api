@@ -42,7 +42,8 @@ export class Character {
       type: 'Planet',
       dimension: 'Dimension C-137'
     },
-    description: "Info to the character's origin location."
+    description: "Info to the character's origin location.",
+    type: () => Location
   })
   @ManyToOne(() => Location, location => location.residents)
   location: Location
@@ -53,7 +54,8 @@ export class Character {
       type: 'Planet',
       dimension: 'Dimension C-137'
     },
-    description: "Info to the character's last known location endpoint."
+    description: "Info to the character's last known location endpoint.",
+    type: () => Location
   })
   @ManyToOne(() => Location, location => location.residents)
   origin: Location

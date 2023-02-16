@@ -50,7 +50,8 @@ export class CreateCharacterDto {
       type: 'Planet',
       dimension: 'Dimension C-137'
     },
-    description: "Info to the character's origin location."
+    description: "Info to the character's origin location.",
+    type: () => CreateLocationDto
   })
   @IsOptional()
   location?: CreateLocationDto
@@ -61,9 +62,9 @@ export class CreateCharacterDto {
       type: 'Planet',
       dimension: 'Dimension C-137'
     },
-    description: "Info to the character's last known location endpoint."
+    description: "Info to the character's last known location endpoint.",
+    type: () => CreateLocationDto
   })
-  @IsObject()
   @IsOptional()
   origin?: CreateLocationDto
 
