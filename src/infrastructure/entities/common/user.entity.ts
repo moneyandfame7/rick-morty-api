@@ -20,6 +20,9 @@ export class User {
   @Column({ nullable: true, type: 'varchar' })
   password: string
 
+  @Column({ nullable: true })
+  photo?: string
+
   @ApiProperty({ example: 'admin', description: 'The role of the user' })
   @ManyToOne(() => Role, role => role.value)
   role: Role
@@ -29,12 +32,16 @@ export class User {
   banned: boolean
 
   @ApiProperty({ example: 'violation', description: 'The ban reason of the user' })
-  @Column({ name: 'ban_reason', type: 'varchar', nullable: true })
-  banReason: string
+  @Column({ type: 'varchar', nullable: true })
+  ban_reason: string
 
-  @Column({ name: 'auth_type', type: 'varchar', nullable: false })
-  authType: string
+  @Column({ type: 'varchar', nullable: false })
+  auth_type: string
 
-  @Column({ nullable: true })
-  photo?: string
+  @ApiProperty({ example: true, description: 'Is the user verified' })
+  @Column({ type: 'boolean', default: false })
+  is_verified: boolean
+
+  @Column({ type: 'uuid', nullable: true })
+  verify_link: string
 }

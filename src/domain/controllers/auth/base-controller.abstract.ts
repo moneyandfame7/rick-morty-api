@@ -6,6 +6,7 @@ import { User } from 'src/infrastructure/entities/common/user.entity'
 
 @Injectable()
 export abstract class BaseController {
+  readonly CLIENT_URL: string
   readonly REFRESH_TOKEN_COOKIE: string
   readonly ACCESS_TOKEN_COOKIE: string
   readonly REFRESH_TOKEN_EXPIRE_COOKIE: number = 30 * 24 * 60 * 60 * 1000 // 30 days
@@ -13,6 +14,7 @@ export abstract class BaseController {
   protected constructor(readonly config: EnvironmentConfigService, readonly authService: AuthService) {
     this.REFRESH_TOKEN_COOKIE = this.config.getJwtRefreshCookie()
     this.ACCESS_TOKEN_COOKIE = this.config.getJwtAccessCookie()
+    this.CLIENT_URL = this.config.getClientUrl()
   }
 
   setCookies(res: Response, refresh_token: string, access_token: string) {
@@ -35,6 +37,7 @@ export abstract class BaseController {
     res.clearCookie(this.REFRESH_TOKEN_COOKIE)
     res.clearCookie(this.ACCESS_TOKEN_COOKIE)
   }
+
   async socialRedirect(req: Request, res: Response) {
     const jwt = await this.authService.buildUserInfoAndTokens(req.user as User)
     this.setCookies(res, jwt.refresh_token, jwt.access_token)

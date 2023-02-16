@@ -24,12 +24,13 @@ export class DiscordStrategy extends PassportStrategy(Strategy, 'discord') {
       username: profile.username,
       email: profile.email,
       password: null,
-      authType: profile.provider,
+      auth_type: profile.provider,
       /* https://stackoverflow.com/questions/65450055/how-to-get-avatar-from-discord-api */
-      photo: `${this.DISCORD_AVATARS_URL}/${profile.id}/${profile.avatar}`
+      photo: `${this.DISCORD_AVATARS_URL}/${profile.id}/${profile.avatar}`,
+      is_verified: true
     }
 
-    const userWithSameAuthType = await this.userService.getOneByAuthType(userInfo.email, userInfo.authType)
+    const userWithSameAuthType = await this.userService.getOneByAuthType(userInfo.email, userInfo.auth_type)
     if (userWithSameAuthType) return userWithSameAuthType
 
     const userWithSameUserName = await this.userService.getOneByUsername(userInfo.username)
