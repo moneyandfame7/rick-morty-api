@@ -1,6 +1,6 @@
-import { DataSource } from 'typeorm'
-import { Seeder, SeederFactoryManager } from 'typeorm-extension'
-import { CreateEpisodeDto } from 'src/infrastructure/dto/main/episode.dto'
+import { type DataSource } from 'typeorm'
+import { type Seeder } from 'typeorm-extension'
+import { type CreateEpisodeDto } from 'src/infrastructure/dto/main/episode.dto'
 import { Episode } from 'src/infrastructure/entities/main/episode.entity'
 import { fetchData } from 'src/infrastructure/common/utils/fetch-data'
 
@@ -15,7 +15,7 @@ export interface IEpisode {
 }
 
 export class EpisodeSeeder implements Seeder {
-  public async run(dataSource: DataSource, factoryManager: SeederFactoryManager): Promise<void> {
+  public async run(dataSource: DataSource): Promise<void> {
     try {
       const episodeRepository = dataSource.getRepository(Episode)
       const episodes: CreateEpisodeDto[] = []

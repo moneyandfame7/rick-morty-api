@@ -25,7 +25,7 @@ export class CreateEpisodeDto {
     example: [1, 2, 3, 4, 5, 7, 10],
     description: 'List of characters who have been seen in the episode.'
   })
-  characters?: any
+  characters?: number[]
 
   createdAt?: Date
 }

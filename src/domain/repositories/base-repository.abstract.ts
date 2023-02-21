@@ -1,12 +1,12 @@
-import { DataSource, Repository, SelectQueryBuilder } from 'typeorm'
-import { QueryPaginationDto } from '../../infrastructure/dto/common/pagination.dto'
+import { type DataSource, type EntityTarget, type ObjectLiteral, Repository, type SelectQueryBuilder } from 'typeorm'
+import type { QueryPaginationDto } from '@dto/common/pagination.dto'
 
-export abstract class BaseRepository<Entity, QueryEntityDto, CreateEntityDto, UpdateEntityDto, GetManyEntities> extends Repository<Entity> {
-  protected constructor(protected dataSource: DataSource, protected alias: string, protected Entity: any) {
-    super(Entity, dataSource.createEntityManager())
+export abstract class BaseRepository<Entity extends ObjectLiteral, QueryEntityDto, CreateEntityDto, UpdateEntityDto, GetManyEntities> extends Repository<Entity> {
+  protected constructor(protected dataSource: DataSource, protected alias: string, protected En: EntityTarget<Entity>) {
+    super(En, dataSource.createEntityManager())
   }
 
-  protected get builder() {
+  protected get builder(): SelectQueryBuilder<Entity> {
     return this.createQueryBuilder(this.alias)
   }
 
@@ -14,15 +14,15 @@ export abstract class BaseRepository<Entity, QueryEntityDto, CreateEntityDto, Up
 
   protected abstract buildRelations(builder: SelectQueryBuilder<Entity>): void
 
-  abstract createOne(dto: CreateEntityDto): Promise<Entity>
+  public abstract createOne(dto: CreateEntityDto): Promise<Entity>
 
-  abstract getMany(queryPaginationDto: QueryPaginationDto, queryEntityDto: QueryEntityDto): Promise<GetManyEntities>
+  public abstract getMany(queryPaginationDto: QueryPaginationDto, queryEntityDto: QueryEntityDto): Promise<GetManyEntities>
 
-  abstract getOne(id: number): Promise<Entity>
+  public abstract getOne(id: number): Promise<Entity | null>
 
-  abstract updateOne(id: number, dto: UpdateEntityDto): Promise<Entity>
+  public abstract updateOne(id: number, dto: UpdateEntityDto): Promise<Entity>
 
-  abstract removeOne(id: number): Promise<Entity>
+  public abstract removeOne(id: number): Promise<Entity>
 
   public async getCount(): Promise<number> {
     const queryBuilder = this.builder

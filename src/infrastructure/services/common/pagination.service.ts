@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common'
-import { QueryPaginationDto } from '../../dto/common/pagination.dto'
-import { EnvironmentConfigService } from '../../config/environment-config.service'
-import { PageDoesNotExistException } from 'src/domain/exceptions/common/pagination.exception'
+import type { QueryPaginationDto } from '@dto/common/pagination.dto'
+import { EnvironmentConfigService } from '@config/environment-config.service'
+import { PageDoesNotExistException } from '@domain/exceptions/common/pagination.exception'
 
 export interface PaginationOptions {
   queryPaginationDto: QueryPaginationDto
@@ -13,32 +13,34 @@ export interface BuildPaginationOptions {
   take: number
   count: number
   pages: number
-  prev: string
-  next: string
+  prev: string | null
+  next: string | null
 }
 
 export interface Payload<Entity> {
   info: BuildPaginationOptions
-  results: Array<Entity>
+  results: Entity[]
 }
 
 @Injectable()
 export class PaginationService<Entity> {
   constructor(private readonly config: EnvironmentConfigService) {}
 
-  private queryString(query: string, current: number, page: number, endpoint: string) {
-    return query.includes('page')
-      ? this.config.getBaseUrl() + '/api/' + query.replace(`page=${current}`, `page=${page}`)
-      : this.config.getBaseUrl() + '/api/' + endpoint + `?page=${page}`
+  private queryString(query: string | undefined, current: number, page: number, endpoint: string): string | null {
+    if (query?.includes('page')) {
+      return this.config.getBaseUrl() + '/api/' + query.replace(`page=${current}`, `page=${page}`)
+    }
+
+    return query ? this.config.getBaseUrl() + '/api/' + endpoint + `?page=${page}` + query.replace(endpoint + '?', '&') : null
   }
 
   public buildPaginationInfo({ queryPaginationDto, count }: PaginationOptions): BuildPaginationOptions {
     const page = queryPaginationDto.page
-    const pages = Math.ceil(count / queryPaginationDto.take)
+    const pages = Math.ceil(count / queryPaginationDto?.take)
     const endpoint = queryPaginationDto.endpoint
     const otherQuery = queryPaginationDto.otherQuery
     const take = queryPaginationDto.take
-
+    console.log(otherQuery)
     if (page > pages) throw new PageDoesNotExistException(page)
     return {
       page,
@@ -50,7 +52,7 @@ export class PaginationService<Entity> {
     }
   }
 
-  public wrapEntityWithPaginationInfo(results: Array<Entity>, info: BuildPaginationOptions): Payload<Entity> {
+  public wrapEntityWithPaginationInfo(results: Entity[], info: BuildPaginationOptions): Payload<Entity> {
     return {
       info,
       results

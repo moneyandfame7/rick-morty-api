@@ -1,8 +1,6 @@
-import { Location } from 'src/infrastructure/entities/main/location.entity'
-
-export interface LocationModel {}
+import type { Location } from '@entities/main/location.entity'
 
 export interface GetManyLocations {
-  locations: Location[]
+  locations: Location[] | null
   count: number
 }

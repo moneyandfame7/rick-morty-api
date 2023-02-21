@@ -1,8 +1,6 @@
-import { Episode } from 'src/infrastructure/entities/main/episode.entity'
-
-export interface EpisodeModel {}
+import type { Episode } from '@entities/main/episode.entity'
 
 export interface GetManyEpisodes {
-  episodes: Episode[]
+  episodes: Episode[] | null
   count: number
 }

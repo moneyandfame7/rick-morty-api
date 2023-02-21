@@ -1,36 +1,32 @@
 import { Injectable } from '@nestjs/common'
 import { JwtService } from '@nestjs/jwt'
-import { User } from '../../entities/common/user.entity'
-import { TokenRepository } from '../../repositories/common/token.repository'
-import { EnvironmentConfigService } from '../../config/environment-config.service'
+import { TokenRepository } from '@repositories/common/token.repository'
+import { EnvironmentConfigService } from '@config/environment-config.service'
+import type { User } from '@entities/common/user.entity'
+import type { Token } from '@entities/common/token.entity'
+import type { GeneratedTokens } from '@domain/models/common/token.model'
 
 @Injectable()
 export class TokenService {
   private readonly ACCESS_SECRET: string
   private readonly REFRESH_SECRET: string
 
-  constructor(
-    private tokenRepository: TokenRepository,
-    private jwtService: JwtService,
-    private readonly config: EnvironmentConfigService
-  ) {
+  constructor(private readonly tokenRepository: TokenRepository, private readonly jwtService: JwtService, private readonly config: EnvironmentConfigService) {
     this.ACCESS_SECRET = this.config.getJwtAccessSecret()
     this.REFRESH_SECRET = this.config.getJwtRefreshSecret()
   }
 
-  async generateTokens(user: User) {
+  public generateTokens(user: User): GeneratedTokens {
     const payload = { ...user }
 
-    const [access_token, refresh_token] = await Promise.all([
-      this.jwtService.signAsync(payload, {
-        secret: this.ACCESS_SECRET,
-        expiresIn: '25m'
-      }),
-      this.jwtService.signAsync(payload, {
-        secret: this.REFRESH_SECRET,
-        expiresIn: '30d'
-      })
-    ])
+    const access_token = this.jwtService.sign(payload, {
+      secret: this.ACCESS_SECRET,
+      expiresIn: '25m'
+    })
+    const refresh_token = this.jwtService.sign(payload, {
+      secret: this.REFRESH_SECRET,
+      expiresIn: '30d'
+    })
 
     return {
       access_token,
@@ -38,35 +34,35 @@ export class TokenService {
     }
   }
 
-  async saveToken(user_id: string, refreshToken: string) {
+  public async saveToken(user_id: string, refreshToken: string): Promise<Token> {
     const tokenData = await this.tokenRepository.get(user_id)
 
     if (tokenData) {
       tokenData.refreshToken = refreshToken
-      return await this.tokenRepository.save(tokenData)
+      return this.tokenRepository.save(tokenData)
     }
 
-    const token = await this.tokenRepository.create({ user_id, refreshToken })
-    return await this.tokenRepository.save(token)
+    const token = this.tokenRepository.create({ user_id, refreshToken })
+    return this.tokenRepository.save(token)
   }
 
-  async removeByToken(refreshToken: string) {
-    return await this.tokenRepository.deleteByToken(refreshToken)
+  public async removeByToken(refreshToken: string): Promise<Token> {
+    return this.tokenRepository.deleteByToken(refreshToken)
   }
 
-  async removeByUserId(user_id: string) {
-    return await this.tokenRepository.delete({ user_id })
+  public async removeByUserId(user_id: string): Promise<void> {
+    await this.tokenRepository.delete({ user_id })
   }
 
-  async findToken(refreshToken: string) {
-    return await this.tokenRepository.findByToken(refreshToken)
+  public async findToken(refreshToken: string): Promise<Token | null> {
+    return this.tokenRepository.findByToken(refreshToken)
   }
 
-  async validateAccessToken(token: string): Promise<User> {
-    return await this.jwtService.verifyAsync(token, { secret: this.ACCESS_SECRET })
+  public validateAccessToken(token: string): User {
+    return this.jwtService.verify(token, { secret: this.ACCESS_SECRET })
   }
 
-  async validateRefreshToken(token: string): Promise<User> {
-    return await this.jwtService.verifyAsync(token, { secret: this.REFRESH_SECRET })
+  public validateRefreshToken(token: string): User {
+    return this.jwtService.verify(token, { secret: this.REFRESH_SECRET })
   }
 }

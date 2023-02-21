@@ -3,13 +3,13 @@ import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger'
 import { FileInterceptor } from '@nestjs/platform-express'
 import { memoryStorage } from 'multer'
 import { Request } from 'express'
-import { UserService } from '../../services/common/user.service'
-import { Roles } from '../../common/decorators/roles.decorator'
-import { RolesGuard } from '../../common/guards/roles.guard'
-import { AddRoleDto, BanUserDto, CreateUserDto, UpdateUserDto } from '../../dto/common/user.dto'
-import { RolesEnum } from '../../common/constants/roles.enum'
-import { JwtAuthGuard } from '../../common/guards/auth/jwt.guard'
-import { User } from '../../entities/common/user.entity'
+import { UserService } from '@services/common/user.service'
+import { Roles } from '@common/decorators/roles.decorator'
+import { RolesGuard } from '@common/guards/roles.guard'
+import { AddRoleDto, BanUserDto, CreateUserDto, UpdateUserDto } from '@dto/common/user.dto'
+import { RolesEnum } from '@common/constants/roles.enum'
+import { JwtAuthGuard } from '@common/guards/auth/jwt.guard'
+import type { User } from '@entities/common/user.entity'
 
 @Controller('api/users')
 @ApiTags('users')
@@ -18,33 +18,33 @@ export class UserController {
 
   @Post()
   @UseGuards(JwtAuthGuard)
-  async createOne(@Body() createUserDto: CreateUserDto) {
-    return await this.userService.createOne(createUserDto)
+  public async createOne(@Body() createUserDto: CreateUserDto): Promise<User> {
+    return this.userService.createOne(createUserDto)
   }
 
   @Get()
   @UseGuards(JwtAuthGuard)
-  async getMany() {
-    return await this.userService.getMany()
+  public async getMany(): Promise<User[]> {
+    return this.userService.getMany()
   }
 
   @Get(':id')
   @UseGuards(JwtAuthGuard)
-  async getOne(@Param('id') id: string) {
-    return await this.userService.getOneById(id)
+  public async getOne(@Param('id') id: string): Promise<User> {
+    return this.userService.getOneById(id)
   }
 
   @Patch(':id')
   @UseGuards(JwtAuthGuard)
-  async updateOne(@Param('id') id: string, @Body() updateUserDto: UpdateUserDto) {
-    return await this.userService.updateOne(id, updateUserDto)
+  public async updateOne(@Param('id') id: string, @Body() updateUserDto: UpdateUserDto): Promise<User> {
+    return this.userService.updateOne(id, updateUserDto)
   }
 
   @Delete(':id')
   @Roles(RolesEnum.ADMIN)
   @UseGuards(JwtAuthGuard, RolesGuard)
-  async removeOne(@Param('id') id: string) {
-    return await this.userService.removeOne(id)
+  public async removeOne(@Param('id') id: string): Promise<User> {
+    return this.userService.removeOne(id)
   }
 
   @ApiOperation({ summary: 'Give a role' })
@@ -52,8 +52,8 @@ export class UserController {
   @Roles(RolesEnum.ADMIN)
   @UseGuards(JwtAuthGuard, RolesGuard)
   @Post('/role')
-  async addRole(@Body() addRoleDto: AddRoleDto) {
-    return await this.userService.addRole(addRoleDto)
+  public async addRole(@Body() addRoleDto: AddRoleDto): Promise<User> {
+    return this.userService.addRole(addRoleDto)
   }
 
   @ApiOperation({ summary: 'Ban a user' })
@@ -61,15 +61,15 @@ export class UserController {
   @Roles(RolesEnum.ADMIN)
   @UseGuards(JwtAuthGuard, RolesGuard)
   @Post('/ban')
-  async ban(@Body() banUserDto: BanUserDto) {
-    return await this.userService.ban(banUserDto)
+  public async ban(@Body() banUserDto: BanUserDto): Promise<User> {
+    return this.userService.ban(banUserDto)
   }
 
   @Post(':id/photo')
   @UseGuards(JwtAuthGuard)
   @UseInterceptors(FileInterceptor('photo', { storage: memoryStorage() }))
-  async changeImage(@Req() req: Request, @UploadedFile() file: Express.Multer.File) {
+  public async changeImage(@Req() req: Request, @UploadedFile() file: Express.Multer.File): Promise<User> {
     const id = (req.user as User).id
-    return await this.userService.changePhoto(id, file)
+    return this.userService.changePhoto(id, file)
   }
 }

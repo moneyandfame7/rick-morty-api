@@ -1,6 +1,6 @@
 import 'dotenv/config'
-import { DataSource, DataSourceOptions } from 'typeorm'
-import { SeederOptions } from 'typeorm-extension'
+import { DataSource, type DataSourceOptions } from 'typeorm'
+import type { SeederOptions } from 'typeorm-extension'
 import { MainSeeder } from './seeds/0_main.seeder'
 
 export const dataSourceOptions: DataSourceOptions & SeederOptions = {

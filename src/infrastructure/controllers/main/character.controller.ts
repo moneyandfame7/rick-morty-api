@@ -4,14 +4,15 @@ import { FileInterceptor } from '@nestjs/platform-express'
 import { Request } from 'express'
 import * as _ from 'lodash'
 import { memoryStorage } from 'multer'
-import { CharacterService } from '../../services/main/character.service'
-import { CreateCharacterDto, QueryCharacterDto, UpdateCharacterDto } from '../../dto/main/character.dto'
-import { QueryPaginationDto } from '../../dto/common/pagination.dto'
-import { Character } from '../../entities/main/character.entity'
-import { RolesEnum } from '../../common/constants/roles.enum'
-import { JwtAuthGuard } from '../../common/guards/auth/jwt.guard'
-import { RolesGuard } from '../../common/guards/roles.guard'
-import { Roles } from '../../common/decorators/roles.decorator'
+import { CharacterService } from '@services/main/character.service'
+import { CreateCharacterDto, QueryCharacterDto, UpdateCharacterDto } from '@dto/main/character.dto'
+import { Character } from '@entities/main/character.entity'
+import { RolesEnum } from '@common/constants/roles.enum'
+import { JwtAuthGuard } from '@common/guards/auth/jwt.guard'
+import { RolesGuard } from '@common/guards/roles.guard'
+import { Roles } from '@common/decorators/roles.decorator'
+import type { Payload } from '@services/common/pagination.service'
+import type { QueryPaginationDto } from '@dto/common/pagination.dto'
 
 @Controller('api/characters')
 @ApiTags('characters')
@@ -24,15 +25,15 @@ export class CharacterController {
   @UseInterceptors(FileInterceptor('image', { storage: memoryStorage() }))
   @Roles(RolesEnum.ADMIN)
   @UseGuards(JwtAuthGuard, RolesGuard)
-  async createOne(@Body() character: CreateCharacterDto, @UploadedFile() file: Express.Multer.File) {
-    return await this.characterService.createOne(character, file)
+  public async createOne(@Body() character: CreateCharacterDto, @UploadedFile() file: Express.Multer.File): Promise<Character> {
+    return this.characterService.createOne(character, file)
   }
 
   @Get()
   @UseGuards(JwtAuthGuard)
   @ApiOperation({ summary: 'get all characters by queries' })
   @ApiResponse({ status: 200, type: [Character] })
-  async getMany(@Query() query: QueryCharacterDto, @Req() req: Request) {
+  public async getMany(@Query() query: QueryCharacterDto, @Req() req: Request): Promise<Payload<Character>> {
     const queryPaginationDto: QueryPaginationDto = {
       take: query.take,
       page: query.page,
@@ -41,7 +42,7 @@ export class CharacterController {
       otherQuery: req.originalUrl.split('/')[2],
       endpoint: 'characters'
     }
-    const queryCharacterDto: any = _.omitBy(
+    const queryCharacterDto = _.omitBy(
       {
         id: query.id,
         name: query.name,
@@ -53,15 +54,15 @@ export class CharacterController {
       },
       _.isNil
     )
-    return await this.characterService.getMany(queryPaginationDto, queryCharacterDto as QueryCharacterDto)
+    return this.characterService.getMany(queryPaginationDto, queryCharacterDto as QueryCharacterDto)
   }
 
   @Get(':id')
   @ApiOperation({ summary: 'get one character with specified id' })
   @ApiResponse({ status: 200, type: Character })
   @UseGuards(JwtAuthGuard)
-  async getOne(@Param('id', ParseIntPipe) id: number) {
-    return await this.characterService.getOne(id)
+  public async getOne(@Param('id', ParseIntPipe) id: number): Promise<Character> {
+    return this.characterService.getOne(id)
   }
 
   @Patch(':id')
@@ -69,7 +70,7 @@ export class CharacterController {
   @ApiResponse({ status: 200, type: Character })
   @Roles(RolesEnum.ADMIN)
   @UseGuards(JwtAuthGuard, RolesGuard)
-  async updateOne(@Param('id', ParseIntPipe) id: number, @Body() updateCharacterDto: UpdateCharacterDto) {
+  public async updateOne(@Param('id', ParseIntPipe) id: number, @Body() updateCharacterDto: UpdateCharacterDto): Promise<Character> {
     return this.characterService.updateOne(id, updateCharacterDto)
   }
 
@@ -78,7 +79,7 @@ export class CharacterController {
   @ApiResponse({ status: 200, type: Character })
   @Roles(RolesEnum.ADMIN)
   @UseGuards(JwtAuthGuard, RolesGuard)
-  removeOne(@Param('id', ParseIntPipe) id: number) {
+  public async removeOne(@Param('id', ParseIntPipe) id: number): Promise<Character> {
     return this.characterService.removeOne(id)
   }
 }

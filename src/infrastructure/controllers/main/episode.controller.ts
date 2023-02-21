@@ -2,13 +2,15 @@ import { Body, Controller, Delete, Get, Param, ParseIntPipe, Patch, Post, Query,
 import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger'
 import { Request } from 'express'
 import * as _ from 'lodash'
-import { EpisodeService } from '../../services/main/episode.service'
-import { CreateEpisodeDto, QueryEpisodeDto, UpdateEpisodeDto } from '../../dto/main/episode.dto'
-import { Episode } from '../../entities/main/episode.entity'
-import { Roles } from '../../common/decorators/roles.decorator'
-import { RolesEnum } from '../../common/constants/roles.enum'
-import { JwtAuthGuard } from '../../common/guards/auth/jwt.guard'
-import { RolesGuard } from '../../common/guards/roles.guard'
+import { EpisodeService } from '@services/main/episode.service'
+import { CreateEpisodeDto, QueryEpisodeDto, UpdateEpisodeDto } from '@dto/main/episode.dto'
+import { Episode } from '@entities/main/episode.entity'
+import { Roles } from '@common/decorators/roles.decorator'
+import { RolesEnum } from '@common/constants/roles.enum'
+import { JwtAuthGuard } from '@common/guards/auth/jwt.guard'
+import { RolesGuard } from '@common/guards/roles.guard'
+import type { Payload } from '@services/common/pagination.service'
+import type { QueryPaginationDto } from '@dto/common/pagination.dto'
 
 @Controller('api/episodes')
 @ApiTags('episodes')
@@ -20,15 +22,15 @@ export class EpisodeController {
   @ApiResponse({ status: 200, type: Episode })
   @Roles(RolesEnum.ADMIN)
   @UseGuards(JwtAuthGuard, RolesGuard)
-  async createOne(@Body() createEpisodeDto: CreateEpisodeDto) {
-    return await this.episodeService.createOne(createEpisodeDto)
+  public async createOne(@Body() createEpisodeDto: CreateEpisodeDto): Promise<Episode> {
+    return this.episodeService.createOne(createEpisodeDto)
   }
 
   @Get()
   @ApiOperation({ summary: 'get all episodes by queries' })
   @ApiResponse({ status: 200, type: [Episode] })
-  async getMany(@Query() query: QueryEpisodeDto, @Req() req: Request) {
-    const queryPaginationDto = {
+  public async getMany(@Query() query: QueryEpisodeDto, @Req() req: Request): Promise<Payload<Episode>> {
+    const queryPaginationDto: QueryPaginationDto = {
       take: query.take,
       page: query.page,
       order: query.order,
@@ -36,7 +38,7 @@ export class EpisodeController {
       otherQuery: req.originalUrl,
       endpoint: 'episodes'
     }
-    const queryEpisodeDto: any = _.omitBy(
+    const queryEpisodeDto = _.omitBy(
       {
         id: query.id,
         name: query.name,
@@ -45,15 +47,15 @@ export class EpisodeController {
       },
       _.isNil
     )
-    return await this.episodeService.getMany(queryPaginationDto, queryEpisodeDto as QueryEpisodeDto)
+    return this.episodeService.getMany(queryPaginationDto, queryEpisodeDto as QueryEpisodeDto)
   }
 
   @Get(':id')
   @ApiOperation({ summary: 'get one episode with specified id' })
   @ApiResponse({ status: 200, type: Episode })
   @UseGuards(JwtAuthGuard)
-  async getOne(@Param('id', ParseIntPipe) id: number) {
-    return await this.episodeService.getOne(id)
+  public async getOne(@Param('id', ParseIntPipe) id: number): Promise<Episode> {
+    return this.episodeService.getOne(id)
   }
 
   @Patch(':id')
@@ -61,8 +63,8 @@ export class EpisodeController {
   @ApiResponse({ status: 200, type: Episode })
   @Roles(RolesEnum.ADMIN)
   @UseGuards(JwtAuthGuard, RolesGuard)
-  async updateOne(@Param('id', ParseIntPipe) id: number, @Body() updateEpisodeDto: UpdateEpisodeDto) {
-    return await this.episodeService.updateOne(id, updateEpisodeDto)
+  public async updateOne(@Param('id', ParseIntPipe) id: number, @Body() updateEpisodeDto: UpdateEpisodeDto): Promise<Episode> {
+    return this.episodeService.updateOne(id, updateEpisodeDto)
   }
 
   @Delete(':id')
@@ -70,7 +72,7 @@ export class EpisodeController {
   @ApiResponse({ status: 200, type: Episode })
   @Roles(RolesEnum.ADMIN)
   @UseGuards(JwtAuthGuard, RolesGuard)
-  async removeOne(@Param('id', ParseIntPipe) id: number) {
-    return await this.episodeService.removeOne(id)
+  public async removeOne(@Param('id', ParseIntPipe) id: number): Promise<Episode> {
+    return this.episodeService.removeOne(id)
   }
 }

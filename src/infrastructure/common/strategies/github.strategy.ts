@@ -1,8 +1,9 @@
-import { Injectable } from '@nestjs/common'
+import { BadRequestException, Injectable } from '@nestjs/common'
 import { PassportStrategy } from '@nestjs/passport'
-import { Profile, Strategy } from 'passport-github2'
-import { UserService } from '../../services/common/user.service'
-import { EnvironmentConfigService } from '../../config/environment-config.service'
+import { type Profile, Strategy } from 'passport-github2'
+import { UserService } from '@services/common/user.service'
+import { EnvironmentConfigService } from '@config/environment-config.service'
+import type { User } from '@entities/common/user.entity'
 
 @Injectable()
 export class GithubStrategy extends PassportStrategy(Strategy, 'github') {
@@ -15,25 +16,29 @@ export class GithubStrategy extends PassportStrategy(Strategy, 'github') {
     })
   }
 
-  async validate(accessToken: string, refreshToken: string, profile: Profile) {
+  async validate(accessToken: string, refreshToken: string, profile: Profile): Promise<User> {
+    if (!profile.emails) {
+      throw new BadRequestException('Email is required')
+    }
     const userInfo = {
-      username: profile.username,
+      username: profile.displayName,
       email: profile.emails[0].value,
-      password: null,
       auth_type: profile.provider,
-      photo: profile.photos[0].value,
+      photo: profile.photos ? (profile.photos[0] as any).value : null,
       is_verified: true
     }
 
     const userWithSameAuthType = await this.userService.getOneByAuthType(userInfo.email, userInfo.auth_type)
-    if (userWithSameAuthType) return userWithSameAuthType
+    if (userWithSameAuthType) {
+      return userWithSameAuthType
+    }
 
     const userWithSameUserName = await this.userService.getOneByUsername(userInfo.username)
     if (userWithSameUserName) {
       userInfo.username = '$N33d t0 Ch@ng3'
-      return await this.userService.createOne(userInfo)
+      return this.userService.createOne(userInfo)
     }
 
-    return await this.userService.createOne(userInfo)
+    return this.userService.createOne(userInfo)
   }
 }

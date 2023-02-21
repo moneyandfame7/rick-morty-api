@@ -2,13 +2,15 @@ import { Body, Controller, Delete, Get, Param, ParseIntPipe, Patch, Post, Query,
 import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger'
 import { Request } from 'express'
 import * as _ from 'lodash'
-import { LocationService } from '../../services/main/location.service'
-import { CreateLocationDto, QueryLocationDto, UpdateLocationDto } from 'src/infrastructure/dto/main/location.dto'
-import { Location } from '../../entities/main/location.entity'
-import { JwtAuthGuard } from '../../common/guards/auth/jwt.guard'
-import { Roles } from '../../common/decorators/roles.decorator'
-import { RolesEnum } from '../../common/constants/roles.enum'
-import { RolesGuard } from '../../common/guards/roles.guard'
+import { LocationService } from '@services/main/location.service'
+import { CreateLocationDto, QueryLocationDto, UpdateLocationDto } from '@dto/main/location.dto'
+import { Location } from '@entities/main/location.entity'
+import { JwtAuthGuard } from '@common/guards/auth/jwt.guard'
+import { Roles } from '@common/decorators/roles.decorator'
+import { RolesEnum } from '@common/constants/roles.enum'
+import { RolesGuard } from '@common/guards/roles.guard'
+import type { Payload } from '@services/common/pagination.service'
+import type { QueryPaginationDto } from '@dto/common/pagination.dto'
 
 @Controller('api/locations')
 @ApiTags('locations')
@@ -20,8 +22,8 @@ export class LocationController {
   @ApiResponse({ status: 200, type: Location })
   @Roles(RolesEnum.ADMIN)
   @UseGuards(JwtAuthGuard, RolesGuard)
-  async createOne(@Body() createLocationDto: CreateLocationDto) {
-    return await this.locationService.createOne(createLocationDto)
+  public async createOne(@Body() createLocationDto: CreateLocationDto): Promise<Location> {
+    return this.locationService.createOne(createLocationDto)
   }
 
   @Get()
@@ -30,8 +32,8 @@ export class LocationController {
   })
   @ApiResponse({ status: 200, type: [Location] })
   @UseGuards(JwtAuthGuard)
-  async getMany(@Query() query: QueryLocationDto, @Req() req: Request) {
-    const queryPaginationDto = {
+  public async getMany(@Query() query: QueryLocationDto, @Req() req: Request): Promise<Payload<Location>> {
+    const queryPaginationDto: QueryPaginationDto = {
       take: query.take,
       page: query.page,
       order: query.order,
@@ -39,7 +41,7 @@ export class LocationController {
       otherQuery: req.originalUrl,
       endpoint: 'locations'
     }
-    const queryLocationDto: any = _.omitBy(
+    const queryLocationDto = _.omitBy(
       {
         id: query.id,
         name: query.name,
@@ -49,14 +51,14 @@ export class LocationController {
       },
       _.isNil
     )
-    return await this.locationService.getMany(queryPaginationDto, queryLocationDto as QueryLocationDto)
+    return this.locationService.getMany(queryPaginationDto, queryLocationDto as QueryLocationDto)
   }
 
   @Get(':id')
   @ApiOperation({ summary: 'Returns the location by id.' })
   @ApiResponse({ status: 200, type: Location })
   @UseGuards(JwtAuthGuard)
-  getOne(@Param('id', ParseIntPipe) id: number) {
+  public async getOne(@Param('id', ParseIntPipe) id: number): Promise<Location> {
     return this.locationService.getOne(id)
   }
 
@@ -65,7 +67,7 @@ export class LocationController {
   @ApiResponse({ status: 200, type: Location })
   @Roles(RolesEnum.ADMIN)
   @UseGuards(JwtAuthGuard, RolesGuard)
-  updateOne(@Param('id', ParseIntPipe) id: number, @Body() updateLocationDto: UpdateLocationDto) {
+  public async updateOne(@Param('id', ParseIntPipe) id: number, @Body() updateLocationDto: UpdateLocationDto): Promise<Location> {
     return this.locationService.updateOne(id, updateLocationDto)
   }
 
@@ -74,7 +76,7 @@ export class LocationController {
   @ApiResponse({ status: 200, type: Location })
   @Roles(RolesEnum.ADMIN)
   @UseGuards(JwtAuthGuard, RolesGuard)
-  removeOne(@Param('id', ParseIntPipe) id: number) {
+  public async removeOne(@Param('id', ParseIntPipe) id: number): Promise<Location> {
     return this.locationService.removeOne(id)
   }
 }
