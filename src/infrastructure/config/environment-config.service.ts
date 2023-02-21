@@ -1,139 +1,181 @@
-import { Injectable } from '@nestjs/common'
+import { Injectable, InternalServerErrorException } from '@nestjs/common'
 import { ConfigService } from '@nestjs/config'
-import { AuthConfig } from 'src/domain/config/auth.interface'
-import { S3BucketConfig } from 'src/domain/config/s3-bucket.interface'
-import { DatabaseConfig } from 'src/domain/config/database.interface'
+import type { AuthConfig } from '@domain/config/auth.interface'
+import type { S3BucketConfig } from '@domain/config/s3-bucket.interface'
+import type { DatabaseConfig } from '@domain/config/database.interface'
 
 @Injectable()
 export class EnvironmentConfigService implements AuthConfig, S3BucketConfig, DatabaseConfig {
   constructor(private readonly configService: ConfigService) {}
 
+  private getStringEnv(env: string): string {
+    const value = this.configService.get<string>(env)
+    if (!value) {
+      throw new InternalServerErrorException('Environment variable not specified')
+    }
+    return value
+  }
+
+  private getNumberEnv(env: string): number {
+    const value = this.configService.get<number>(env)
+    if (!value) {
+      throw new InternalServerErrorException('Environment variable not specified')
+    }
+    return value
+  }
+
   /**
    * Common configurations
    **/
-  getBaseUrl(): string {
-    return this.configService.get<string>('BASE_URL')
+  public getBaseUrl(): string {
+    return this.getStringEnv('BASE_URL')
   }
-  getClientUrl(): string {
-    return this.configService.get<string>('CLIENT_URL')
+
+  public getClientUrl(): string {
+    return this.getStringEnv('CLIENT_URL')
   }
-  /* Mailer credentials */
-  getMailerHost(): string {
-    return this.configService.get<string>('MAILER_HOST')
+
+  /**
+   * Mailer credentials
+   **/
+  public getMailerHost(): string {
+    return this.getStringEnv('MAILER_HOST')
   }
-  getMailerPort(): number {
-    return this.configService.get<number>('MAILER_PORT')
+
+  public getMailerPort(): number {
+    return this.getNumberEnv('MAILER_PORT')
   }
-  getMailerUser(): string {
-    return this.configService.get<string>('MAILER_USER')
+
+  public getMailerUser(): string {
+    return this.getStringEnv('MAILER_USER')
   }
-  getMailerPassword(): string {
-    return this.configService.get<string>('MAILER_PASSWORD')
+
+  public getMailerPassword(): string {
+    return this.getStringEnv('MAILER_PASSWORD')
   }
 
   /**
    * Database credentials
    **/
-  getDatabaseHost(): string {
-    return this.configService.get<string>('DB_HOST')
+  public getDatabaseHost(): string {
+    return this.getStringEnv('DB_HOST')
   }
-  getDatabaseName(): string {
-    return this.configService.get<string>('DB_NAME')
+
+  public getDatabaseName(): string {
+    return this.getStringEnv('DB_NAME')
   }
-  getDatabasePassword(): string {
-    return this.configService.get<string>('DB_PASSWORD')
+
+  public getDatabasePassword(): string {
+    return this.getStringEnv('DB_PASSWORD')
   }
-  getDatabasePort(): number {
-    return this.configService.get<number>('DB_PORT')
+
+  public getDatabasePort(): number {
+    return this.getNumberEnv('DB_PORT')
   }
-  getDatabaseUsername(): string {
-    return this.configService.get<string>('DB_USERNAME')
+
+  public getDatabaseUsername(): string {
+    return this.getStringEnv('DB_USERNAME')
   }
 
   /**
    * S3Bucket credentials
    **/
-  getS3BucketAccessKey(): string {
-    return this.configService.get<string>('S3BUCKET_ACCESS_KEY')
+  public getS3BucketAccessKey(): string {
+    return this.getStringEnv('S3BUCKET_ACCESS_KEY')
   }
-  getS3BucketAccessSecret(): string {
-    return this.configService.get<string>('S3BUCKET_ACCESS_SECRET')
+
+  public getS3BucketAccessSecret(): string {
+    return this.getStringEnv('S3BUCKET_ACCESS_SECRET')
   }
-  getS3BucketName(): string {
-    return this.configService.get<string>('S3BUCKET_NAME')
+
+  public getS3BucketName(): string {
+    return this.getStringEnv('S3BUCKET_NAME')
   }
-  getS3BucketRegion(): string {
-    return this.configService.get<string>('S3BUCKET_REGION')
+
+  public getS3BucketRegion(): string {
+    return this.getStringEnv('S3BUCKET_REGION')
   }
-  getS3BucketUrl(): string {
-    return this.configService.get<string>('S3BUCKET_URL')
+
+  public getS3BucketUrl(): string {
+    return this.getStringEnv('S3BUCKET_URL')
   }
 
   /**
    * JWT credentials
    **/
-  getJwtAccessCookie(): string {
-    return this.configService.get<string>('JWT_ACCESS_COOKIE')
+  public getJwtAccessCookie(): string {
+    return this.getStringEnv('JWT_ACCESS_COOKIE')
   }
-  getJwtAccessSecret(): string {
-    return this.configService.get<string>('JWT_ACCESS_SECRET')
+
+  public getJwtAccessSecret(): string {
+    return this.getStringEnv('JWT_ACCESS_SECRET')
   }
-  getJwtRefreshCookie(): string {
-    return this.configService.get<string>('JWT_REFRESH_COOKIE')
+
+  public getJwtRefreshCookie(): string {
+    return this.getStringEnv('JWT_REFRESH_COOKIE')
   }
-  getJwtRefreshSecret(): string {
-    return this.configService.get<string>('JWT_REFRESH_SECRET')
+
+  public getJwtRefreshSecret(): string {
+    return this.getStringEnv('JWT_REFRESH_SECRET')
   }
 
   /**
    * Google credentials
    **/
-  getGoogleCallbackUrl(): string {
-    return this.configService.get<string>('GOOGLE_CALLBACK_URL')
+  public getGoogleCallbackUrl(): string {
+    return this.getStringEnv('GOOGLE_CALLBACK_URL')
   }
-  getGoogleClientId(): string {
-    return this.configService.get<string>('GOOGLE_CLIENT_ID')
+
+  public getGoogleClientId(): string {
+    return this.getStringEnv('GOOGLE_CLIENT_ID')
   }
-  getGoogleClientSecret(): string {
-    return this.configService.get<string>('GOOGLE_CLIENT_SECRET')
+
+  public getGoogleClientSecret(): string {
+    return this.getStringEnv('GOOGLE_CLIENT_SECRET')
   }
 
   /**
    * Discord credentials
    **/
-  getDiscordCallbackUrl(): string {
-    return this.configService.get<string>('DISCORD_CALLBACK_URL')
+  public getDiscordCallbackUrl(): string {
+    return this.getStringEnv('DISCORD_CALLBACK_URL')
   }
-  getDiscordClientId(): string {
-    return this.configService.get<string>('DISCORD_CLIENT_ID')
+
+  public getDiscordClientId(): string {
+    return this.getStringEnv('DISCORD_CLIENT_ID')
   }
-  getDiscordClientSecret(): string {
-    return this.configService.get<string>('DISCORD_CLIENT_SECRET')
+
+  public getDiscordClientSecret(): string {
+    return this.getStringEnv('DISCORD_CLIENT_SECRET')
   }
 
   /**
    * GitHub credentials
    **/
-  getGithubCallbackUrl(): string {
-    return this.configService.get<string>('GITHUB_CALLBACK_URL')
+  public getGithubCallbackUrl(): string {
+    return this.getStringEnv('GITHUB_CALLBACK_URL')
   }
-  getGithubClientId(): string {
-    return this.configService.get<string>('GITHUB_CLIENT_ID')
+
+  public getGithubClientId(): string {
+    return this.getStringEnv('GITHUB_CLIENT_ID')
   }
-  getGithubClientSecret(): string {
-    return this.configService.get<string>('GITHUB_CLIENT_SECRET')
+
+  public getGithubClientSecret(): string {
+    return this.getStringEnv('GITHUB_CLIENT_SECRET')
   }
 
   /**
    * Spotify credentials
    **/
-  getSpotifyCallbackUrl(): string {
-    return this.configService.get<string>('SPOTIFY_CALLBACK_URL')
+  public getSpotifyCallbackUrl(): string {
+    return this.getStringEnv('SPOTIFY_CALLBACK_URL')
   }
-  getSpotifyClientId(): string {
-    return this.configService.get<string>('SPOTIFY_CLIENT_ID')
+
+  public getSpotifyClientId(): string {
+    return this.getStringEnv('SPOTIFY_CLIENT_ID')
   }
-  getSpotifyClientSecret(): string {
-    return this.configService.get<string>('SPOTIFY_CLIENT_SECRET')
+
+  public getSpotifyClientSecret(): string {
+    return this.getStringEnv('SPOTIFY_CLIENT_SECRET')
   }
 }

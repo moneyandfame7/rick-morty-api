@@ -3,9 +3,9 @@ import { Transform } from 'class-transformer'
 import { ApiProperty } from '@nestjs/swagger'
 import { PartialType } from '@nestjs/mapped-types'
 import { CreateLocationDto } from './location.dto'
-import { Episode } from '../../entities/main/episode.entity'
+import type { Episode } from '@entities/main/episode.entity'
 import { QueryPaginationDto } from '../common/pagination.dto'
-import { toCorrectId } from '../../common/transforms/to-correct-id.transform'
+import { toCorrectId } from '@common/transforms/to-correct-id.transform'
 
 export class CreateCharacterDto {
   @IsNumber()
@@ -31,7 +31,7 @@ export class CreateCharacterDto {
   })
   @IsIn(['Female', 'Male', 'Genderless', 'unknown'])
   @IsString()
-  gender: string = 'unknown'
+  gender: string
 
   @ApiProperty({ example: 'Human', description: 'The species of the character.' })
   @IsString()

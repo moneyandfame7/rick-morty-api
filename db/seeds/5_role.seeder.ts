@@ -1,5 +1,5 @@
-import { DataSource } from 'typeorm'
-import { Seeder, SeederFactoryManager } from 'typeorm-extension'
+import type { DataSource } from 'typeorm'
+import type { Seeder, SeederFactoryManager } from 'typeorm-extension'
 import { Role } from 'src/infrastructure/entities/common/role.entity'
 
 export class RoleSeeder implements Seeder {

@@ -1,6 +1,6 @@
-import { DataSource } from 'typeorm'
-import { Seeder, SeederFactoryManager } from 'typeorm-extension'
-import { CreateLocationDto } from 'src/infrastructure/dto/main/location.dto'
+import { type DataSource } from 'typeorm'
+import { type Seeder } from 'typeorm-extension'
+import { type CreateLocationDto } from 'src/infrastructure/dto/main/location.dto'
 import { Location } from 'src/infrastructure/entities/main/location.entity'
 import { fetchData } from 'src/infrastructure/common/utils/fetch-data'
 
@@ -15,7 +15,7 @@ export interface ILocation {
 }
 
 export class LocationSeeder implements Seeder {
-  public async run(dataSource: DataSource, factoryManager: SeederFactoryManager): Promise<void> {
+  public async run(dataSource: DataSource): Promise<void> {
     try {
       const locationRepository = dataSource.getRepository(Location)
       const locations: CreateLocationDto[] = []

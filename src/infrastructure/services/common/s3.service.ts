@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common'
-import { PutObjectCommand, PutObjectCommandInput, S3Client } from '@aws-sdk/client-s3'
-import { EnvironmentConfigService } from '../../config/environment-config.service'
+import { PutObjectCommand, type PutObjectCommandInput, S3Client } from '@aws-sdk/client-s3'
+import { EnvironmentConfigService } from '@config/environment-config.service'
 
 @Injectable()
 export class S3Service {
@@ -8,7 +8,7 @@ export class S3Service {
   private readonly bucketUrl: string
   public readonly bucketName: string
 
-  constructor(private config: EnvironmentConfigService) {
+  constructor(private readonly config: EnvironmentConfigService) {
     this.s3 = new S3Client({
       credentials: {
         accessKeyId: config.getS3BucketAccessKey(),
@@ -20,7 +20,7 @@ export class S3Service {
     this.bucketUrl = config.getS3BucketUrl()
   }
 
-  public async upload(params: PutObjectCommandInput) {
+  public async upload(params: PutObjectCommandInput): Promise<string> {
     const command = new PutObjectCommand(params)
     const url = await this.s3.send(command).then(() => `${this.bucketUrl}/${params.Key}`)
 

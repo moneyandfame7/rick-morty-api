@@ -1,11 +1,11 @@
-import { DataSource, Repository, SelectQueryBuilder } from 'typeorm'
+import { DataSource, Repository, type SelectQueryBuilder } from 'typeorm'
 import { Injectable } from '@nestjs/common'
-import { User } from '../../entities/common/user.entity'
-import { CreateUserDto, UpdateUserDto } from '../../dto/common/user.dto'
+import { User } from '@entities/common/user.entity'
+import type { CreateUserDto, UpdateUserDto } from '@dto/common/user.dto'
 
 @Injectable()
 export class UserRepository extends Repository<User> {
-  constructor(private dataSource: DataSource) {
+  constructor(private readonly dataSource: DataSource) {
     super(User, dataSource.createEntityManager())
   }
 
@@ -13,33 +13,33 @@ export class UserRepository extends Repository<User> {
     return this.createQueryBuilder('user')
   }
 
-  private buildRelations(builder: SelectQueryBuilder<User>) {
+  private buildRelations(builder: SelectQueryBuilder<User>): void {
     builder.leftJoinAndSelect('user.role', 'role')
   }
 
   public async createOne(createUserDto: CreateUserDto): Promise<User> {
-    const queryBuilder: SelectQueryBuilder<User> = this.builder
+    const queryBuilder = this.builder
     const created = await queryBuilder.insert().into(User).values(createUserDto).returning('*').execute()
 
     return created.raw[0]
   }
 
-  public async getOneById(id: User['id']): Promise<User> {
-    const queryBuilder: SelectQueryBuilder<User> = this.builder
+  public async getOneById(id: User['id']): Promise<User | null> {
+    const queryBuilder = this.builder
     this.buildRelations(queryBuilder)
 
-    return await queryBuilder.where('user.id = :id', { id }).getOne()
+    return queryBuilder.where('user.id = :id', { id }).getOne()
   }
 
-  public async getMany() {
-    const queryBuilder: SelectQueryBuilder<User> = this.builder
+  public async getMany(): Promise<User[]> {
+    const queryBuilder = this.builder
     this.buildRelations(queryBuilder)
 
-    return await queryBuilder.getMany()
+    return queryBuilder.getMany()
   }
 
   public async updateOne(id: User['id'], updateUserDto: UpdateUserDto): Promise<User> {
-    const queryBuilder: SelectQueryBuilder<User> = this.builder
+    const queryBuilder = this.builder
 
     const updated = await queryBuilder.update(User).set(updateUserDto).where('id = :id', { id }).returning('*').execute()
 
@@ -47,7 +47,7 @@ export class UserRepository extends Repository<User> {
   }
 
   public async removeOne(id: User['id']): Promise<User> {
-    const queryBuilder: SelectQueryBuilder<User> = this.builder
+    const queryBuilder = this.builder
     this.buildRelations(queryBuilder)
 
     const removed = await queryBuilder.delete().from(User).where('id = :id', { id }).returning('*').execute()
@@ -55,31 +55,31 @@ export class UserRepository extends Repository<User> {
     return removed.raw[0]
   }
 
-  public async getOneByUsername(username: string): Promise<User> {
+  public async getOneByUsername(username: string): Promise<User | null> {
     const queryBuilder = this.builder
     this.buildRelations(queryBuilder)
 
-    return await queryBuilder.where('username = :username', { username }).getOne()
+    return queryBuilder.where('username = :username', { username }).getOne()
   }
 
-  public async getOneByVerifyLink(verify_link: string): Promise<User> {
+  public async getOneByVerifyLink(verify_link: string): Promise<User | null> {
     const queryBuilder = this.builder
     this.buildRelations(queryBuilder)
 
-    return await queryBuilder.where('verify_link = :verify_link', { verify_link }).getOne()
+    return queryBuilder.where('verify_link = :verify_link', { verify_link }).getOne()
   }
 
-  public async getOneByEmail(email: string): Promise<User> {
+  public async getOneByEmail(email: string): Promise<User | null> {
     const queryBuilder = this.builder
     this.buildRelations(queryBuilder)
 
-    return await queryBuilder.where('email = :email', { email }).getOne()
+    return queryBuilder.where('email = :email', { email }).getOne()
   }
 
-  public async getOneByAuthType(email: string, auth_type: string) {
+  public async getOneByAuthType(email: string, auth_type: string): Promise<User | null> {
     const queryBuilder = this.builder
     this.buildRelations(queryBuilder)
-    return await queryBuilder.where('email = :email', { email }).andWhere('auth_type = :auth_type', { auth_type }).getOne()
+    return queryBuilder.where('email = :email', { email }).andWhere('auth_type = :auth_type', { auth_type }).getOne()
   }
 
   public async ban(id: string, ban_reason: string): Promise<User> {
@@ -102,13 +102,6 @@ export class UserRepository extends Repository<User> {
   public async getCount(): Promise<number> {
     const queryBuilder = this.builder
 
-    return await queryBuilder.getCount()
+    return queryBuilder.getCount()
   }
-
-  // public async addRole(addRoleDto: AddRoleDto) {
-  //   const queryBuilder = this.builder
-  //   this.buildRelations(queryBuilder)
-  //
-  //   return await queryBuilder.where('id = :id', { id: addRoleDto.userId }).val
-  // }
 }

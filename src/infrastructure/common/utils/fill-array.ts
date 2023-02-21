@@ -1,4 +1,4 @@
-export const fillArray = (count: number) => {
+export const fillArray = (count: number): number[] => {
   let i = 0
   const a = Array(count)
 

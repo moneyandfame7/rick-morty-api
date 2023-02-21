@@ -1,6 +1,8 @@
 import { BadRequestException, Injectable } from '@nestjs/common'
-import { AddRoleDto, BanUserDto, CreateUserDto, UpdateUserDto } from '../../dto/common/user.dto'
-import { UserRepository } from '../../repositories/common/user.repository'
+import * as sharp from 'sharp'
+import type { PutObjectCommandInput } from '@aws-sdk/client-s3'
+import type { AddRoleDto, BanUserDto, CreateUserDto, UpdateUserDto } from '@dto/common/user.dto'
+import { UserRepository } from '@repositories/common/user.repository'
 import { RolesService } from './roles.service'
 import { TokenService } from './token.service'
 import {
@@ -9,11 +11,10 @@ import {
   UserWithEmailAlreadyExistsException,
   UserWithIdNotFoundException,
   UserWithUsernameAlreadyExistsException
-} from 'src/domain/exceptions/common/user.exception'
-import * as sharp from 'sharp'
-import { PutObjectCommandInput } from '@aws-sdk/client-s3'
+} from '@domain/exceptions/common/user.exception'
+
 import { S3Service } from './s3.service'
-import { User } from '../../entities/common/user.entity'
+import type { User } from '@entities/common/user.entity'
 
 @Injectable()
 export class UserService {
@@ -24,81 +25,86 @@ export class UserService {
     private readonly s3Service: S3Service
   ) {}
 
-  async createOne(dto: CreateUserDto) {
+  async createOne(dto: CreateUserDto): Promise<User> {
     const userWithSameEmail = await this.getOneByEmail(dto.email)
-    console.log('puk')
-    if (userWithSameEmail && dto.auth_type === 'jwt') throw new UserWithEmailAlreadyExistsException(dto.email)
+    if (userWithSameEmail && dto.auth_type === 'jwt') {
+      throw new UserWithEmailAlreadyExistsException(dto.email)
+    }
 
     const user = await this.userRepository.createOne(dto)
-    user.role = await this.rolesService.getRole('user')
-    return await this.userRepository.save(user)
+    user.role = await this.rolesService.getOne('user')
+    return this.userRepository.save(user)
   }
 
-  async getOneById(id: string) {
+  async getOneById(id: string): Promise<User> {
     const user = await this.userRepository.getOneById(id)
 
-    if (!user) throw new UserWithIdNotFoundException(id)
+    if (!user) {
+      throw new UserWithIdNotFoundException(id)
+    }
 
     return user
   }
 
-  async getOneByEmail(email: string) {
-    const user = await this.userRepository.getOneByEmail(email)
-
-    return user ? user : null
+  async getOneByEmail(email: string): Promise<User | null> {
+    return this.userRepository.getOneByEmail(email)
   }
 
-  async getOneByAuthType(email: string, authType: string) {
-    const user = await this.userRepository.getOneByAuthType(email, authType)
-
-    return user ? user : null
+  async getOneByAuthType(email: string, authType: string): Promise<User | null> {
+    return this.userRepository.getOneByAuthType(email, authType)
   }
 
-  async getOneByUsername(username: string) {
-    const user = await this.userRepository.getOneByUsername(username)
-
-    return user ? user : null
+  async getOneByUsername(username: string): Promise<User | null> {
+    return this.userRepository.getOneByUsername(username)
   }
 
-  async getOneByVerifyLink(link: string) {
+  async getOneByVerifyLink(link: string): Promise<User> {
     const user = await this.userRepository.getOneByVerifyLink(link)
-    if (!user) throw new UserDoesNotExistException()
+    if (!user) {
+      throw new UserDoesNotExistException()
+    }
 
     return user
   }
 
-  async getMany() {
+  async getMany(): Promise<User[]> {
     const users = await this.userRepository.getMany()
 
-    if (!users.length) throw new UsersNotFoundException()
+    if (!users.length) {
+      throw new UsersNotFoundException()
+    }
 
     return users
   }
 
-  async getCount() {
-    return await this.userRepository.getCount()
+  async getCount(): Promise<number> {
+    return this.userRepository.getCount()
   }
 
-  async updateOne(id: string, updateUserDto: UpdateUserDto) {
+  async updateOne(id: string, updateUserDto: UpdateUserDto): Promise<User> {
     const user = await this.userRepository.getOneById(id)
 
-    if (!user) throw new UserWithIdNotFoundException(id)
+    if (!user) {
+      throw new UserWithIdNotFoundException(id)
+    }
 
-    return await this.userRepository.updateOne(id, updateUserDto)
+    return this.userRepository.updateOne(id, updateUserDto)
   }
 
-  async changeUsername(id: string, username: string) {
+  async changeUsername(id: string, username: string): Promise<User> {
     const user = await this.userRepository.getOneByUsername(username)
-    if (user) throw new UserWithUsernameAlreadyExistsException(username)
+    if (user) {
+      throw new UserWithUsernameAlreadyExistsException(username)
+    }
 
-    return await this.updateOne(id, { username })
+    return this.updateOne(id, { username })
   }
 
-  async save(user: User) {
-    return await this.userRepository.save(user)
+  async save(user: User): Promise<User> {
+    return this.userRepository.save(user)
   }
 
-  async changePhoto(id: string, file: Express.Multer.File) {
+  async changePhoto(id: string, file: Express.Multer.File): Promise<User> {
     if (!file) throw new BadRequestException('You must provide a photo')
     const fileBuffer = await sharp(file.buffer).resize({ height: 128, width: 128, fit: 'cover' }).toBuffer()
     const [, type] = file.mimetype.split('/')
@@ -112,36 +118,41 @@ export class UserService {
     const user = await this.getOneById(id)
     user.photo = await this.s3Service.upload(params)
 
-    return await this.userRepository.save(user)
+    return this.userRepository.save(user)
   }
 
-  async removeOne(id: string) {
+  async removeOne(id: string): Promise<User> {
     const user = await this.userRepository.getOneById(id)
-    await this.tokenService.removeByUserId(user.id)
-    if (!user) throw new UserWithIdNotFoundException(id)
 
-    return await this.userRepository.removeOne(id)
+    if (!user) {
+      throw new UserWithIdNotFoundException(id)
+    }
+
+    await this.tokenService.removeByUserId(user.id)
+    return this.userRepository.removeOne(id)
   }
 
-  async addRole(dto: AddRoleDto) {
+  async addRole(dto: AddRoleDto): Promise<User> {
     const user = await this.userRepository.getOneById(dto.userId)
-    const role = await this.rolesService.getRole(dto.value)
+    const role = await this.rolesService.getOne(dto.value)
 
     if (user && role) {
       user.role = role
-      return await this.userRepository.save(user)
+      return this.userRepository.save(user)
     }
     throw new BadRequestException('Role or user not found.')
   }
 
-  async ban(dto: BanUserDto) {
+  async ban(dto: BanUserDto): Promise<User> {
     const user = await this.userRepository.getOneById(dto.userId)
-    if (!user) throw new UserWithIdNotFoundException(dto.userId)
+    if (!user) {
+      throw new UserWithIdNotFoundException(dto.userId)
+    }
 
-    return await this.userRepository.ban(dto.userId, dto.banReason)
+    return this.userRepository.ban(dto.userId, dto.banReason)
   }
 
-  public async emailExists(email: string) {
+  public async emailExists(email: string): Promise<boolean> {
     const user = await this.userRepository.getOneByEmail(email)
 
     return !!user

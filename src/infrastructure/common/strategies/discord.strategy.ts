@@ -1,8 +1,9 @@
-import { Injectable } from '@nestjs/common'
+import { BadRequestException, Injectable } from '@nestjs/common'
 import { PassportStrategy } from '@nestjs/passport'
-import { Profile, Strategy } from 'passport-discord'
-import { UserService } from '../../services/common/user.service'
-import { EnvironmentConfigService } from '../../config/environment-config.service'
+import { type Profile, Strategy } from 'passport-discord'
+import { UserService } from '@services/common/user.service'
+import { EnvironmentConfigService } from '@config/environment-config.service'
+import type { User } from '@entities/common/user.entity'
 
 @Injectable()
 export class DiscordStrategy extends PassportStrategy(Strategy, 'discord') {
@@ -17,13 +18,13 @@ export class DiscordStrategy extends PassportStrategy(Strategy, 'discord') {
     })
   }
 
-  async validate(accessToken: string, refreshToken: string, profile: Profile) {
-    console.log(profile)
-
+  async validate(accessToken: string, refreshToken: string, profile: Profile): Promise<User> {
+    if (!profile.email) {
+      throw new BadRequestException('Error is required')
+    }
     const userInfo = {
       username: profile.username,
       email: profile.email,
-      password: null,
       auth_type: profile.provider,
       /* https://stackoverflow.com/questions/65450055/how-to-get-avatar-from-discord-api */
       photo: `${this.DISCORD_AVATARS_URL}/${profile.id}/${profile.avatar}`,
@@ -31,14 +32,16 @@ export class DiscordStrategy extends PassportStrategy(Strategy, 'discord') {
     }
 
     const userWithSameAuthType = await this.userService.getOneByAuthType(userInfo.email, userInfo.auth_type)
-    if (userWithSameAuthType) return userWithSameAuthType
+    if (userWithSameAuthType) {
+      return userWithSameAuthType
+    }
 
     const userWithSameUserName = await this.userService.getOneByUsername(userInfo.username)
     if (userWithSameUserName) {
       userInfo.username = '$N33d t0 Ch@ng3'
-      return await this.userService.createOne(userInfo)
+      return this.userService.createOne(userInfo)
     }
 
-    return await this.userService.createOne(userInfo)
+    return this.userService.createOne(userInfo)
   }
 }

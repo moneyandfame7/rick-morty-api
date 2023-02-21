@@ -1,8 +1,8 @@
 import { PassportStrategy } from '@nestjs/passport'
-import { Profile, Strategy, VerifyCallback } from 'passport-spotify'
 import { ConfigService } from '@nestjs/config'
-import { Injectable } from '@nestjs/common'
-import { UserService } from '../../services/common/user.service'
+import { BadRequestException, Injectable } from '@nestjs/common'
+import { type Profile, Strategy, type VerifyCallback } from 'passport-spotify'
+import { UserService } from '@services/common/user.service'
 
 @Injectable()
 export class SpotifyStrategy extends PassportStrategy(Strategy, 'spotify') {
@@ -16,18 +16,23 @@ export class SpotifyStrategy extends PassportStrategy(Strategy, 'spotify') {
     })
   }
 
-  async validate(accessToken: string, refreshToken: string, profile: Profile, done: VerifyCallback) {
+  async validate(accessToken: string, refreshToken: string, profile: Profile, done: VerifyCallback): Promise<void> {
+    if (!profile.emails) {
+      throw new BadRequestException('Email is required')
+    }
     const userInfo = {
       username: profile.displayName,
       email: profile.emails[0].value,
-      password: null,
+      password: undefined,
       auth_type: profile.provider,
-      photo: (profile.photos[0] as any).value,
+      photo: profile.photos ? (profile.photos[0] as any).value : null,
       is_verified: true
     }
 
     const userWithSameAuthType = await this.userService.getOneByAuthType(userInfo.email, userInfo.auth_type)
-    if (userWithSameAuthType) return userWithSameAuthType
+    if (userWithSameAuthType) {
+      done(null, userWithSameAuthType)
+    }
 
     const userWithSameUserName = await this.userService.getOneByUsername(userInfo.username)
     if (userWithSameUserName) {

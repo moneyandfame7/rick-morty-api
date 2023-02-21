@@ -1,6 +1,6 @@
 import { IsIn, IsInt, IsOptional, IsString, Max, Min } from 'class-validator'
 import { Type } from 'class-transformer'
-import { Order } from '../../common/constants/order.constant'
+import { Order } from '@common/constants/order.constant'
 
 export class QueryPaginationDto {
   @IsString()
@@ -12,14 +12,14 @@ export class QueryPaginationDto {
   @IsInt()
   @Min(1)
   @IsOptional()
-  readonly page?: number = 1
+  readonly page: number = 1
 
   @Type(() => Number)
   @IsInt()
   @Min(1)
   @Max(50)
   @IsOptional()
-  readonly take?: number = 20
+  readonly take: number = 20
 
   @IsString()
   @IsOptional()

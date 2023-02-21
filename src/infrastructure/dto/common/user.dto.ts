@@ -1,7 +1,7 @@
 import { ApiProperty, PartialType } from '@nestjs/swagger'
 import { IsBoolean, IsEmail, IsEnum, IsIn, IsNotEmpty, IsOptional, IsUUID, MaxLength, MinLength } from 'class-validator'
 import { Type } from 'class-transformer'
-import { RolesEnum } from '../../common/constants/roles.enum'
+import { RolesEnum } from '@common/constants/roles.enum'
 
 export class CreateUserDto {
   @ApiProperty({ example: 'User_228', description: 'The username of the user.' })
@@ -19,11 +19,10 @@ export class CreateUserDto {
     example: '$2b$05$oSq9tOJGxOvmDpj7KLaJP.t0BGI6ic4OrOSCf/493ZsG9z/JoC3ki',
     description: 'The hashed password of the user.'
   })
-  @IsNotEmpty()
   @MinLength(3)
   @MaxLength(32)
   @Type(() => String)
-  readonly password: string
+  readonly password?: string
 
   @IsIn(['google', 'instagram', 'discord', 'github', 'jwt'])
   readonly auth_type: string

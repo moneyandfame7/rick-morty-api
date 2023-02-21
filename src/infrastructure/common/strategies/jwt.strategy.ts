@@ -1,9 +1,9 @@
 import { PassportStrategy } from '@nestjs/passport'
 import { Injectable } from '@nestjs/common'
 import { ExtractJwt, Strategy } from 'passport-jwt'
-import { AuthService } from '../../services/auth/auth.service'
-import { Request } from 'express'
-import { EnvironmentConfigService } from '../../config/environment-config.service'
+import { AuthService } from '@services/auth/auth.service'
+import type { Request } from 'express'
+import { EnvironmentConfigService } from '@config/environment-config.service'
 
 @Injectable()
 export class JwtStrategy extends PassportStrategy(Strategy) {
@@ -16,16 +16,16 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
     })
   }
 
-  private static extractJwtFromCookie(req: Request) {
+  private static extractJwtFromCookie(req: Request): string | null {
     /* ця функція достає токен з cookie */
-    console.log('Extract JWT from cookie.')
+    // TODO: зробити тут мб перевірку якщо вже є в куках рефреш токен то просто оновити токен і все?ч
     if (req.cookies && 'ACCESS_TOKEN' in req.cookies) {
-      return req.cookies['ACCESS_TOKEN']
+      return req.cookies.ACCESS_TOKEN
     }
     return null
   }
 
-  async validate(payload) {
+  private validate(payload: any): any {
     /* це передається в req.user */
     return { ...payload, iat: undefined, exp: undefined }
   }

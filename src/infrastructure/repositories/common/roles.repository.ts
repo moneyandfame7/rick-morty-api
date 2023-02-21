@@ -1,45 +1,45 @@
-import { DataSource, Repository, SelectQueryBuilder } from 'typeorm'
+import { DataSource, Repository, type SelectQueryBuilder } from 'typeorm'
 import { Injectable } from '@nestjs/common'
-import { Role } from '../../entities/common/role.entity'
-import { CreateRoleDto } from '../../dto/common/roles.dto'
+import { Role } from '@entities/common/role.entity'
+import type { CreateRoleDto } from '@dto/common/roles.dto'
 
 @Injectable()
 export class RolesRepository extends Repository<Role> {
-  constructor(private dataSource: DataSource) {
+  constructor(private readonly dataSource: DataSource) {
     super(Role, dataSource.createEntityManager())
   }
 
-  private get builder(): any {
+  private get builder(): SelectQueryBuilder<Role> {
     return this.createQueryBuilder('role')
   }
 
-  private buildRelations(builder: SelectQueryBuilder<Role>) {
+  private buildRelations(builder: SelectQueryBuilder<Role>): void {
     builder.leftJoinAndSelect('role.users', 'users')
   }
 
   public async createOne(createRoleDto: CreateRoleDto): Promise<Role> {
-    const queryBuilder: SelectQueryBuilder<Role> = this.builder
+    const queryBuilder = this.builder
     const created = await queryBuilder.insert().into(Role).values(createRoleDto).returning('*').execute()
 
     return created.raw[0]
   }
 
-  public async getOne(value: string): Promise<Role> {
-    const queryBuilder: SelectQueryBuilder<Role> = this.builder
+  public async getOne(value: string): Promise<Role | null> {
+    const queryBuilder = this.builder
 
-    return await queryBuilder.where('role.value = :value', { value }).getOne()
+    return queryBuilder.where('role.value = :value', { value }).getOne()
   }
 
-  public async getMany() {
-    const queryBuilder: SelectQueryBuilder<Role> = this.builder
+  public async getMany(): Promise<Role[]> {
+    const queryBuilder = this.builder
     this.buildRelations(queryBuilder)
 
-    return await queryBuilder.getMany()
+    return queryBuilder.getMany()
   }
 
   public async getCount(): Promise<number> {
     const queryBuilder = this.builder
 
-    return await queryBuilder.getCount()
+    return queryBuilder.getCount()
   }
 }
