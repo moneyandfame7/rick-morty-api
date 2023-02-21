@@ -7,7 +7,7 @@ import { BaseController } from 'src/domain/controllers/auth/base-controller.abst
 import { EnvironmentConfigService } from '@config/environment-config.service'
 import { AuthService } from '@services/auth/auth.service'
 import { UserService } from '@services/common/user.service'
-import { SetUsernameDto } from '@dto/common/user.dto'
+import { EmailDto, ResetPasswordDto, SetUsernameDto } from '@dto/common/user.dto'
 import type { User } from '@entities/common/user.entity'
 import { type AuthRedirect, type AuthTokensWithUser } from '@domain/models/auth/auth.model'
 import type { Token } from '@entities/common/token.entity'
@@ -67,13 +67,13 @@ export class AuthController extends BaseController {
 
   @Get('/finish')
   @UseGuards(JwtAuthGuard)
-  public finish(@Req() req: Request, @Res({ passthrough: true }) res: Response): AuthTokensWithUser {
-    const user = req.user as User
+  public finish(@Req() req: Request): AuthTokensWithUser {
+    const payload = req.user as User
     const { refresh_token, access_token } = this.getCookies(req)
     return {
       refresh_token,
       access_token,
-      user
+      payload
     }
   }
 
@@ -88,6 +88,17 @@ export class AuthController extends BaseController {
     return userData
   }
 
-  /* @Get('/reset-password')
-  public  resetPassword(@Req() req: Request, @Body() dto: ResetPasswordDto) {}*/
+  @Post('/forgot')
+  public async forgot(@Body() dto: EmailDto) {
+    return this.authService.forgot(dto.email)
+  }
+
+  @Post('/reset/:id/:token')
+  public async reset(@Param('id') id: string, @Param('token') token: string, @Body() dto: ResetPasswordDto, @Res({ passthrough: true }) res: Response) {
+    const user = await this.authService.reset(id, token, dto.password)
+    const userData = await this.authService.buildUserInfoAndTokens(user)
+    this.setCookies(res, userData.refresh_token, userData.access_token)
+
+    return userData
+  }
 }

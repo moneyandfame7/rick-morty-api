@@ -10,8 +10,6 @@ async function bootstrap(): Promise<void> {
   const app = await NestFactory.create(AppModule, {
     cors: { origin: process.env.CLIENT_URL, credentials: true }
   })
-  const string = 'aboba'
-
   app.useGlobalPipes(new ValidationPipe({ transform: true, whitelist: true }))
   app.use(cookieParser())
   const config = new DocumentBuilder()

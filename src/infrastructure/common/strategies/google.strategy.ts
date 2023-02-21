@@ -22,7 +22,6 @@ export class GoogleStrategy extends PassportStrategy(Strategy, 'google') {
     const userInfo = {
       username: profile.displayName,
       email: profile.emails[0].value,
-      // password: null,
       auth_type: profile.provider,
       photo: profile.photos ? (profile.photos[0] as any).value : null,
       is_verified: true

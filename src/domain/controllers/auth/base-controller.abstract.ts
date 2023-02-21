@@ -45,7 +45,7 @@ export abstract class BaseController {
   public async socialRedirect(req: Request, res: Response): Promise<AuthRedirect> {
     const jwt = await this.authService.buildUserInfoAndTokens(req.user as User)
     this.setCookies(res, jwt.refresh_token, jwt.access_token)
-    if (jwt.user.username === '$N33d t0 Ch@ng3') return { url: '/auth/change-username' }
+    if (jwt.payload.username === '$N33d t0 Ch@ng3') return { url: '/auth/change-username' }
 
     return { url: '/auth/finish' }
   }
