@@ -3,7 +3,6 @@ import { PassportStrategy } from '@nestjs/passport'
 import { type Profile, Strategy } from 'passport-discord'
 import { UserService } from '@services/common/user.service'
 import { EnvironmentConfigService } from '@config/environment-config.service'
-import type { User } from '@entities/common/user.entity'
 
 @Injectable()
 export class DiscordStrategy extends PassportStrategy(Strategy, 'discord') {
@@ -18,7 +17,7 @@ export class DiscordStrategy extends PassportStrategy(Strategy, 'discord') {
     })
   }
 
-  async validate(accessToken: string, refreshToken: string, profile: Profile): Promise<User> {
+  async validate(accessToken: string, refreshToken: string, profile: Profile) {
     if (!profile.email) {
       throw new BadRequestException('Error is required')
     }
@@ -31,7 +30,7 @@ export class DiscordStrategy extends PassportStrategy(Strategy, 'discord') {
       is_verified: true
     }
 
-    const userWithSameAuthType = await this.userService.getOneByAuthType(userInfo.email, userInfo.auth_type)
+    /* const userWithSameAuthType = await this.userService.getOneByAuthType(userInfo.email, userInfo.auth_type)
     if (userWithSameAuthType) {
       return userWithSameAuthType
     }
@@ -42,6 +41,8 @@ export class DiscordStrategy extends PassportStrategy(Strategy, 'discord') {
       return this.userService.createOne(userInfo)
     }
 
-    return this.userService.createOne(userInfo)
+    return this.userService.createOne(userInfo)*/
+
+    return userInfo
   }
 }

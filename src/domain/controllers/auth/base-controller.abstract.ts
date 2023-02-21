@@ -5,6 +5,8 @@ import type { GeneratedTokens } from '@domain/models/common/token.model'
 import type { AuthRedirect } from '@domain/models/auth/auth.model'
 import { EnvironmentConfigService } from '@config/environment-config.service'
 import { AuthService } from '@services/auth/auth.service'
+import { UserService } from '@services/common/user.service'
+import { CreateUserDto } from '@dto/common/user.dto'
 
 @Injectable()
 export abstract class BaseController {
@@ -13,7 +15,7 @@ export abstract class BaseController {
   public readonly ACCESS_TOKEN_COOKIE: string
   public readonly REFRESH_TOKEN_EXPIRE_COOKIE: number = 30 * 24 * 60 * 60 * 1000 // 30 days
   public readonly ACCESS_TOKEN_EXPIRE_COOKIE: number = 30 * 60 * 1000 // 30 minutes
-  protected constructor(readonly config: EnvironmentConfigService, readonly authService: AuthService) {
+  protected constructor(readonly config: EnvironmentConfigService, readonly authService: AuthService, readonly userService: UserService) {
     this.REFRESH_TOKEN_COOKIE = this.config.getJwtRefreshCookie()
     this.ACCESS_TOKEN_COOKIE = this.config.getJwtAccessCookie()
     this.CLIENT_URL = this.config.getClientUrl()
@@ -47,6 +49,10 @@ export abstract class BaseController {
     this.setCookies(res, jwt.refresh_token, jwt.access_token)
     if (jwt.payload.username === '$N33d t0 Ch@ng3') return { url: '/auth/change-username' }
 
-    return { url: '/auth/finish' }
+    return { url: `/auth/welcome` }
+  }
+
+  public socialLogin(user: CreateUserDto) {
+    return this.authService.buildUserInfoAndTokens(user)
   }
 }

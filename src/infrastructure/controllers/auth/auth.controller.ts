@@ -1,4 +1,4 @@
-import { Body, Controller, Get, Param, Post, Redirect, Req, Res, UnauthorizedException, UseGuards } from '@nestjs/common'
+import { Body, Controller, Get, Param, Post, Query, Redirect, Req, Res, UnauthorizedException, UseGuards } from '@nestjs/common'
 import { ApiTags } from '@nestjs/swagger'
 import { Request, Response } from 'express'
 import { JwtAuthGuard } from '@common/guards/auth/jwt.guard'
@@ -7,7 +7,7 @@ import { BaseController } from 'src/domain/controllers/auth/base-controller.abst
 import { EnvironmentConfigService } from '@config/environment-config.service'
 import { AuthService } from '@services/auth/auth.service'
 import { UserService } from '@services/common/user.service'
-import { EmailDto, ResetPasswordDto, SetUsernameDto } from '@dto/common/user.dto'
+import { EmailDto, ResetPasswordDto, SetUsernameDto, UserDetailsDto } from '@dto/common/user.dto'
 import type { User } from '@entities/common/user.entity'
 import { type AuthRedirect, type AuthTokensWithUser } from '@domain/models/auth/auth.model'
 import type { Token } from '@entities/common/token.entity'
@@ -16,15 +16,15 @@ import type { Token } from '@entities/common/token.entity'
 @ApiTags('auth')
 export class AuthController extends BaseController {
   constructor(readonly config: EnvironmentConfigService, readonly authService: AuthService, readonly userService: UserService) {
-    super(config, authService)
+    super(config, authService, userService)
   }
 
   @Post('/signup')
-  public async signup(@Body() userDto: SignUpDto, @Req() req: Request, @Res({ passthrough: true }) res: Response): Promise<AuthTokensWithUser> {
-    const userData = await this.authService.signup(userDto)
-    this.setCookies(res, userData.refresh_token, userData.access_token)
-
-    return userData
+  public async signup(@Body() dto: SignUpDto, @Req() req: Request, @Res({ passthrough: true }) res: Response) {
+    // TODO: робити на клієнті редірект на сторінку /welcome де задавати юзернейм і іншу інфу
+    const userData = await this.authService.signup(dto)
+    return userData.access_token
+    // return `${this.config.getBaseUrl()}/auth/welcome?token=${userData.access_token}`
   }
 
   @Post('/login')
@@ -65,7 +65,7 @@ export class AuthController extends BaseController {
     }
   }
 
-  @Get('/finish')
+  @Get('/status')
   @UseGuards(JwtAuthGuard)
   public finish(@Req() req: Request): AuthTokensWithUser {
     const payload = req.user as User
@@ -75,6 +75,13 @@ export class AuthController extends BaseController {
       access_token,
       payload
     }
+  }
+
+  @Post('/welcome')
+  public async welcome(@Query('token') token: string, @Body() details: UserDetailsDto, @Res({ passthrough: true }) res: Response) {
+    const userData = await this.authService.welcome(token, details)
+    this.setCookies(res, userData.refresh_token, userData.access_token)
+    return userData
   }
 
   @Post('/change-username')

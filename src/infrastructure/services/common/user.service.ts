@@ -30,6 +30,10 @@ export class UserService {
     if (userWithSameEmail && dto.auth_type === 'jwt') {
       throw new UserWithEmailAlreadyExistsException(dto.email)
     }
+    const userWithSameUsername = await this.getOneByUsername(dto.username)
+    if (userWithSameUsername) {
+      throw new UserWithUsernameAlreadyExistsException(dto.username)
+    }
 
     const user = await this.userRepository.createOne(dto)
     user.role = await this.rolesService.getOne('user')

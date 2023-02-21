@@ -29,7 +29,7 @@ export class SpotifyStrategy extends PassportStrategy(Strategy, 'spotify') {
       is_verified: true
     }
 
-    const userWithSameAuthType = await this.userService.getOneByAuthType(userInfo.email, userInfo.auth_type)
+    /* const userWithSameAuthType = await this.userService.getOneByAuthType(userInfo.email, userInfo.auth_type)
     if (userWithSameAuthType) {
       done(null, userWithSameAuthType)
     }
@@ -41,7 +41,7 @@ export class SpotifyStrategy extends PassportStrategy(Strategy, 'spotify') {
       done(null, createdUser)
     }
 
-    const createdUser = await this.userService.createOne(userInfo)
-    done(null, createdUser)
+    const createdUser = await this.userService.createOne(userInfo)*/
+    done(null, userInfo)
   }
 }

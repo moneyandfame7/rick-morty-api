@@ -3,14 +3,16 @@ import * as bcrypt from 'bcrypt'
 import { v4 as uuid } from 'uuid'
 import { UserService } from '@services/common/user.service'
 import { TokenService } from '@services/common/token.service'
-import { UserDoesNotExistException, UserWithEmailAlreadyExistsException, UserWithUsernameAlreadyExistsException } from '@domain/exceptions/common/user.exception'
+import { UserDoesNotExistException, UserWithEmailAlreadyExistsException } from '@domain/exceptions/common/user.exception'
 import { AuthIncorrectEmailException, AuthIncorrectPasswordException } from '@domain/exceptions/common/auth.exception'
 import { MailService } from '@services/common/mail.service'
 import { EnvironmentConfigService } from '@config/environment-config.service'
-import type { SignInDto, SignUpDto } from '@dto/auth/auth.dto'
+import type { SignInDto } from '@dto/auth/auth.dto'
+import { SignUpDto } from '@dto/auth/auth.dto'
 import type { User } from '@entities/common/user.entity'
 import type { AuthTokensWithUser } from '@domain/models/auth/auth.model'
 import type { Token } from '@entities/common/token.entity'
+import { UserDetailsDto } from '@dto/common/user.dto'
 
 @Injectable()
 export class AuthService {
@@ -21,26 +23,28 @@ export class AuthService {
     private readonly mailService: MailService
   ) {}
 
-  public async signup(userDto: SignUpDto): Promise<AuthTokensWithUser> {
-    const withSameEmail = await this.userService.getOneByAuthType(userDto.email, 'jwt')
+  public async signup(dto: SignUpDto) {
+    const withSameEmail = await this.userService.getOneByAuthType(dto.email, 'jwt')
     if (withSameEmail) {
-      throw new UserWithEmailAlreadyExistsException(userDto.email)
+      throw new UserWithEmailAlreadyExistsException(dto.email)
     }
 
-    const withSameUsername = await this.userService.getOneByUsername(userDto.username)
-    if (withSameUsername) throw new UserWithUsernameAlreadyExistsException(userDto.username)
-
-    const hashedPassword = await this.hashPassword(userDto.password)
+    const hashedPassword = await this.hashPassword(dto.password)
     const verify_link = uuid()
-
-    const user = await this.userService.createOne({
-      ...userDto,
+    const info = {
+      email: dto.email,
       password: hashedPassword,
+      username: null,
+      contry: null,
+      mail_subscribe: true,
+      verify_link,
       auth_type: 'jwt',
-      verify_link
-    })
-    await this.mailService.sendVerifyMail(user.email, `${this.config.getBaseUrl()}/auth/verify/${verify_link}`)
-    return this.buildUserInfoAndTokens(user)
+      is_verified: false
+    }
+
+    await this.mailService.sendVerifyMail(info.email, `${this.config.getClientUrl()}/auth/verify/${verify_link}`)
+
+    return this.buildUserInfoAndTokens(info)
   }
 
   public async login(userDto: SignInDto): Promise<AuthTokensWithUser> {
@@ -77,6 +81,20 @@ export class AuthService {
 
     user.is_verified = true
     await this.userService.save(user)
+    return this.buildUserInfoAndTokens(user)
+  }
+
+  public async welcome(token: string, details: UserDetailsDto) {
+    const verify = this.tokenService.validateAccessToken(token)
+    console.log(verify, ' <<<< VERIFY')
+    const user = await this.userService.createOne({
+      ...verify,
+      username: details.username,
+      country: details.country,
+      mail_subscribe: details.mail_subscribe
+    })
+    console.log(user, ' <<<< USER')
+
     return this.buildUserInfoAndTokens(user)
   }
 
@@ -118,13 +136,8 @@ export class AuthService {
     return this.userService.updateOne(id, { password: hashedPassword })
   }
 
-  public async buildUserInfoAndTokens(user: User): Promise<AuthTokensWithUser> {
-    const payload = {
-      id: user.id,
-      email: user.email,
-      username: user.username,
-      role: user.role
-    }
+  public async buildUserInfoAndTokens(user: any): Promise<AuthTokensWithUser> {
+    const payload = user
     const tokens = this.tokenService.generateTokens(payload)
     await this.tokenService.saveToken(user.id, tokens.refresh_token)
     return {

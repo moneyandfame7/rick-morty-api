@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common'
+import { BadRequestException, Injectable } from '@nestjs/common'
 import { JwtService } from '@nestjs/jwt'
 import { TokenRepository } from '@repositories/common/token.repository'
 import { EnvironmentConfigService } from '@config/environment-config.service'
@@ -33,7 +33,7 @@ export class TokenService {
     }
   }
 
-  public generateTempToken(payload: JwtPayload, secret: string): string {
+  public generateTempToken(payload: any, secret: string): string {
     return this.jwtService.sign(payload, {
       secret,
       expiresIn: '10m'
@@ -65,7 +65,11 @@ export class TokenService {
   }
 
   public validateAccessToken(token: string): User {
-    return this.jwtService.verify(token, { secret: this.ACCESS_SECRET })
+    try {
+      return this.jwtService.verify(token, { secret: this.ACCESS_SECRET })
+    } catch (e) {
+      throw new BadRequestException('Invalid token')
+    }
   }
 
   public validateRefreshToken(token: string): User {
