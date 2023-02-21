@@ -30,8 +30,6 @@ export interface ICharacter {
 export class CharacterSeeder implements Seeder {
   public async run(dataSource: DataSource): Promise<void> {
     try {
-      // TODO: додавати url з aws
-      // TODO: змінити на інший бакет + винести в сервіси щоб передавати тільки id
       const characterRepository = dataSource.getRepository(Character)
       const characters: CreateCharacterDto[] = []
       const responseLocation = await fetchData<ILocation>('https://rickandmortyapi.com/api/location')
@@ -54,7 +52,9 @@ export class CharacterSeeder implements Seeder {
       })
 
       await characterRepository.insert(characters)
-      if (characters) console.log('✅ Characters filling successfully.')
+      if (characters) {
+        console.log('✅ Characters filling successfully.')
+      }
     } catch (error) {
       console.log('❌ Episodes filling failed.')
     }
