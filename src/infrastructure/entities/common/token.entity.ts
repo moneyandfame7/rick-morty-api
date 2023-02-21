@@ -11,5 +11,5 @@ export class Token {
   user_id: string
 
   @Column({ nullable: false })
-  refreshToken: string
+  refresh_token: string
 }

@@ -1,9 +1,9 @@
-import { BadRequestException, Injectable, UnauthorizedException } from '@nestjs/common'
+import { BadRequestException, Injectable, InternalServerErrorException, UnauthorizedException } from '@nestjs/common'
 import * as bcrypt from 'bcrypt'
 import { v4 as uuid } from 'uuid'
 import { UserService } from '@services/common/user.service'
 import { TokenService } from '@services/common/token.service'
-import { UserWithEmailAlreadyExistsException, UserWithUsernameAlreadyExistsException } from '@domain/exceptions/common/user.exception'
+import { UserDoesNotExistException, UserWithEmailAlreadyExistsException, UserWithUsernameAlreadyExistsException } from '@domain/exceptions/common/user.exception'
 import { AuthIncorrectEmailException, AuthIncorrectPasswordException } from '@domain/exceptions/common/auth.exception'
 import { MailService } from '@services/common/mail.service'
 import { EnvironmentConfigService } from '@config/environment-config.service'
@@ -23,7 +23,9 @@ export class AuthService {
 
   public async signup(userDto: SignUpDto): Promise<AuthTokensWithUser> {
     const withSameEmail = await this.userService.getOneByAuthType(userDto.email, 'jwt')
-    if (withSameEmail) throw new UserWithEmailAlreadyExistsException(userDto.email)
+    if (withSameEmail) {
+      throw new UserWithEmailAlreadyExistsException(userDto.email)
+    }
 
     const withSameUsername = await this.userService.getOneByUsername(userDto.username)
     if (withSameUsername) throw new UserWithUsernameAlreadyExistsException(userDto.username)
@@ -78,12 +80,56 @@ export class AuthService {
     return this.buildUserInfoAndTokens(user)
   }
 
+  public async forgot(email: string) {
+    const user = await this.userService.getOneByAuthType(email, 'jwt')
+    if (!user) {
+      throw new UserDoesNotExistException()
+    }
+    const secret = this.config.getJwtAccessSecret() + user.password
+    const payload = {
+      id: user.id,
+      email: user.email,
+      username: user.username,
+      role: user.role
+    }
+    const token = this.tokenService.generateTempToken(payload, secret)
+    const link = `${this.config.getClientUrl()}/auth/reset/${user.id}/${token}`
+    await this.mailService.sendForgotPasswordLink(user.email, link)
+
+    return link
+  }
+
+  public async reset(id: string, token: string, password: string): Promise<User> {
+    const oldUser = await this.userService.getOneById(id)
+    if (!oldUser) {
+      throw new UserDoesNotExistException()
+    }
+    const compare = await this.comparePassword(password, oldUser.password)
+    if (compare) {
+      throw new BadRequestException('Password is equal to old password')
+    }
+    const secret = this.config.getJwtAccessSecret() + oldUser.password
+    try {
+      this.tokenService.validateTempToken(token, secret)
+    } catch (e) {
+      throw new InternalServerErrorException('Invalid token')
+    }
+    const hashedPassword = await this.hashPassword(password)
+    return this.userService.updateOne(id, { password: hashedPassword })
+  }
+
   public async buildUserInfoAndTokens(user: User): Promise<AuthTokensWithUser> {
-    const tokens = this.tokenService.generateTokens(user)
+    const payload = {
+      id: user.id,
+      email: user.email,
+      username: user.username,
+      role: user.role
+    }
+    const tokens = this.tokenService.generateTokens(payload)
     await this.tokenService.saveToken(user.id, tokens.refresh_token)
     return {
       ...tokens,
-      user
+      payload
     }
   }
 

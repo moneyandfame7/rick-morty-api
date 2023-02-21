@@ -26,13 +26,13 @@ export class TokenRepository extends Repository<Token> {
   public async deleteByToken(refreshToken: string): Promise<Token> {
     const queryBuilder = this.builder
 
-    const { raw } = await queryBuilder.delete().from(Token).where('refreshToken = :refreshToken', { refreshToken }).returning('*').execute()
+    const { raw } = await queryBuilder.delete().from(Token).where('refresh_token = :refresh_token', { refresh_token: refreshToken }).returning('*').execute()
     return raw[0]
   }
 
   public async findByToken(refreshToken: string): Promise<Token | null> {
     const queryBuilder = this.builder
 
-    return queryBuilder.where('refreshToken = :refreshToken', { refreshToken }).getOne()
+    return queryBuilder.where('refresh_token = :refresh_token', { refresh_token: refreshToken }).getOne()
   }
 }

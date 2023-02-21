@@ -20,6 +20,7 @@ export class UserDoesNotExistException extends UnprocessableEntityException {
 
 export class UserWithEmailAlreadyExistsException extends UnprocessableEntityException {
   constructor(email: string) {
+    console.log('puk')
     super(`User with email ${email} already exists`)
   }
 }

@@ -4,6 +4,7 @@ import { ExtractJwt, Strategy } from 'passport-jwt'
 import { AuthService } from '@services/auth/auth.service'
 import type { Request } from 'express'
 import { EnvironmentConfigService } from '@config/environment-config.service'
+import { JwtPayload } from '@domain/models/auth/auth.model'
 
 @Injectable()
 export class JwtStrategy extends PassportStrategy(Strategy) {
@@ -25,8 +26,9 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
     return null
   }
 
-  private validate(payload: any): any {
+  private validate(payload: JwtPayload): JwtPayload {
     /* це передається в req.user */
-    return { ...payload, iat: undefined, exp: undefined }
+    console.log(payload, '<<<<< PAYLOAD')
+    return payload
   }
 }

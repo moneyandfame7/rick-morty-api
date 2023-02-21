@@ -64,7 +64,14 @@ export class SetUsernameDto {
   username: string
 }
 
-export class ResetPasswordDto {
+export class EmailDto {
   @IsEmail()
   email: string
+}
+
+export class ResetPasswordDto {
+  @MinLength(3)
+  @MaxLength(32)
+  @Type(() => String)
+  password: string
 }

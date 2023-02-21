@@ -40,7 +40,6 @@ export class PaginationService<Entity> {
     const endpoint = queryPaginationDto.endpoint
     const otherQuery = queryPaginationDto.otherQuery
     const take = queryPaginationDto.take
-    console.log(otherQuery)
     if (page > pages) throw new PageDoesNotExistException(page)
     return {
       page,
