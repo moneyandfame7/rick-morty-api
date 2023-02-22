@@ -73,10 +73,18 @@ export class TokenService {
   }
 
   public validateRefreshToken(token: string): User {
-    return this.jwtService.verify(token, { secret: this.REFRESH_SECRET })
+    try {
+      return this.jwtService.verify(token, { secret: this.REFRESH_SECRET })
+    } catch (e) {
+      throw new BadRequestException('Invalid token')
+    }
   }
 
   public validateTempToken(token: string, secret: string): JwtPayload {
-    return this.jwtService.verify(token, { secret })
+    try {
+      return this.jwtService.verify(token, { secret })
+    } catch (e) {
+      throw new BadRequestException('Invalid token')
+    }
   }
 }

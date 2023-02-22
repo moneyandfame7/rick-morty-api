@@ -22,6 +22,7 @@ export class DiscordController extends BaseController {
   public async redirect(@Req() req: Request, @Res({ passthrough: true }) res: Response) {
     const user = req.user as CreateUserDto
     const exist = await this.userService.getOneByAuthType(user.email, user.auth_type)
+    // todo: зробити замість social login усюди this.authService.build ....
     const userData = await this.socialLogin(user)
     return {
       token: userData.access_token,

@@ -79,7 +79,12 @@ export class ResetPasswordDto {
   @MinLength(3)
   @MaxLength(32)
   @Type(() => String)
-  password: string
+  readonly password: string
+
+  @MinLength(3)
+  @MaxLength(32)
+  @Type(() => String)
+  readonly confirmPassword: string
 }
 
 export class UserDetailsDto {

@@ -1,4 +1,4 @@
-import { BadRequestException, Injectable, InternalServerErrorException, UnauthorizedException } from '@nestjs/common'
+import { BadRequestException, Injectable, UnauthorizedException } from '@nestjs/common'
 import * as bcrypt from 'bcrypt'
 import { v4 as uuid } from 'uuid'
 import { UserService } from '@services/common/user.service'
@@ -12,7 +12,7 @@ import { SignUpDto } from '@dto/auth/auth.dto'
 import type { User } from '@entities/common/user.entity'
 import type { AuthTokensWithUser } from '@domain/models/auth/auth.model'
 import type { Token } from '@entities/common/token.entity'
-import { UserDetailsDto } from '@dto/common/user.dto'
+import { ResetPasswordDto, UserDetailsDto } from '@dto/common/user.dto'
 
 @Injectable()
 export class AuthService {
@@ -86,14 +86,12 @@ export class AuthService {
 
   public async welcome(token: string, details: UserDetailsDto) {
     const verify = this.tokenService.validateAccessToken(token)
-    console.log(verify, ' <<<< VERIFY')
     const user = await this.userService.createOne({
       ...verify,
       username: details.username,
       country: details.country,
       mail_subscribe: details.mail_subscribe
     })
-    console.log(user, ' <<<< USER')
 
     return this.buildUserInfoAndTokens(user)
   }
@@ -117,22 +115,21 @@ export class AuthService {
     return link
   }
 
-  public async reset(id: string, token: string, password: string): Promise<User> {
+  public async reset(id: string, token: string, dto: ResetPasswordDto): Promise<User> {
     const oldUser = await this.userService.getOneById(id)
     if (!oldUser) {
       throw new UserDoesNotExistException()
     }
-    const compare = await this.comparePassword(password, oldUser.password)
+    const compare = await this.comparePassword(dto.password, oldUser.password)
     if (compare) {
       throw new BadRequestException('Password is equal to old password')
     }
     const secret = this.config.getJwtAccessSecret() + oldUser.password
-    try {
-      this.tokenService.validateTempToken(token, secret)
-    } catch (e) {
-      throw new InternalServerErrorException('Invalid token')
+    this.tokenService.validateTempToken(token, secret)
+    if (dto.password !== dto.confirmPassword) {
+      throw new BadRequestException('Passwords do not match')
     }
-    const hashedPassword = await this.hashPassword(password)
+    const hashedPassword = await this.hashPassword(dto.password)
     return this.userService.updateOne(id, { password: hashedPassword })
   }
 

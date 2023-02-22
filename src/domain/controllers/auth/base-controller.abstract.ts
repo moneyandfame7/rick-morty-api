@@ -1,8 +1,6 @@
 import { Injectable } from '@nestjs/common'
 import type { Request, Response } from 'express'
-import type { User } from '@entities/common/user.entity'
 import type { GeneratedTokens } from '@domain/models/common/token.model'
-import type { AuthRedirect } from '@domain/models/auth/auth.model'
 import { EnvironmentConfigService } from '@config/environment-config.service'
 import { AuthService } from '@services/auth/auth.service'
 import { UserService } from '@services/common/user.service'
@@ -42,14 +40,6 @@ export abstract class BaseController {
   public clearCookies(res: Response): void {
     res.clearCookie(this.REFRESH_TOKEN_COOKIE)
     res.clearCookie(this.ACCESS_TOKEN_COOKIE)
-  }
-
-  public async socialRedirect(req: Request, res: Response): Promise<AuthRedirect> {
-    const jwt = await this.authService.buildUserInfoAndTokens(req.user as User)
-    this.setCookies(res, jwt.refresh_token, jwt.access_token)
-    if (jwt.payload.username === '$N33d t0 Ch@ng3') return { url: '/auth/change-username' }
-
-    return { url: `/auth/welcome` }
   }
 
   public socialLogin(user: CreateUserDto) {
