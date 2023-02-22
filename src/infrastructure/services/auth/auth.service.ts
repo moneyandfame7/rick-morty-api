@@ -10,13 +10,14 @@ import { EnvironmentConfigService } from '@config/environment-config.service'
 import type { SignInDto } from '@dto/auth/auth.dto'
 import { SignUpDto } from '@dto/auth/auth.dto'
 import type { User } from '@entities/common/user.entity'
-import type { AuthTokensWithUser } from '@domain/models/auth/auth.model'
+import type { AuthTokens } from '@domain/models/auth/auth.model'
 import type { Token } from '@entities/common/token.entity'
 import { ResetPasswordDto, UserDetailsDto } from '@dto/common/user.dto'
+import { UserBeforeAuthentication } from '@domain/models/common/user.model'
 
 @Injectable()
 export class AuthService {
-  constructor(
+  public constructor(
     private readonly config: EnvironmentConfigService,
     private readonly userService: UserService,
     private readonly tokenService: TokenService,
@@ -28,29 +29,41 @@ export class AuthService {
     if (withSameEmail) {
       throw new UserWithEmailAlreadyExistsException(dto.email)
     }
-    console.log(dto.password, dto.confirmPassword)
     if (dto.password != dto.confirmPassword) {
       throw new BadRequestException('Passwords do not match')
     }
     const hashedPassword = await this.hashPassword(dto.password)
-    const verify_link = uuid()
-    const info = {
+    const info: UserBeforeAuthentication = {
       email: dto.email,
-      password: hashedPassword,
       username: null,
-      contry: null,
-      mail_subscribe: true,
-      verify_link,
+      password: hashedPassword,
       auth_type: 'jwt',
+      photo: null,
       is_verified: false
     }
 
-    await this.mailService.sendVerifyMail(info.email, `${this.config.getClientUrl()}/auth/verify/${verify_link}`)
-
-    return this.buildUserInfoAndTokens(info)
+    return this.tokenService.generateTempToken(info)
   }
 
-  public async login(userDto: SignInDto): Promise<AuthTokensWithUser> {
+  public async welcome(token: string, details: UserDetailsDto) {
+    const verify = this.tokenService.validateTempToken(token)
+    const verify_link = uuid()
+    console.log(verify, ' <<<< PAYLOAD')
+    const user = await this.userService.createOne({
+      ...verify,
+      username: details.username,
+      country: details.country,
+      mail_subscribe: details.mail_subscribe
+    })
+    if (!user.is_verified) {
+      await this.userService.updateOne(user.id, { verify_link })
+      await this.mailService.sendVerifyMail(user.email, `${this.config.getClientUrl()}/auth/verify/${verify_link}`)
+    }
+
+    return this.buildUserInfoAndTokens(user)
+  }
+
+  public async login(userDto: SignInDto): Promise<AuthTokens> {
     const user = await this.validateUser(userDto)
 
     return this.buildUserInfoAndTokens(user)
@@ -60,13 +73,13 @@ export class AuthService {
     return this.tokenService.removeByToken(refreshToken)
   }
 
-  public async refresh(refreshToken: string): Promise<AuthTokensWithUser> {
+  public async refresh(refreshToken: string): Promise<AuthTokens> {
     if (!refreshToken) {
       throw new UnauthorizedException()
     }
 
     const userData = this.tokenService.validateRefreshToken(refreshToken)
-    const tokenFromDatabase = await this.tokenService.findToken(refreshToken)
+    const tokenFromDatabase = await this.tokenService.getOne(refreshToken)
     if (!userData || !tokenFromDatabase) {
       throw new UnauthorizedException()
     }
@@ -75,28 +88,15 @@ export class AuthService {
     return this.buildUserInfoAndTokens(user)
   }
 
-  public async verify(link: string): Promise<AuthTokensWithUser> {
+  public async verify(link: string): Promise<AuthTokens> {
     const user = await this.userService.getOneByVerifyLink(link)
 
     if (!user) {
       throw new BadRequestException('Incorrect verification link')
     }
 
-    user.is_verified = true
-    await this.userService.save(user)
-    return this.buildUserInfoAndTokens(user)
-  }
-
-  public async welcome(token: string, details: UserDetailsDto) {
-    const verify = this.tokenService.validateAccessToken(token)
-    const user = await this.userService.createOne({
-      ...verify,
-      username: details.username,
-      country: details.country,
-      mail_subscribe: details.mail_subscribe
-    })
-
-    return this.buildUserInfoAndTokens(user)
+    const updated = await this.userService.updateOne(user.id, { is_verified: true })
+    return this.buildUserInfoAndTokens(updated)
   }
 
   public async forgot(email: string) {
@@ -104,14 +104,12 @@ export class AuthService {
     if (!user) {
       throw new UserDoesNotExistException()
     }
-    const secret = this.config.getJwtAccessSecret() + user.password
     const payload = {
       id: user.id,
       email: user.email,
-      username: user.username,
-      role: user.role
+      username: user.username
     }
-    const token = this.tokenService.generateTempToken(payload, secret)
+    const token = this.tokenService.generateTempToken(payload)
     const link = `${this.config.getClientUrl()}/auth/reset/${user.id}/${token}`
     await this.mailService.sendForgotPasswordLink(user.email, link)
 
@@ -127,8 +125,7 @@ export class AuthService {
     if (compare) {
       throw new BadRequestException('Password is equal to old password')
     }
-    const secret = this.config.getJwtAccessSecret() + oldUser.password
-    this.tokenService.validateTempToken(token, secret)
+    this.tokenService.validateTempToken(token)
     if (dto.password !== dto.confirmPassword) {
       throw new BadRequestException('Passwords do not match')
     }
@@ -136,18 +133,14 @@ export class AuthService {
     return this.userService.updateOne(id, { password: hashedPassword })
   }
 
-  public async buildUserInfoAndTokens(user: any): Promise<AuthTokensWithUser> {
-    const payload = user
-    const tokens = this.tokenService.generateTokens(payload)
+  public async buildUserInfoAndTokens(user: any): Promise<AuthTokens> {
+    const tokens = this.tokenService.generateTokens(user)
     await this.tokenService.saveToken(user.id, tokens.refresh_token)
-    return {
-      ...tokens,
-      payload
-    }
+    return tokens
   }
 
   private async validateUser(userDto: SignInDto): Promise<User> {
-    const user = await this.userService.getOneByEmail(userDto.email)
+    const user = await this.userService.getOneByAuthType(userDto.email, 'jwt')
     if (!user) throw new AuthIncorrectEmailException()
 
     const passwordEquals = await this.comparePassword(userDto.password, user.password)

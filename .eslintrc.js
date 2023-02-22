@@ -34,6 +34,7 @@ module.exports = {
     '@typescript-eslint/naming-convention': 'off',
     '@typescript-eslint/indent': 'off',
     '@typescript-eslint/no-unused-expressions': 'off',
-    '@typescript-eslint/no-unused-vars': 'warn'
+    '@typescript-eslint/no-unused-vars': 'warn',
+    '@typescript-eslint/explicit-member-accessibility': 'error'
   }
 }

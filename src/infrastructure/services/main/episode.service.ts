@@ -1,16 +1,16 @@
 import { Injectable } from '@nestjs/common'
-import type { QueryPaginationDto } from 'src/infrastructure/dto/common/pagination.dto'
-import type { CreateEpisodeDto, QueryEpisodeDto, UpdateEpisodeDto } from 'src/infrastructure/dto/main/episode.dto'
-import { EpisodeRepository } from '../../repositories/main/episode.repository'
+import type { QueryPaginationDto } from '@dto/common/pagination.dto'
+import type { CreateEpisodeDto, QueryEpisodeDto, UpdateEpisodeDto } from '@dto/main/episode.dto'
+import { EpisodeRepository } from '@repositories/main/episode.repository'
 import { PaginationService, type Payload } from '../common/pagination.service'
-import type { Episode } from '../../entities/main/episode.entity'
-import { EpisodeAlreadyExistException, EpisodesNotFoundException, EpisodeWithIdNotFoundException } from 'src/domain/exceptions/main/episode.exception'
+import type { Episode } from '@entities/main/episode.entity'
+import { EpisodeAlreadyExistException, EpisodesNotFoundException, EpisodeWithIdNotFoundException } from '@domain/exceptions/main/episode.exception'
 
 @Injectable()
 export class EpisodeService {
-  constructor(private readonly episodeRepository: EpisodeRepository, private readonly paginationService: PaginationService<Episode>) {}
+  public constructor(private readonly episodeRepository: EpisodeRepository, private readonly paginationService: PaginationService<Episode>) {}
 
-  async createOne(createEpisodeDto: CreateEpisodeDto): Promise<Episode> {
+  public async createOne(createEpisodeDto: CreateEpisodeDto): Promise<Episode> {
     const exist = await this.episodeRepository.findOneBy({ name: createEpisodeDto.name })
     if (exist) throw new EpisodeAlreadyExistException(createEpisodeDto.name)
 
@@ -18,7 +18,7 @@ export class EpisodeService {
     return this.episodeRepository.save(episode)
   }
 
-  async getMany(queryPaginationDto: QueryPaginationDto, queryEpisodeDto: QueryEpisodeDto): Promise<Payload<Episode>> {
+  public async getMany(queryPaginationDto: QueryPaginationDto, queryEpisodeDto: QueryEpisodeDto): Promise<Payload<Episode>> {
     const { episodes, count } = await this.episodeRepository.getMany(queryPaginationDto, queryEpisodeDto)
 
     if (!count || !episodes) throw new EpisodesNotFoundException()
@@ -27,7 +27,7 @@ export class EpisodeService {
     return this.paginationService.wrapEntityWithPaginationInfo(episodes, buildPaginationInfo)
   }
 
-  async getOne(id: number): Promise<Episode> {
+  public async getOne(id: number): Promise<Episode> {
     const episode = await this.episodeRepository.getOne(id)
 
     if (!episode) throw new EpisodeWithIdNotFoundException(id)
@@ -35,7 +35,7 @@ export class EpisodeService {
     return episode
   }
 
-  async updateOne(id: number, updateEpisodeDto: Partial<UpdateEpisodeDto>): Promise<Episode> {
+  public async updateOne(id: number, updateEpisodeDto: Partial<UpdateEpisodeDto>): Promise<Episode> {
     const episode = await this.episodeRepository.getOne(id)
 
     if (!episode) throw new EpisodeWithIdNotFoundException(id)
@@ -43,7 +43,7 @@ export class EpisodeService {
     return this.episodeRepository.updateOne(id, updateEpisodeDto)
   }
 
-  async removeOne(id: number): Promise<Episode> {
+  public async removeOne(id: number): Promise<Episode> {
     const episode = await this.episodeRepository.getOne(id)
 
     if (!episode) throw new EpisodeWithIdNotFoundException(id)
@@ -51,7 +51,7 @@ export class EpisodeService {
     return this.episodeRepository.removeOne(id)
   }
 
-  async getCount(): Promise<number> {
+  public async getCount(): Promise<number> {
     return this.episodeRepository.getCount()
   }
 }

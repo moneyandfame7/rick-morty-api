@@ -4,7 +4,8 @@ import type { GeneratedTokens } from '@domain/models/common/token.model'
 import { EnvironmentConfigService } from '@config/environment-config.service'
 import { AuthService } from '@services/auth/auth.service'
 import { UserService } from '@services/common/user.service'
-import { CreateUserDto } from '@dto/common/user.dto'
+import { TokenService } from '@services/common/token.service'
+import { UserBeforeAuthentication } from '@domain/models/common/user.model'
 
 @Injectable()
 export class BaseController {
@@ -13,7 +14,12 @@ export class BaseController {
   public readonly ACCESS_TOKEN_COOKIE: string
   public readonly REFRESH_TOKEN_EXPIRE_COOKIE: number = 30 * 24 * 60 * 60 * 1000 // 30 days
   public readonly ACCESS_TOKEN_EXPIRE_COOKIE: number = 30 * 60 * 1000 // 30 minutes
-  protected constructor(protected readonly config: EnvironmentConfigService, protected readonly authService: AuthService, protected readonly userService: UserService) {
+  protected constructor(
+    protected readonly config: EnvironmentConfigService,
+    protected readonly authService: AuthService,
+    protected readonly userService: UserService,
+    protected tokenService: TokenService
+  ) {
     this.REFRESH_TOKEN_COOKIE = this.config.getJwtRefreshCookie()
     this.ACCESS_TOKEN_COOKIE = this.config.getJwtAccessCookie()
     this.CLIENT_URL = this.config.getClientUrl()
@@ -42,7 +48,25 @@ export class BaseController {
     res.clearCookie(this.ACCESS_TOKEN_COOKIE)
   }
 
-  public socialLogin(user: CreateUserDto) {
-    return this.authService.buildUserInfoAndTokens(user)
+  public async socialLogin(user: UserBeforeAuthentication) {
+    const existUser = await this.userService.getOneByAuthType(user.email, user.auth_type)
+    if (!existUser) {
+      const token = this.tokenService.generateTempToken(user)
+      return {
+        message: 'User not registered, redirect to welcome page with this token:',
+        token
+      }
+    }
+    const existToken = await this.tokenService.getOneByUserId(existUser.id)
+    /*
+     * він сто пудов існує тому шо ми перевірили,
+     * шо юзер існує ( коли створюється юзер, токен додається в дб )
+     *  */
+    const tokens = await this.authService.refresh(existToken!.refresh_token)
+    return {
+      message: 'Already registered, redirect to home page',
+      tokens,
+      user: existUser
+    }
   }
 }

@@ -11,9 +11,13 @@ import { CharactersNotFoundException, CharacterWithIdNotFoundException } from '@
 
 @Injectable()
 export class CharacterService {
-  constructor(private readonly characterRepository: CharacterRepository, private readonly s3Service: S3Service, private readonly paginationService: PaginationService<Character>) {}
+  public constructor(
+    private readonly characterRepository: CharacterRepository,
+    private readonly s3Service: S3Service,
+    private readonly paginationService: PaginationService<Character>
+  ) {}
 
-  async createOne(createCharacterDto: CreateCharacterDto, file: Express.Multer.File): Promise<Character> {
+  public async createOne(createCharacterDto: CreateCharacterDto, file: Express.Multer.File): Promise<Character> {
     if (!file) throw new BadRequestException('You must provide an image')
     const fileBuffer = await sharp(file.buffer).resize({ height: 300, width: 300, fit: 'cover' }).toBuffer()
 
@@ -39,7 +43,7 @@ export class CharacterService {
     return this.characterRepository.save(character)
   }
 
-  async getMany(queryPaginationDto: QueryPaginationDto, queryCharacterDto: QueryCharacterDto): Promise<Payload<Character>> {
+  public async getMany(queryPaginationDto: QueryPaginationDto, queryCharacterDto: QueryCharacterDto): Promise<Payload<Character>> {
     const { characters, count } = await this.characterRepository.getMany(queryPaginationDto, queryCharacterDto)
 
     if (!count || !characters) throw new CharactersNotFoundException()
@@ -48,7 +52,7 @@ export class CharacterService {
     return this.paginationService.wrapEntityWithPaginationInfo(characters, buildPaginationInfo)
   }
 
-  async getOne(id: number): Promise<Character> {
+  public async getOne(id: number): Promise<Character> {
     const character = await this.characterRepository.getOne(id)
 
     if (!character) throw new CharacterWithIdNotFoundException(id)
@@ -56,7 +60,7 @@ export class CharacterService {
     return character
   }
 
-  async updateOne(id: number, updateCharacterDto: UpdateCharacterDto): Promise<Character> {
+  public async updateOne(id: number, updateCharacterDto: UpdateCharacterDto): Promise<Character> {
     const character = await this.characterRepository.getOne(id)
 
     if (!character) throw new CharacterWithIdNotFoundException(id)
@@ -64,7 +68,7 @@ export class CharacterService {
     return this.characterRepository.updateOne(id, updateCharacterDto)
   }
 
-  async removeOne(id: number): Promise<Character> {
+  public async removeOne(id: number): Promise<Character> {
     const character = await this.characterRepository.getOne(id)
 
     if (!character) throw new CharacterWithIdNotFoundException(id)
@@ -72,7 +76,7 @@ export class CharacterService {
     return this.characterRepository.removeOne(id)
   }
 
-  async getCount(): Promise<number> {
+  public async getCount(): Promise<number> {
     return this.characterRepository.getCount()
   }
 }
