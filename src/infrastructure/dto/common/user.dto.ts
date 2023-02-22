@@ -95,8 +95,10 @@ export class UserDetailsDto {
   username: string
 
   @IsBoolean()
+  @Type(() => Boolean)
   mail_subscribe: boolean
 
   @IsNotEmpty()
+  @IsString()
   country: string
 }

@@ -23,6 +23,7 @@ export class AuthController extends BaseController {
   public async signup(@Body() dto: SignUpDto, @Req() req: Request, @Res({ passthrough: true }) res: Response) {
     // TODO: робити на клієнті редірект на сторінку /welcome де задавати юзернейм і іншу інфу
     const userData = await this.authService.signup(dto)
+    console.log(userData.access_token)
     return userData.access_token
     // return `${this.config.getBaseUrl()}/auth/welcome?token=${userData.access_token}`
   }

@@ -28,7 +28,10 @@ export class AuthService {
     if (withSameEmail) {
       throw new UserWithEmailAlreadyExistsException(dto.email)
     }
-
+    console.log(dto.password, dto.confirmPassword)
+    if (dto.password != dto.confirmPassword) {
+      throw new BadRequestException('Passwords do not match')
+    }
     const hashedPassword = await this.hashPassword(dto.password)
     const verify_link = uuid()
     const info = {
