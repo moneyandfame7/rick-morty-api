@@ -8,9 +8,9 @@ import { LocationAlreadyExistsException, LocationsNotFoundException, LocationWit
 
 @Injectable()
 export class LocationService {
-  constructor(private readonly locationRepository: LocationRepository, private readonly paginationService: PaginationService<Location>) {}
+  public constructor(private readonly locationRepository: LocationRepository, private readonly paginationService: PaginationService<Location>) {}
 
-  async createOne(createLocationDto: CreateLocationDto): Promise<Location> {
+  public async createOne(createLocationDto: CreateLocationDto): Promise<Location> {
     const withSameName = await this.locationRepository.findOneBy({ name: createLocationDto.name })
     if (withSameName) throw new LocationAlreadyExistsException(createLocationDto.name)
 

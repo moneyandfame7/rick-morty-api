@@ -9,7 +9,7 @@ import { CreateUserDto } from '@dto/common/user.dto'
 
 @Controller('/auth/github')
 export class GithubController extends BaseController {
-  constructor(readonly config: EnvironmentConfigService, readonly authService: AuthService, readonly userService: UserService) {
+  public constructor(protected readonly config: EnvironmentConfigService, protected readonly authService: AuthService, protected readonly userService: UserService) {
     super(config, authService, userService)
   }
 

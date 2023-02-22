@@ -7,13 +7,13 @@ import { UserService } from '@services/common/user.service'
 import { CreateUserDto } from '@dto/common/user.dto'
 
 @Injectable()
-export abstract class BaseController {
+export class BaseController {
   public readonly CLIENT_URL: string
   public readonly REFRESH_TOKEN_COOKIE: string
   public readonly ACCESS_TOKEN_COOKIE: string
   public readonly REFRESH_TOKEN_EXPIRE_COOKIE: number = 30 * 24 * 60 * 60 * 1000 // 30 days
   public readonly ACCESS_TOKEN_EXPIRE_COOKIE: number = 30 * 60 * 1000 // 30 minutes
-  protected constructor(readonly config: EnvironmentConfigService, readonly authService: AuthService, readonly userService: UserService) {
+  protected constructor(protected readonly config: EnvironmentConfigService, protected readonly authService: AuthService, protected readonly userService: UserService) {
     this.REFRESH_TOKEN_COOKIE = this.config.getJwtRefreshCookie()
     this.ACCESS_TOKEN_COOKIE = this.config.getJwtAccessCookie()
     this.CLIENT_URL = this.config.getClientUrl()
