@@ -1,18 +1,18 @@
-import { BadRequestException, Injectable, InternalServerErrorException, UnauthorizedException } from '@nestjs/common'
-import * as bcrypt from 'bcrypt'
-import { v4 as uuid } from 'uuid'
-import { UserService } from '@services/common/user.service'
-import { TokenService } from '@services/common/token.service'
-import { UserDoesNotExistException, UserWithEmailAlreadyExistsException } from '@domain/exceptions/common/user.exception'
-import { AuthIncorrectEmailException, AuthIncorrectPasswordException } from '@domain/exceptions/common/auth.exception'
-import { MailService } from '@services/common/mail.service'
 import { EnvironmentConfigService } from '@config/environment-config.service'
+import { AuthIncorrectEmailException, AuthIncorrectPasswordException } from '@domain/exceptions/common/auth.exception'
+import { UserDoesNotExistException, UserWithEmailAlreadyExistsException } from '@domain/exceptions/common/user.exception'
+import type { AuthTokens } from '@domain/models/auth/auth.model'
+import { UserBeforeAuthentication } from '@domain/models/common/user.model'
 import type { SignInDto } from '@dto/auth/auth.dto'
 import { SignUpDto } from '@dto/auth/auth.dto'
-import type { User } from '@entities/common/user.entity'
-import type { AuthTokens } from '@domain/models/auth/auth.model'
 import { ResetPasswordDto, UserDetailsDto } from '@dto/common/user.dto'
-import { UserBeforeAuthentication } from '@domain/models/common/user.model'
+import type { User } from '@entities/common/user.entity'
+import { BadRequestException, Injectable, InternalServerErrorException, UnauthorizedException } from '@nestjs/common'
+import { MailService } from '@services/common/mail.service'
+import { TokenService } from '@services/common/token.service'
+import { UserService } from '@services/common/user.service'
+import * as bcrypt from 'bcrypt'
+import { v4 as uuid } from 'uuid'
 
 @Injectable()
 export class AuthService {
@@ -45,8 +45,10 @@ export class AuthService {
     const tokens = await this.buildUserInfoAndTokens(user)
     return {
       message: 'User is redirected to Welcome page',
-      user,
-      tokens
+      body: {
+        user,
+        tokens
+      }
     }
   }
 
@@ -55,16 +57,14 @@ export class AuthService {
   public async welcome(token: string, details: UserDetailsDto) {
     const welcomePageUser = this.tokenService.validateAccessToken(token)
 
-    // if (!welcomePageUser.is_verified) {
-    //   await this.mailService.sendVerifyMail(welcomePageUser.email, `${this.config.getClientUrl()}/auth/verify/${welcomePageUser.verify_link}`)
-    // }
-
     const user = await this.userService.updateOne(welcomePageUser.id, details)
     const tokens = await this.buildUserInfoAndTokens(user)
     return {
       message: 'User is redirected to Home page',
-      user,
-      tokens
+      body: {
+        user,
+        tokens
+      }
     }
   }
 
@@ -75,12 +75,14 @@ export class AuthService {
     if (!(user.username || user.country || user.mail_subscribe)) {
       return {
         message: 'User is redirected to Welcome page',
-        user,
-        tokens
+        body: {
+          user,
+          tokens
+        }
       }
     }
 
-    return { message: 'User is redirected to Home page', user, tokens }
+    return { message: 'User is redirected to Home page', body: { user, tokens } }
   }
 
   public async logout(refreshToken: string) {
@@ -88,7 +90,9 @@ export class AuthService {
     const user = await this.userService.getOneById(removedToken.user_id)
     return {
       message: 'User is logged out',
-      user
+      body: {
+        user
+      }
     }
   }
 
@@ -98,8 +102,10 @@ export class AuthService {
       const ifPassedWelcomePage = user.country || user.username || user.mail_subscribe
       return {
         message: ifPassedWelcomePage ? 'User is finished registration' : 'User is redirected to welcome page',
-        user,
-        tokens
+        body: {
+          user,
+          tokens
+        }
       }
     }
     throw new InternalServerErrorException('папєрєджіваю про памілку')
@@ -126,7 +132,9 @@ export class AuthService {
     if (!user) {
       throw new BadRequestException('Incorrect verification link')
     }
-
+    if (user.is_verified) {
+      throw new BadRequestException('User already verified')
+    }
     const updated = await this.userService.updateOne(user.id, { is_verified: true })
     return this.buildUserInfoAndTokens(updated)
   }
@@ -143,17 +151,18 @@ export class AuthService {
     }
     const token = this.tokenService.generateTempToken(payload)
     const link = `${this.config.getClientUrl()}/auth/reset/${user.id}/${token}`
+    console.log(link)
     await this.mailService.sendForgotPasswordLink(user.email, link)
 
     return link
   }
 
-  public async reset(id: string, token: string, dto: ResetPasswordDto): Promise<User> {
-    const oldUser = await this.userService.getOneById(id)
-    if (!oldUser) {
+  public async reset(id: string, token: string, dto: ResetPasswordDto): Promise<AuthTokens> {
+    const user = await this.userService.getOneById(id)
+    if (!user) {
       throw new UserDoesNotExistException()
     }
-    const compare = await this.comparePassword(dto.password, oldUser.password)
+    const compare = await this.comparePassword(dto.password, user.password)
     if (compare) {
       throw new BadRequestException('Password is equal to old password')
     }
@@ -162,7 +171,8 @@ export class AuthService {
       throw new BadRequestException('Passwords do not match')
     }
     const hashedPassword = await this.hashPassword(dto.password)
-    return this.userService.updateOne(id, { password: hashedPassword })
+    const updated = await this.userService.updateOne(id, { password: hashedPassword })
+    return this.buildUserInfoAndTokens(updated)
   }
 
   public async buildUserInfoAndTokens(user: User): Promise<AuthTokens> {

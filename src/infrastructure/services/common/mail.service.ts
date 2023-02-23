@@ -29,8 +29,6 @@ export class MailService {
   }
 
   async sendVerifyMail(email: string, link: string): Promise<void> {
-    const user = await this.userService.getOneByAuthType(email, 'jwt')
-
     await this.transporter.sendMail({
       from: this.user,
       to: email,
@@ -38,7 +36,7 @@ export class MailService {
       text: '',
       html: `
         <div >
-             <h1>Hi ${user?.username}!</h1>
+             <h1>Hi!</h1>
             <p style="font-size:18px">Please confirm that you signed up using the email address ${email} by clicking the link below.</p>
              <a href="${link}" target="_blank">
              ${link}
@@ -48,7 +46,6 @@ export class MailService {
     })
   }
   async sendForgotPasswordLink(email: string, link: string) {
-    const user = await this.userService.getOneByAuthType(email, 'jwt')
     await this.transporter.sendMail({
       from: this.user,
       to: email,
@@ -56,7 +53,7 @@ export class MailService {
       text: '',
       html: `
         <div >
-             <h1>Hi ${user?.username}!</h1>
+             <h1>Hi!</h1>
              <p style="font-size:18px">Someone (hopefully you) has requested a password reset for your Rick&MortyAPI account. Follow the link below to set a new password:</p>
              <a href="${link}" target="_blank">
              ${link}

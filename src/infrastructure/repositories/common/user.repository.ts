@@ -46,7 +46,7 @@ export class UserRepository extends Repository<User> {
 
   public async updateOne(id: User['id'], updateUserDto: UpdateUserDto): Promise<User> {
     const queryBuilder = this.builder
-
+    this.buildRelations(queryBuilder)
     // todo: fix any
     const updated = await queryBuilder
       .update(User)
