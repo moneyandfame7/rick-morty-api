@@ -12,10 +12,9 @@ export class TokenRepository extends Repository<Token> {
     return this.createQueryBuilder('token')
   }
 
-  //
-  // private buildRelations(builder: SelectQueryBuilder<Token>) {
-  //   builder.leftJoinAndSelect('token.userId', 'user')
-  // }
+  private buildRelations(builder: SelectQueryBuilder<Token>) {
+    builder.leftJoinAndSelect('token.user_id', 'user')
+  }
 
   public async get(user_id: string): Promise<Token | null> {
     const queryBuilder = this.builder
@@ -23,16 +22,22 @@ export class TokenRepository extends Repository<Token> {
     return queryBuilder.where('user_id = :user_id', { user_id }).getOne()
   }
 
-  public async deleteByToken(refreshToken: string): Promise<Token> {
+  public async deleteByToken(refresh_token: string): Promise<Token> {
     const queryBuilder = this.builder
 
-    const { raw } = await queryBuilder.delete().from(Token).where('refresh_token = :refresh_token', { refresh_token: refreshToken }).returning('*').execute()
+    const { raw } = await queryBuilder.delete().from(Token).where('refresh_token = :refresh_token', { refresh_token }).returning('*').execute()
     return raw[0]
   }
 
-  public async findByToken(refreshToken: string): Promise<Token | null> {
+  public async findByToken(refresh_token: string): Promise<Token | null> {
+    const queryBuilder = this.builder
+    this.buildRelations(queryBuilder)
+    return queryBuilder.where('refresh_token = :refresh_token', { refresh_token }).getOne()
+  }
+
+  public async getOneByUserId(user_id: string) {
     const queryBuilder = this.builder
 
-    return queryBuilder.where('refresh_token = :refresh_token', { refresh_token: refreshToken }).getOne()
+    return queryBuilder.where('user_id = :user_id', { user_id }).getOne()
   }
 }

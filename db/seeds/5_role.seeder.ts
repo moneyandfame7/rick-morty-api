@@ -8,8 +8,8 @@ export class RoleSeeder implements Seeder {
       const roleRepository = dataSource.getRepository(Role)
 
       const roles: Role[] = [
-        { id: 1, value: 'admin' },
-        { id: 2, value: 'user' }
+        { id: 1, value: 'user' },
+        { id: 2, value: 'admin' }
       ]
       await roleRepository.insert(roles)
       console.log('✅ Roles filling successfully. ')

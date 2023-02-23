@@ -18,56 +18,29 @@ import type { User } from '@entities/common/user.entity'
 
 @Injectable()
 export class UserService {
-  constructor(
+  public constructor(
     private readonly userRepository: UserRepository,
     private readonly rolesService: RolesService,
     private readonly tokenService: TokenService,
     private readonly s3Service: S3Service
   ) {}
 
-  async createOne(dto: CreateUserDto): Promise<User> {
-    const userWithSameEmail = await this.getOneByEmail(dto.email)
-    if (userWithSameEmail && dto.auth_type === 'jwt') {
+  public async createOne(dto: CreateUserDto): Promise<User> {
+    const userWithSameEmail = await this.getOneByAuthType(dto.email, dto.auth_type)
+    if (userWithSameEmail && userWithSameEmail.auth_type === 'jwt') {
       throw new UserWithEmailAlreadyExistsException(dto.email)
     }
+    // const userWithSameUsername = await this.getOneByUsername(dto.username)
+    // if (userWithSameUsername) {
+    //   throw new UserWithUsernameAlreadyExistsException(dto.username)
+    // }
 
     const user = await this.userRepository.createOne(dto)
     user.role = await this.rolesService.getOne('user')
     return this.userRepository.save(user)
   }
 
-  async getOneById(id: string): Promise<User> {
-    const user = await this.userRepository.getOneById(id)
-
-    if (!user) {
-      throw new UserWithIdNotFoundException(id)
-    }
-
-    return user
-  }
-
-  async getOneByEmail(email: string): Promise<User | null> {
-    return this.userRepository.getOneByEmail(email)
-  }
-
-  async getOneByAuthType(email: string, authType: string): Promise<User | null> {
-    return this.userRepository.getOneByAuthType(email, authType)
-  }
-
-  async getOneByUsername(username: string): Promise<User | null> {
-    return this.userRepository.getOneByUsername(username)
-  }
-
-  async getOneByVerifyLink(link: string): Promise<User> {
-    const user = await this.userRepository.getOneByVerifyLink(link)
-    if (!user) {
-      throw new UserDoesNotExistException()
-    }
-
-    return user
-  }
-
-  async getMany(): Promise<User[]> {
+  public async getMany(): Promise<User[]> {
     const users = await this.userRepository.getMany()
 
     if (!users.length) {
@@ -77,11 +50,38 @@ export class UserService {
     return users
   }
 
-  async getCount(): Promise<number> {
-    return this.userRepository.getCount()
+  public async getOneById(id: string): Promise<User> {
+    const user = await this.userRepository.getOneById(id)
+
+    if (!user) {
+      throw new UserWithIdNotFoundException(id)
+    }
+
+    return user
   }
 
-  async updateOne(id: string, updateUserDto: UpdateUserDto): Promise<User> {
+  public async getOneByEmail(email: string): Promise<User | null> {
+    return this.userRepository.getOneByEmail(email)
+  }
+
+  public async getOneByAuthType(email: string, authType: string): Promise<User | null> {
+    return this.userRepository.getOneByAuthType(email, authType)
+  }
+
+  public async getOneByUsername(username: string): Promise<User | null> {
+    return this.userRepository.getOneByUsername(username)
+  }
+
+  public async getOneByVerifyLink(link: string): Promise<User> {
+    const user = await this.userRepository.getOneByVerifyLink(link)
+    if (!user) {
+      throw new UserDoesNotExistException()
+    }
+
+    return user
+  }
+
+  public async updateOne(id: string, updateUserDto: UpdateUserDto): Promise<User> {
     const user = await this.userRepository.getOneById(id)
 
     if (!user) {
@@ -91,7 +91,7 @@ export class UserService {
     return this.userRepository.updateOne(id, updateUserDto)
   }
 
-  async changeUsername(id: string, username: string): Promise<User> {
+  public async changeUsername(id: string, username: string): Promise<User> {
     const user = await this.userRepository.getOneByUsername(username)
     if (user) {
       throw new UserWithUsernameAlreadyExistsException(username)
@@ -100,11 +100,11 @@ export class UserService {
     return this.updateOne(id, { username })
   }
 
-  async save(user: User): Promise<User> {
+  public async save(user: User): Promise<User> {
     return this.userRepository.save(user)
   }
 
-  async changePhoto(id: string, file: Express.Multer.File): Promise<User> {
+  public async changePhoto(id: string, file: Express.Multer.File): Promise<User> {
     if (!file) throw new BadRequestException('You must provide a photo')
     const fileBuffer = await sharp(file.buffer).resize({ height: 128, width: 128, fit: 'cover' }).toBuffer()
     const [, type] = file.mimetype.split('/')
@@ -121,7 +121,7 @@ export class UserService {
     return this.userRepository.save(user)
   }
 
-  async removeOne(id: string): Promise<User> {
+  public async removeOne(id: string): Promise<User> {
     const user = await this.userRepository.getOneById(id)
 
     if (!user) {
@@ -132,7 +132,7 @@ export class UserService {
     return this.userRepository.removeOne(id)
   }
 
-  async addRole(dto: AddRoleDto): Promise<User> {
+  public async addRole(dto: AddRoleDto): Promise<User> {
     const user = await this.userRepository.getOneById(dto.userId)
     const role = await this.rolesService.getOne(dto.value)
 
@@ -143,7 +143,7 @@ export class UserService {
     throw new BadRequestException('Role or user not found.')
   }
 
-  async ban(dto: BanUserDto): Promise<User> {
+  public async ban(dto: BanUserDto): Promise<User> {
     const user = await this.userRepository.getOneById(dto.userId)
     if (!user) {
       throw new UserWithIdNotFoundException(dto.userId)
@@ -156,5 +156,9 @@ export class UserService {
     const user = await this.userRepository.getOneByEmail(email)
 
     return !!user
+  }
+
+  public async getCount(): Promise<number> {
+    return this.userRepository.getCount()
   }
 }

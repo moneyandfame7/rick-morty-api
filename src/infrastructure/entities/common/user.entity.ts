@@ -9,7 +9,7 @@ export class User {
   id: string
 
   @ApiProperty({ example: 'User_228', description: 'The username of the user' })
-  @Column({ nullable: false, type: 'varchar', unique: true })
+  @Column({ nullable: true, type: 'varchar', unique: true })
   username: string
 
   @ApiProperty({ example: 'user@gmail.com', description: 'The email of the user' })
@@ -44,4 +44,10 @@ export class User {
 
   @Column({ type: 'uuid', nullable: true })
   verify_link: string
+
+  @Column({ type: 'boolean', nullable: true })
+  mail_subscribe: boolean
+
+  @Column({ type: 'varchar', nullable: true })
+  country: string
 }

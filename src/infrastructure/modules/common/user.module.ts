@@ -1,12 +1,12 @@
 import { Module } from '@nestjs/common'
-import { UserService } from '../../services/common/user.service'
-import { UserController } from '../../controllers/common/user.controller'
+import { UserService } from '@services/common/user.service'
+import { UserController } from '@controllers/common/user.controller'
 import { TypeOrmModule } from '@nestjs/typeorm'
-import { Character } from '../../entities/main/character.entity'
-import { UserRepository } from '../../repositories/common/user.repository'
+import { Character } from '@entities/main/character.entity'
+import { UserRepository } from '@repositories/common/user.repository'
 import { RolesModule } from './roles.module'
-import { TokenModule } from './token.module'
 import { S3Module } from './s3.module'
+import { TokenModule } from '@modules/common/token.module'
 
 @Module({
   imports: [TypeOrmModule.forFeature([Character]), RolesModule, TokenModule, S3Module],
