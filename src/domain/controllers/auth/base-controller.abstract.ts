@@ -51,9 +51,7 @@ export class BaseController {
   public async socialLogin(user: UserBeforeAuthentication) {
     const existUser = await this.userService.getOneByAuthType(user.email, user.auth_type)
 
-    console.log(existUser)
     if (existUser) {
-      // Редірект на home page
       const tokens = await this.authService.buildUserInfoAndTokens(existUser)
       const ifPassedWelcomePage = existUser.country || existUser.username || existUser.mail_subscribe
 
@@ -64,7 +62,6 @@ export class BaseController {
       }
     }
 
-    // Редірект на welcome page
     const info: UserBeforeAuthentication = {
       email: user.email,
       username: user.username,
