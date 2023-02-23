@@ -25,7 +25,8 @@ export class GithubStrategy extends PassportStrategy(Strategy, 'github') {
       password: null,
       auth_type: profile.provider,
       photo: profile.photos ? (profile.photos[0] as any).value : null,
-      is_verified: true
+      is_verified: true,
+      verify_link: null
     }
 
     return userInfo

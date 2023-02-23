@@ -1,4 +1,4 @@
-import { Body, Controller, Get, Param, Post, Query, Req, Res, UnauthorizedException, UseGuards } from '@nestjs/common'
+import { Body, Controller, Get, Param, Post, Redirect, Req, Res, UnauthorizedException, UseGuards } from '@nestjs/common'
 import { ApiTags } from '@nestjs/swagger'
 import { Request, Response } from 'express'
 import { JwtAuthGuard } from '@common/guards/auth/jwt.guard'
@@ -9,7 +9,6 @@ import { AuthService } from '@services/auth/auth.service'
 import { UserService } from '@services/common/user.service'
 import { EmailDto, ResetPasswordDto, UserDetailsDto } from '@dto/common/user.dto'
 import type { AuthTokens } from '@domain/models/auth/auth.model'
-import type { Token } from '@entities/common/token.entity'
 import { TokenService } from '@services/common/token.service'
 
 @Controller('auth')
@@ -25,22 +24,43 @@ export class AuthController extends BaseController {
   }
 
   @Post('/signup')
-  public async signup(@Body() dto: SignUpDto) {
+  @Redirect('https://google.com.com', 302)
+  public async signup(@Body() dto: SignUpDto, @Req() req: Request, @Res({ passthrough: true }) res: Response) {
+    const { access_token, refresh_token } = this.getCookies(req)
+    if (access_token && refresh_token) {
+      const user = this.tokenService.validateAccessToken(access_token)
+      return {
+        message: 'User already logged in, redirect to Home Page (or redirect to last in history page)',
+        tokens: { access_token, refresh_token },
+        user
+      }
+    }
     // TODO: робити на клієнті редірект на сторінку /welcome де задавати юзернейм і іншу інфу
-    return this.authService.signup(dto)
+    const info = await this.authService.signup(dto)
+    this.setCookies(res, info.tokens.refresh_token, info.tokens.access_token)
+    return info
   }
 
   @Post('/login')
-  public async login(@Body() userDto: SignInDto): Promise<AuthTokens> {
-    return this.authService.login(userDto)
-    // this.setCookies(res, userData.refresh_token, userData.access_token)
+  public async login(@Body() userDto: SignInDto, @Req() req: Request, @Res({ passthrough: true }) res: Response) {
+    const { access_token, refresh_token } = this.getCookies(req)
+    if (access_token && refresh_token) {
+      const user = this.tokenService.validateAccessToken(access_token)
+      return {
+        message: 'User already logged in, redirect to Home Page (or redirect to last in history page)',
+        tokens: { access_token, refresh_token },
+        user
+      }
+    }
+    const info = await this.authService.login(userDto)
+    this.setCookies(res, info.tokens.refresh_token, info.tokens.access_token)
 
-    // return userData
+    return info
   }
 
-  @Get('/logout')
+  @Post('/logout')
   @UseGuards(JwtAuthGuard)
-  public async logout(@Req() req: Request, @Res({ passthrough: true }) res: Response): Promise<Token> {
+  public async logout(@Req() req: Request, @Res({ passthrough: true }) res: Response) {
     const { access_token, refresh_token } = this.getCookies(req)
     if (access_token && refresh_token) {
       this.clearCookies(res)
@@ -53,9 +73,9 @@ export class AuthController extends BaseController {
   @Get('/refresh')
   public async refresh(@Req() req: Request, @Res({ passthrough: true }) res: Response): Promise<AuthTokens> {
     const { refresh_token } = this.getCookies(req)
-    return this.authService.refresh(refresh_token)
-    // this.setCookies(res, userData.refresh_token, userData.access_token)
-    // return userData
+    const tokens = await this.authService.refresh(refresh_token)
+    this.setCookies(res, tokens.refresh_token, tokens.access_token)
+    return tokens
   }
 
   @Post('/verify/:link')
@@ -66,14 +86,20 @@ export class AuthController extends BaseController {
 
   @Get('/status')
   @UseGuards(JwtAuthGuard)
-  public status(@Req() req: Request): AuthTokens {
-    return this.getCookies(req)
+  public status(@Req() req: Request) {
+    const tokens = this.getCookies(req)
+    return this.authService.status(tokens)
   }
 
   // TODO: на клієнті робимо редірект, якщо юзер вже авторизований
   @Post('/welcome')
-  public async welcome(@Query('token') token: string, @Body() details: UserDetailsDto, @Res({ passthrough: true }) res: Response) {
-    return this.authService.welcome(token, details)
+  @UseGuards(JwtAuthGuard)
+  public async welcome(@Body() details: UserDetailsDto, @Req() req: Request, @Res({ passthrough: true }) res: Response) {
+    const { access_token } = this.getCookies(req)
+    const info = await this.authService.welcome(access_token, details)
+
+    this.setCookies(res, info.tokens.refresh_token, info.tokens.access_token)
+    return info
   }
 
   @Post('/forgot')

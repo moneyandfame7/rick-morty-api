@@ -1,4 +1,4 @@
-import { BadRequestException, Injectable, UnauthorizedException } from '@nestjs/common'
+import { BadRequestException, Injectable, InternalServerErrorException, UnauthorizedException } from '@nestjs/common'
 import * as bcrypt from 'bcrypt'
 import { v4 as uuid } from 'uuid'
 import { UserService } from '@services/common/user.service'
@@ -11,7 +11,6 @@ import type { SignInDto } from '@dto/auth/auth.dto'
 import { SignUpDto } from '@dto/auth/auth.dto'
 import type { User } from '@entities/common/user.entity'
 import type { AuthTokens } from '@domain/models/auth/auth.model'
-import type { Token } from '@entities/common/token.entity'
 import { ResetPasswordDto, UserDetailsDto } from '@dto/common/user.dto'
 import { UserBeforeAuthentication } from '@domain/models/common/user.model'
 
@@ -29,48 +28,81 @@ export class AuthService {
     if (withSameEmail) {
       throw new UserWithEmailAlreadyExistsException(dto.email)
     }
-    if (dto.password != dto.confirmPassword) {
-      throw new BadRequestException('Passwords do not match')
-    }
     const hashedPassword = await this.hashPassword(dto.password)
+    const verify_link = uuid()
     const info: UserBeforeAuthentication = {
       email: dto.email,
       username: null,
       password: hashedPassword,
       auth_type: 'jwt',
       photo: null,
-      is_verified: false
+      is_verified: false,
+      verify_link
     }
+    const user = await this.userService.createOne(info)
+    await this.mailService.sendVerifyMail(user.email, verify_link)
 
-    return this.tokenService.generateTempToken(info)
+    const tokens = await this.buildUserInfoAndTokens(user)
+    return {
+      message: 'User is redirected to Welcome page',
+      user,
+      tokens
+    }
   }
 
+  // todo: на клієнті зробити функцію, яка перевіряє, якщо юзер авторизований, але не пройшов велкам пейдж - тоді редірект на велком пейдж
+  // якщо не авторизований, то на /login
   public async welcome(token: string, details: UserDetailsDto) {
-    const verify = this.tokenService.validateTempToken(token)
-    const verify_link = uuid()
-    console.log(verify, ' <<<< PAYLOAD')
-    const user = await this.userService.createOne({
-      ...verify,
-      username: details.username,
-      country: details.country,
-      mail_subscribe: details.mail_subscribe
-    })
-    if (!user.is_verified) {
-      await this.userService.updateOne(user.id, { verify_link })
-      await this.mailService.sendVerifyMail(user.email, `${this.config.getClientUrl()}/auth/verify/${verify_link}`)
+    const welcomePageUser = this.tokenService.validateAccessToken(token)
+
+    // if (!welcomePageUser.is_verified) {
+    //   await this.mailService.sendVerifyMail(welcomePageUser.email, `${this.config.getClientUrl()}/auth/verify/${welcomePageUser.verify_link}`)
+    // }
+
+    const user = await this.userService.updateOne(welcomePageUser.id, details)
+    const tokens = await this.buildUserInfoAndTokens(user)
+    return {
+      message: 'User is redirected to Home page',
+      user,
+      tokens
+    }
+  }
+
+  public async login(userDto: SignInDto) {
+    const user = await this.validateUser(userDto)
+    const tokens = await this.buildUserInfoAndTokens(user)
+
+    if (!(user.username || user.country || user.mail_subscribe)) {
+      return {
+        message: 'User is redirected to Welcome page',
+        user,
+        tokens
+      }
     }
 
-    return this.buildUserInfoAndTokens(user)
+    return { message: 'User is redirected to Home page', user, tokens }
   }
 
-  public async login(userDto: SignInDto): Promise<AuthTokens> {
-    const user = await this.validateUser(userDto)
-
-    return this.buildUserInfoAndTokens(user)
+  public async logout(refreshToken: string) {
+    const removedToken = await this.tokenService.removeByToken(refreshToken)
+    const user = await this.userService.getOneById(removedToken.user_id)
+    return {
+      message: 'User is logged out',
+      user
+    }
   }
 
-  public async logout(refreshToken: string): Promise<Token> {
-    return this.tokenService.removeByToken(refreshToken)
+  public async status(tokens: AuthTokens) {
+    const user = await this.tokenService.validateAccessToken(tokens.access_token)
+    if (user) {
+      const ifPassedWelcomePage = user.country || user.username || user.mail_subscribe
+      return {
+        message: ifPassedWelcomePage ? 'User is finished registration' : 'User is redirected to welcome page',
+        user,
+        tokens
+      }
+    }
+    throw new InternalServerErrorException('папєрєджіваю про памілку')
   }
 
   public async refresh(refreshToken: string): Promise<AuthTokens> {
@@ -133,8 +165,8 @@ export class AuthService {
     return this.userService.updateOne(id, { password: hashedPassword })
   }
 
-  public async buildUserInfoAndTokens(user: any): Promise<AuthTokens> {
-    const tokens = this.tokenService.generateTokens(user)
+  public async buildUserInfoAndTokens(user: User): Promise<AuthTokens> {
+    const tokens = await this.tokenService.generateTokens(user)
     await this.tokenService.saveToken(user.id, tokens.refresh_token)
     return tokens
   }

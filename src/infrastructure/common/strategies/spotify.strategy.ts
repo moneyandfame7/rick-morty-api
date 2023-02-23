@@ -26,7 +26,8 @@ export class SpotifyStrategy extends PassportStrategy(Strategy, 'spotify') {
       password: null,
       auth_type: profile.provider,
       photo: profile.photos ? (profile.photos[0] as any).value : null,
-      is_verified: true
+      is_verified: true,
+      verify_link: null
     }
 
     done(null, userInfo)

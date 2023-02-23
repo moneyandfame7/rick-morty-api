@@ -3,10 +3,11 @@ import { type Profile, Strategy, type VerifyCallback } from 'passport-google-oau
 import { BadRequestException, Injectable } from '@nestjs/common'
 import { EnvironmentConfigService } from '@config/environment-config.service'
 import { UserBeforeAuthentication } from '@domain/models/common/user.model'
+import { UserService } from '@services/common/user.service'
 
 @Injectable()
 export class GoogleStrategy extends PassportStrategy(Strategy, 'google') {
-  public constructor(private readonly config: EnvironmentConfigService) {
+  public constructor(private readonly config: EnvironmentConfigService, private readonly userService: UserService) {
     super({
       clientID: config.getGoogleClientId(),
       clientSecret: config.getGoogleClientSecret(),
@@ -25,7 +26,8 @@ export class GoogleStrategy extends PassportStrategy(Strategy, 'google') {
       password: null,
       auth_type: profile.provider,
       photo: profile.photos ? (profile.photos[0] as any).value : null,
-      is_verified: true
+      is_verified: true,
+      verify_link: null
     }
 
     done(null, userInfo)

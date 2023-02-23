@@ -12,6 +12,14 @@ export interface JwtPayload {
   email: string
   username: string
   auth_type: string
-  country: string
   is_verified: boolean
+}
+
+export interface TempUserPayload {
+  email: string
+  password: string | null
+  username: string | null
+  auth_type: string
+  is_verified: boolean
+  photo: string | null
 }

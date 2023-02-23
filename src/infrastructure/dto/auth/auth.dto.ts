@@ -1,5 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger'
-import { IsEmail, IsNotEmpty, IsString, MaxLength, MinLength } from 'class-validator'
+import { IsEmail, IsNotEmpty, MaxLength, MinLength } from 'class-validator'
 import { Type } from 'class-transformer'
 
 export class SignInDto {
@@ -23,7 +23,4 @@ export class SignUpDto {
   @MaxLength(32)
   @Type(() => String)
   readonly password: string
-
-  @IsString()
-  public readonly confirmPassword: string
 }

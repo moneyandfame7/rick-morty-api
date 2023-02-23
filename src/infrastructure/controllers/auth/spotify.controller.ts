@@ -1,6 +1,6 @@
-import { Controller, Get, Req, UseGuards } from '@nestjs/common'
+import { Controller, Get, Req, Res, UseGuards } from '@nestjs/common'
 import { SpotifyAuthGuard } from '@common/guards/auth/spotify.guard'
-import { Request } from 'express'
+import { Request, Response } from 'express'
 import { EnvironmentConfigService } from '@config/environment-config.service'
 import { AuthService } from '@services/auth/auth.service'
 import { BaseController } from '@domain/controllers/auth/base-controller.abstract'
@@ -25,8 +25,10 @@ export class SpotifyController extends BaseController {
 
   @Get('/redirect')
   @UseGuards(SpotifyAuthGuard)
-  public redirect(@Req() req: Request) {
+  public async redirect(@Req() req: Request, @Res({ passthrough: true }) res: Response) {
     const user = req.user as UserBeforeAuthentication
-    return this.socialLogin(user)
+    const info = await this.socialLogin(user)
+    this.setCookies(res, info.tokens.refresh_token, info.tokens.access_token)
+    return info
   }
 }

@@ -6,6 +6,7 @@ import type { User } from '@entities/common/user.entity'
 import type { Token } from '@entities/common/token.entity'
 import type { GeneratedTokens } from '@domain/models/common/token.model'
 import { JwtPayload } from '@domain/models/auth/auth.model'
+import { UserBeforeAuthentication } from '@domain/models/common/user.model'
 
 @Injectable()
 export class TokenService {
@@ -93,7 +94,7 @@ export class TokenService {
     }
   }
 
-  public validateTempToken(token: string): JwtPayload {
+  public validateTempToken(token: string): UserBeforeAuthentication {
     try {
       return this.jwtService.verify(token, { secret: this.ACCESS_SECRET })
     } catch (e) {

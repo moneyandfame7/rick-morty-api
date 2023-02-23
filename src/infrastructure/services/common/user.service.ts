@@ -26,7 +26,7 @@ export class UserService {
   ) {}
 
   public async createOne(dto: CreateUserDto): Promise<User> {
-    const userWithSameEmail = await this.getOneByEmail(dto.email)
+    const userWithSameEmail = await this.getOneByAuthType(dto.email, dto.auth_type)
     if (userWithSameEmail && userWithSameEmail.auth_type === 'jwt') {
       throw new UserWithEmailAlreadyExistsException(dto.email)
     }

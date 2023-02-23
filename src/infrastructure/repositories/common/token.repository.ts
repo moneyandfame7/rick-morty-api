@@ -12,10 +12,9 @@ export class TokenRepository extends Repository<Token> {
     return this.createQueryBuilder('token')
   }
 
-  //
-  // private buildRelations(builder: SelectQueryBuilder<Token>) {
-  //   builder.leftJoinAndSelect('token.userId', 'user')
-  // }
+  private buildRelations(builder: SelectQueryBuilder<Token>) {
+    builder.leftJoinAndSelect('token.user_id', 'user')
+  }
 
   public async get(user_id: string): Promise<Token | null> {
     const queryBuilder = this.builder
@@ -32,7 +31,7 @@ export class TokenRepository extends Repository<Token> {
 
   public async findByToken(refresh_token: string): Promise<Token | null> {
     const queryBuilder = this.builder
-
+    this.buildRelations(queryBuilder)
     return queryBuilder.where('refresh_token = :refresh_token', { refresh_token }).getOne()
   }
 

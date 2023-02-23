@@ -9,7 +9,7 @@ export class CreateUserDto {
   @MaxLength(20)
   @IsNotEmpty()
   @Type(() => String)
-  readonly username: string
+  readonly username: string | null
 
   @ApiProperty({ example: 'user@gmail.com', description: 'The email of the user.' })
   @IsEmail()
@@ -22,17 +22,17 @@ export class CreateUserDto {
   @MinLength(3)
   @MaxLength(32)
   @Type(() => String)
-  readonly password?: string
+  readonly password: string | null
 
   @IsIn(['google', 'instagram', 'discord', 'github', 'jwt'])
   readonly auth_type: string
 
   @IsOptional()
-  readonly photo?: string
+  readonly photo: string | null
 
   @IsUUID()
   @IsOptional()
-  readonly verify_link?: string
+  readonly verify_link: string | null
 
   @IsBoolean()
   readonly is_verified?: boolean = false

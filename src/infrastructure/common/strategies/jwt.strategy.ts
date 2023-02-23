@@ -17,7 +17,6 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
 
   private static extractJwtFromCookie(req: Request): string | null {
     /* ця функція достає токен з cookie */
-    // TODO: це не потрібно, бо я буду пхати кожен раз access token в запити
     if (req.cookies && 'ACCESS_TOKEN' in req.cookies) {
       return req.cookies.ACCESS_TOKEN
     }

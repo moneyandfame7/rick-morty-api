@@ -45,9 +45,9 @@ export class User {
   @Column({ type: 'uuid', nullable: true })
   verify_link: string
 
-  @Column({ type: 'boolean', nullable: false })
+  @Column({ type: 'boolean', nullable: true })
   mail_subscribe: boolean
 
-  @Column({ type: 'varchar', nullable: false })
+  @Column({ type: 'varchar', nullable: true })
   country: string
 }

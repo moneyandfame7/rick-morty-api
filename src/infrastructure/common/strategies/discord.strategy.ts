@@ -28,7 +28,8 @@ export class DiscordStrategy extends PassportStrategy(Strategy, 'discord') {
       auth_type: profile.provider,
       /* https://stackoverflow.com/questions/65450055/how-to-get-avatar-from-discord-api */
       photo: `${this.DISCORD_AVATARS_URL}/${profile.id}/${profile.avatar}`,
-      is_verified: true
+      is_verified: true,
+      verify_link: null
     }
 
     return userInfo
