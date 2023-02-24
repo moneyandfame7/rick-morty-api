@@ -6,7 +6,7 @@ import { UserRepository } from '@repositories/common/user.repository'
 import { RolesService } from './roles.service'
 import { TokenService } from './token.service'
 import {
-  UserDoesNotExistException,
+  UserNotFoundException,
   UsersNotFoundException,
   UserWithEmailAlreadyExistsException,
   UserWithIdNotFoundException,
@@ -75,7 +75,7 @@ export class UserService {
   public async getOneByVerifyLink(link: string): Promise<User> {
     const user = await this.userRepository.getOneByVerifyLink(link)
     if (!user) {
-      throw new UserDoesNotExistException()
+      throw new UserNotFoundException()
     }
 
     return user

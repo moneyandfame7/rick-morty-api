@@ -11,7 +11,7 @@ import type { Role } from '@entities/common/role.entity'
 @Controller('api/roles')
 @ApiTags('roles')
 export class RolesController {
-  constructor(private readonly rolesService: RolesService) {}
+  public constructor(private readonly rolesService: RolesService) {}
 
   @Post()
   @Roles(RolesEnum.ADMIN)

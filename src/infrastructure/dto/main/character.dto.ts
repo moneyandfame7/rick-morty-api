@@ -1,48 +1,46 @@
 import { IsArray, IsDate, IsIn, IsNotEmpty, IsNumber, IsObject, IsOptional, IsString } from 'class-validator'
-import { Transform } from 'class-transformer'
 import { ApiProperty } from '@nestjs/swagger'
 import { PartialType } from '@nestjs/mapped-types'
 import { CreateLocationDto } from './location.dto'
 import type { Episode } from '@entities/main/episode.entity'
 import { QueryPaginationDto } from '../common/pagination.dto'
-import { toCorrectId } from '@common/transforms/to-correct-id.transform'
 
 export class CreateCharacterDto {
   @IsNumber()
   @IsOptional()
-  id?: number
+  public id?: number
 
   @ApiProperty({ example: 'Rick Sanchez', description: 'The name of the character.' })
   @IsNotEmpty()
-  name: string
+  public name: string
 
   @ApiProperty({ example: 'Genetic experiment', description: 'The type or subspecies of the character.' })
-  @IsString()
-  type: string
+  @IsOptional()
+  public type: string
 
   @ApiProperty({ example: 'Alive', description: "The status of the character ('Alive', 'Dead' or 'unknown')." })
   @IsIn(['Alive', 'Dead', 'unknown'])
-  @IsNotEmpty()
-  status: string
+  public status: string
 
   @ApiProperty({
     example: 'Male',
     description: "The gender of the character ('Female', 'Male', 'Genderless' or 'unknown')."
   })
   @IsIn(['Female', 'Male', 'Genderless', 'unknown'])
-  @IsString()
-  gender: string
+  public gender: string
 
   @ApiProperty({ example: 'Human', description: 'The species of the character.' })
   @IsString()
-  @IsNotEmpty()
-  species: string
+  public species: string
 
   @ApiProperty({ example: 'https://example.com/images/1', description: 'Link to character`s photo.' })
   @IsString()
   @IsOptional()
-  image?: string
+  public image?: string
 
+  // TODO: розібратись з локацією, можливо зробити так,
+  //  шоб в dto юзер вводив імʼя локації, і шукати її вже потім,
+  //  episode теж сам
   @IsObject()
   @ApiProperty({
     example: {
@@ -54,7 +52,7 @@ export class CreateCharacterDto {
     type: () => CreateLocationDto
   })
   @IsOptional()
-  location?: CreateLocationDto
+  public location?: CreateLocationDto
 
   @ApiProperty({
     example: {
@@ -66,7 +64,7 @@ export class CreateCharacterDto {
     type: () => CreateLocationDto
   })
   @IsOptional()
-  origin?: CreateLocationDto
+  public origin?: CreateLocationDto
 
   @ApiProperty({
     example: [1, 2, 3, 4, 5, 7, 10],
@@ -74,23 +72,22 @@ export class CreateCharacterDto {
   })
   @IsArray()
   @IsOptional()
-  episodes?: Episode[]
+  public episodes?: Episode[]
 
   @IsDate()
   @IsOptional()
-  createdAt?: Date = new Date()
+  public createdAt?: Date = new Date()
 }
 
 export class QueryCharacterDto extends QueryPaginationDto {
   @ApiProperty({ example: [1], description: 'The id of the character.', required: false })
-  @Transform(({ value }) => toCorrectId(value))
   @IsOptional()
-  id?: number[]
+  public id?: string
 
   @IsOptional()
   @ApiProperty({ example: 'Rick Sanchez', description: 'The name of the character.', required: false })
   @IsString()
-  name?: string
+  public name?: string
 
   @ApiProperty({
     example: 'Alive',
@@ -100,7 +97,7 @@ export class QueryCharacterDto extends QueryPaginationDto {
   @IsOptional()
   @IsIn(['Alive', 'Dead', 'unknown'])
   @IsString()
-  status?: string
+  public status?: string
 
   @ApiProperty({
     example: 'Genetic experiment',
@@ -109,12 +106,12 @@ export class QueryCharacterDto extends QueryPaginationDto {
   })
   @IsOptional()
   @IsString()
-  type?: string
+  public type?: string
 
   @ApiProperty({ example: 'Human', description: 'The species of the character.', required: false })
   @IsOptional()
   @IsString()
-  species?: string
+  public species?: string
 
   @IsOptional()
   @ApiProperty({
@@ -124,12 +121,12 @@ export class QueryCharacterDto extends QueryPaginationDto {
   })
   @IsIn(['Female', 'Male', 'Genderless', 'unknown'])
   @IsString()
-  gender?: string
+  public gender?: string
 
   @ApiProperty({ example: 'Pilot', description: 'The name of the episode.', required: false })
   @IsOptional()
   @IsString()
-  episode_name?: string
+  public episode_name?: string
 }
 
 export class UpdateCharacterDto extends PartialType(CreateCharacterDto) {}

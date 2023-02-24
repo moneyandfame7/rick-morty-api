@@ -1,12 +1,13 @@
 import { Controller, Get, Req, Res, UseGuards } from '@nestjs/common'
 import { Request, Response } from 'express'
 import { EnvironmentConfigService } from '@config/environment-config.service'
-import { BaseController } from '@domain/controllers/auth/base-controller.abstract'
+import { BaseController } from '@domain/controllers/auth/base-controller'
 import { AuthService } from '@services/auth/auth.service'
 import { GoogleAuthGuard } from '@common/guards/auth/google.guard'
 import { UserService } from '@services/common/user.service'
 import { TokenService } from '@services/common/token.service'
 import { UserBeforeAuthentication } from '@domain/models/common/user.model'
+import { AuthTokens } from '@domain/models/auth/auth.model'
 
 @Controller('/auth/google')
 export class GoogleController extends BaseController {
@@ -25,10 +26,10 @@ export class GoogleController extends BaseController {
 
   @Get('/redirect')
   @UseGuards(GoogleAuthGuard)
-  public async redirect(@Req() req: Request, @Res({ passthrough: true }) res: Response) {
+  public async redirect(@Req() req: Request, @Res({ passthrough: true }) res: Response): Promise<AuthTokens> {
     const user = req.user as UserBeforeAuthentication
-    const info = await this.socialLogin(user)
-    this.setCookies(res, info.tokens.refresh_token, info.tokens.access_token)
-    return info
+    const tokens = await this.socialLogin(user)
+    this.setCookies(res, tokens.refresh_token, tokens.access_token)
+    return tokens
   }
 }

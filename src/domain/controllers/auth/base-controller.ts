@@ -6,6 +6,7 @@ import { AuthService } from '@services/auth/auth.service'
 import { UserService } from '@services/common/user.service'
 import { TokenService } from '@services/common/token.service'
 import { UserBeforeAuthentication } from '@domain/models/common/user.model'
+import { AuthTokens } from '@domain/models/auth/auth.model'
 
 @Injectable()
 export class BaseController {
@@ -48,35 +49,27 @@ export class BaseController {
     res.clearCookie(this.ACCESS_TOKEN_COOKIE)
   }
 
-  public async socialLogin(user: UserBeforeAuthentication) {
+  public async socialLogin(user: UserBeforeAuthentication): Promise<AuthTokens> {
     const existUser = await this.userService.getOneByAuthType(user.email, user.auth_type)
+    // @TODO: зробити тип який повертається на клієнт, мб status, message, body чи щось таке. або просто токени, але розписати по логіці, шо коли відбувається
 
     if (existUser) {
-      const tokens = await this.authService.buildUserInfoAndTokens(existUser)
-      const ifPassedWelcomePage = existUser.country || existUser.username || existUser.mail_subscribe
-
-      return {
-        message: ifPassedWelcomePage ? 'User is finished registration' : 'User is redirected to welcome page',
-        user: existUser,
-        tokens
-      }
+      return this.authService.buildUserInfoAndTokens(existUser)
+      // const ifPassedWelcomePage = existUser.country || existUser.username || existUser.mail_subscribe
+      // return {
+      //   message: ifPassedWelcomePage ? 'User is finished registration' : 'User is redirected to welcome page',
+      //   user: existUser,
+      //   tokens
+      // }
     }
 
     const info: UserBeforeAuthentication = {
       email: user.email,
       username: user.username,
-      password: null,
       auth_type: user.auth_type,
-      photo: null,
-      is_verified: true,
-      verify_link: null
+      is_verified: true
     }
     const createdUser = await this.userService.createOne(info)
-    const tokens = await this.authService.buildUserInfoAndTokens(createdUser)
-    return {
-      message: 'User is redirected to Welcome Page',
-      user: createdUser,
-      tokens
-    }
+    return this.authService.buildUserInfoAndTokens(createdUser)
   }
 }

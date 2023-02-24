@@ -1,4 +1,4 @@
-import { Body, Controller, Delete, Get, Param, ParseIntPipe, Patch, Post, Query, Req, UploadedFile, UseGuards, UseInterceptors } from '@nestjs/common'
+import { Body, Controller, Delete, Get, Param, ParseIntPipe, Patch, Post, Query, Req, UploadedFile, UseGuards, UseInterceptors, ValidationPipe } from '@nestjs/common'
 import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger'
 import { FileInterceptor } from '@nestjs/platform-express'
 import { Request } from 'express'
@@ -11,13 +11,13 @@ import { RolesEnum } from '@common/constants/roles.enum'
 import { JwtAuthGuard } from '@common/guards/auth/jwt.guard'
 import { RolesGuard } from '@common/guards/roles.guard'
 import { Roles } from '@common/decorators/roles.decorator'
-import type { Payload } from '@services/common/pagination.service'
-import type { QueryPaginationDto } from '@dto/common/pagination.dto'
+import type { Response } from '@services/common/pagination.service'
+import { QueryPaginationDto } from '@dto/common/pagination.dto'
 
 @Controller('api/characters')
 @ApiTags('characters')
 export class CharacterController {
-  constructor(private readonly characterService: CharacterService) {}
+  public constructor(private readonly characterService: CharacterService) {}
 
   @Post()
   @ApiOperation({ summary: 'create and save a new character to collection' })
@@ -33,13 +33,13 @@ export class CharacterController {
   @UseGuards(JwtAuthGuard)
   @ApiOperation({ summary: 'get all characters by queries' })
   @ApiResponse({ status: 200, type: [Character] })
-  public async getMany(@Query() query: QueryCharacterDto, @Req() req: Request): Promise<Payload<Character>> {
+  public async getMany(@Query(new ValidationPipe({ transform: true })) query: QueryCharacterDto, @Req() req: Request): Promise<Response<Character>> {
     const queryPaginationDto: QueryPaginationDto = {
       take: query.take,
       page: query.page,
       order: query.order,
       skip: query.skip,
-      otherQuery: req.originalUrl.split('/')[2],
+      otherQuery: req.originalUrl.split('?')[1],
       endpoint: 'characters'
     }
     const queryCharacterDto = _.omitBy(

@@ -18,16 +18,14 @@ export class SpotifyStrategy extends PassportStrategy(Strategy, 'spotify') {
 
   public async validate(accessToken: string, refreshToken: string, profile: Profile, done: VerifyCallback): Promise<void> {
     if (!profile.emails) {
-      throw new UnauthorizedException('There was an error. Try another authorization method.')
+      throw new UnauthorizedException('An error has occurred. Try another authorization method.')
     }
     const userInfo: UserBeforeAuthentication = {
       username: profile.displayName,
       email: profile.emails?.[0].value,
-      password: null,
       auth_type: profile.provider,
-      photo: profile.photos ? (profile.photos[0] as any).value : null,
-      is_verified: true,
-      verify_link: null
+      photo: profile.photos ? (profile.photos[0] as any).value : undefined, // eslint-disable-line
+      is_verified: true
     }
 
     done(null, userInfo)

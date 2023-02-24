@@ -1,26 +1,17 @@
 import { ApiProperty } from '@nestjs/swagger'
-import { IsEmail, IsNotEmpty, MaxLength, MinLength } from 'class-validator'
+import { IsEmail, MinLength } from 'class-validator'
 import { Type } from 'class-transformer'
 
-export class SignInDto {
-  @IsEmail()
-  email: string
-
-  @IsNotEmpty()
-  password: string
-}
-
-export class SignUpDto {
+export class AuthDto {
   @ApiProperty({ example: 'user@gmail.com', description: 'The email of the user.' })
   @IsEmail()
-  readonly email: string
+  public readonly email: string
 
   @ApiProperty({
-    example: '$2b$05$oSq9tOJGxOvmDpj7KLaJP.t0BGI6ic4OrOSCf/493ZsG9z/JoC3ki',
-    description: 'The hashed password of the user.'
+    example: '123user123',
+    description: 'The password of the user.'
   })
-  @MinLength(3)
-  @MaxLength(32)
+  @MinLength(8)
   @Type(() => String)
-  readonly password: string
+  public readonly password: string
 }

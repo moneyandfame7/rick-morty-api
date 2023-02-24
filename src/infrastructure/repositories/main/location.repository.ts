@@ -8,12 +8,16 @@ import type { GetManyLocations } from '@domain/models/main/location.model'
 
 @Injectable()
 export class LocationRepository extends BaseRepository<Location, QueryLocationDto, CreateLocationDto, UpdateLocationDto, GetManyLocations> {
-  constructor(protected dataSource: DataSource) {
+  public constructor(protected dataSource: DataSource) {
     super(dataSource, 'location', Location)
   }
 
   protected buildQueries(builder: SelectQueryBuilder<Location>, queries: QueryLocationDto): void {
-    queries.id ? builder.where('location.id IN (:...ids)', { ids: queries.id }) : null
+    if (queries.id) {
+      const ids = this.toCorrectQuerieIds(queries.id)
+
+      queries.id ? builder.where('location.id IN (:...ids)', { ids }) : null
+    }
 
     queries.name ? builder.andWhere('location.name ilike :name', { name: `%${queries.name}%` }) : null
 

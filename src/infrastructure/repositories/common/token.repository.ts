@@ -4,7 +4,7 @@ import { Token } from '@entities/common/token.entity'
 
 @Injectable()
 export class TokenRepository extends Repository<Token> {
-  constructor(private readonly dataSource: DataSource) {
+  public constructor(private readonly dataSource: DataSource) {
     super(Token, dataSource.createEntityManager())
   }
 
@@ -35,7 +35,7 @@ export class TokenRepository extends Repository<Token> {
     return queryBuilder.where('refresh_token = :refresh_token', { refresh_token }).getOne()
   }
 
-  public async getOneByUserId(user_id: string) {
+  public async getOneByUserId(user_id: string): Promise<Token | null> {
     const queryBuilder = this.builder
 
     return queryBuilder.where('user_id = :user_id', { user_id }).getOne()

@@ -8,12 +8,16 @@ import type { GetManyEpisodes } from '@domain/models/main/episode.model'
 
 @Injectable()
 export class EpisodeRepository extends BaseRepository<Episode, QueryEpisodeDto, CreateEpisodeDto, UpdateEpisodeDto, GetManyEpisodes> {
-  constructor(protected dataSource: DataSource) {
+  public constructor(protected dataSource: DataSource) {
     super(dataSource, 'episode', Episode)
   }
 
   protected buildQueries(builder: SelectQueryBuilder<Episode>, queries: QueryEpisodeDto): void {
-    queries.id ? builder.where('episode.id IN (:...id)', { id: queries.id }) : null
+    if (queries.id) {
+      const ids = this.toCorrectQuerieIds(queries.id)
+
+      queries.id ? builder.where('episode.id IN (:...ids)', { ids }) : null
+    }
 
     queries.name ? builder.andWhere('episode.name ilike :name', { name: `%${queries.name}%` }) : null
 

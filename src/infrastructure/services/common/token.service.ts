@@ -5,8 +5,7 @@ import { EnvironmentConfigService } from '@config/environment-config.service'
 import type { User } from '@entities/common/user.entity'
 import type { Token } from '@entities/common/token.entity'
 import type { GeneratedTokens } from '@domain/models/common/token.model'
-import { JwtPayload } from '@domain/models/auth/auth.model'
-import { UserBeforeAuthentication } from '@domain/models/common/user.model'
+import { JwtPayload, TempJwtPayload } from '@domain/models/auth/auth.model'
 
 @Injectable()
 export class TokenService {
@@ -18,13 +17,21 @@ export class TokenService {
     this.REFRESH_SECRET = this.config.getJwtRefreshSecret()
   }
 
-  public generateTokens(payload: JwtPayload): GeneratedTokens {
-    const payloadD = { ...payload }
-    const access_token = this.jwtService.sign(payloadD, {
+  public generateTokens(user: User): GeneratedTokens {
+    const payload = {
+      id: user.id,
+      email: user.email,
+      username: user.username,
+      banned: user.banned,
+      role: user.role,
+      country: user.country,
+      mail_subscribe: user.mail_subscribe
+    }
+    const access_token = this.jwtService.sign(payload, {
       secret: this.ACCESS_SECRET,
       expiresIn: '25m'
     })
-    const refresh_token = this.jwtService.sign(payloadD, {
+    const refresh_token = this.jwtService.sign(payload, {
       secret: this.REFRESH_SECRET,
       expiresIn: '30d'
     })
@@ -35,7 +42,7 @@ export class TokenService {
     }
   }
 
-  public generateTempToken(payload: any): string {
+  public generateTempToken(payload: TempJwtPayload): string {
     return this.jwtService.sign(payload, {
       secret: this.ACCESS_SECRET,
       expiresIn: '10m'
@@ -66,19 +73,7 @@ export class TokenService {
     return this.tokenRepository.findByToken(refreshToken)
   }
 
-  public async getOneByUserId(id: string): Promise<Token | null> {
-    return this.tokenRepository.getOneByUserId(id)
-  }
-
-  // public async getOneByUserAuthType(email: string, authType: string): Promise<Token | null> {
-  //   const user = await this.userService.getOneByAuthType(email, authType)
-  //   if (user) {
-  //     return this.tokenRepository.getOneByUserId(user.id)
-  //   }
-  //   return null
-  // }
-
-  public validateAccessToken(token: string): User {
+  public validateAccessToken(token: string): JwtPayload {
     try {
       return this.jwtService.verify(token, { secret: this.ACCESS_SECRET })
     } catch (e) {
@@ -86,7 +81,7 @@ export class TokenService {
     }
   }
 
-  public validateRefreshToken(token: string): User {
+  public validateRefreshToken(token: string): JwtPayload {
     try {
       return this.jwtService.verify(token, { secret: this.REFRESH_SECRET })
     } catch (e) {
@@ -94,7 +89,7 @@ export class TokenService {
     }
   }
 
-  public validateTempToken(token: string): UserBeforeAuthentication {
+  public validateTempToken(token: string): TempJwtPayload {
     try {
       return this.jwtService.verify(token, { secret: this.ACCESS_SECRET })
     } catch (e) {

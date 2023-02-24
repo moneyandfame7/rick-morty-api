@@ -1,24 +1,39 @@
-import { BadRequestException, Injectable } from '@nestjs/common'
+import { Injectable } from '@nestjs/common'
 import * as sharp from 'sharp'
 import type { PutObjectCommandInput } from '@aws-sdk/client-s3'
 import type { CreateCharacterDto, QueryCharacterDto, UpdateCharacterDto } from '@dto/main/character.dto'
 import type { Character } from '@entities/main/character.entity'
 import type { QueryPaginationDto } from '@dto/common/pagination.dto'
 import { CharacterRepository } from '@repositories/main/character.repository'
-import { PaginationService, type Payload } from '../common/pagination.service'
+import { PaginationService, type Response } from '../common/pagination.service'
 import { S3Service } from '../common/s3.service'
-import { CharactersNotFoundException, CharacterWithIdNotFoundException } from '@domain/exceptions/main/characters.exception'
+import { CharactersException } from '@domain/exceptions/main/characters.exception'
+import { BaseServiceAbstract } from '@domain/services/main/base-service.abstract'
 
 @Injectable()
-export class CharacterService {
+export class CharacterService extends BaseServiceAbstract<Character, CreateCharacterDto, UpdateCharacterDto, QueryCharacterDto> {
   public constructor(
     private readonly characterRepository: CharacterRepository,
     private readonly s3Service: S3Service,
-    private readonly paginationService: PaginationService<Character>
-  ) {}
+    private readonly paginationService: PaginationService<Character>,
+    private readonly charactersException: CharactersException
+  ) {
+    super()
+  }
 
   public async createOne(createCharacterDto: CreateCharacterDto, file: Express.Multer.File): Promise<Character> {
-    if (!file) throw new BadRequestException('You must provide an image')
+    const exists = await this.characterRepository.findOneBy({
+      name: createCharacterDto.name,
+      type: createCharacterDto.type,
+      status: createCharacterDto.status,
+      species: createCharacterDto.species
+    })
+    if (exists) {
+      throw this.charactersException.alreadyExists()
+    }
+    if (!file) {
+      throw this.charactersException.emptyFile()
+    }
     const fileBuffer = await sharp(file.buffer).resize({ height: 300, width: 300, fit: 'cover' }).toBuffer()
 
     const characterAttributes: CreateCharacterDto = {
@@ -43,10 +58,12 @@ export class CharacterService {
     return this.characterRepository.save(character)
   }
 
-  public async getMany(queryPaginationDto: QueryPaginationDto, queryCharacterDto: QueryCharacterDto): Promise<Payload<Character>> {
+  public async getMany(queryPaginationDto: QueryPaginationDto, queryCharacterDto: QueryCharacterDto): Promise<Response<Character>> {
     const { characters, count } = await this.characterRepository.getMany(queryPaginationDto, queryCharacterDto)
 
-    if (!count || !characters) throw new CharactersNotFoundException()
+    if (!count || !characters) {
+      throw this.charactersException.manyNotFound()
+    }
 
     const buildPaginationInfo = this.paginationService.buildPaginationInfo({ queryPaginationDto, count })
     return this.paginationService.wrapEntityWithPaginationInfo(characters, buildPaginationInfo)
@@ -55,7 +72,9 @@ export class CharacterService {
   public async getOne(id: number): Promise<Character> {
     const character = await this.characterRepository.getOne(id)
 
-    if (!character) throw new CharacterWithIdNotFoundException(id)
+    if (!character) {
+      throw this.charactersException.withIdNotFound(id)
+    }
 
     return character
   }
@@ -63,7 +82,9 @@ export class CharacterService {
   public async updateOne(id: number, updateCharacterDto: UpdateCharacterDto): Promise<Character> {
     const character = await this.characterRepository.getOne(id)
 
-    if (!character) throw new CharacterWithIdNotFoundException(id)
+    if (!character) {
+      throw this.charactersException.withIdNotFound(id)
+    }
 
     return this.characterRepository.updateOne(id, updateCharacterDto)
   }
@@ -71,7 +92,9 @@ export class CharacterService {
   public async removeOne(id: number): Promise<Character> {
     const character = await this.characterRepository.getOne(id)
 
-    if (!character) throw new CharacterWithIdNotFoundException(id)
+    if (!character) {
+      throw this.charactersException.withIdNotFound(id)
+    }
 
     return this.characterRepository.removeOne(id)
   }

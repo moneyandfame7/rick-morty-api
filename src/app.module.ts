@@ -17,10 +17,11 @@ import { GoogleModule } from '@modules/auth/google.module'
 import { SpotifyModule } from '@modules/auth/spotify.module'
 import { GithubModule } from '@modules/auth/github.module'
 import { MailModule } from '@modules/common/mail.module'
+import { ApiErrorModule } from '@modules/common/api-error.module'
 
 const configs = [EnvironmentConfigModule, ConfigModule.forRoot({ isGlobal: true }), TypeOrmModule.forRoot(dataSourceOptions)]
 const auth = [PassportModule, AuthModule, DiscordModule, GoogleModule, GithubModule, SpotifyModule]
-const commons = [UserModule, TokenModule, RolesModule, S3Module, MailModule]
+const commons = [UserModule, TokenModule, RolesModule, S3Module, MailModule, ApiErrorModule]
 const main = [CharacterModule, EpisodeModule, LocationModule]
 
 @Module({

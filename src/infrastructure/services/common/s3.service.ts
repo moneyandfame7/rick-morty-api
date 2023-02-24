@@ -8,7 +8,7 @@ export class S3Service {
   private readonly bucketUrl: string
   public readonly bucketName: string
 
-  constructor(private readonly config: EnvironmentConfigService) {
+  public constructor(private readonly config: EnvironmentConfigService) {
     this.s3 = new S3Client({
       credentials: {
         accessKeyId: config.getS3BucketAccessKey(),
@@ -22,9 +22,6 @@ export class S3Service {
 
   public async upload(params: PutObjectCommandInput): Promise<string> {
     const command = new PutObjectCommand(params)
-    const url = await this.s3.send(command).then(() => `${this.bucketUrl}/${params.Key}`)
-
-    console.log(`Image was uploaded to ${url}`)
-    return url
+    return this.s3.send(command).then(() => `${this.bucketUrl}/${params.Key}`)
   }
 }

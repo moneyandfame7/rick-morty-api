@@ -6,7 +6,7 @@ import type { DatabaseConfig } from '@domain/config/database.interface'
 
 @Injectable()
 export class EnvironmentConfigService implements AuthConfig, S3BucketConfig, DatabaseConfig {
-  constructor(private readonly configService: ConfigService) {}
+  public constructor(private readonly configService: ConfigService) {}
 
   private getStringEnv(env: string): string {
     const value = this.configService.get<string>(env)

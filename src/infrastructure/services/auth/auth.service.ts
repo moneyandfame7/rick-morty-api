@@ -1,18 +1,17 @@
 import { EnvironmentConfigService } from '@config/environment-config.service'
-import { AuthIncorrectEmailException, AuthIncorrectPasswordException } from '@domain/exceptions/common/auth.exception'
-import { UserDoesNotExistException, UserWithEmailAlreadyExistsException } from '@domain/exceptions/common/user.exception'
-import type { AuthTokens } from '@domain/models/auth/auth.model'
+import { UserNotFoundException } from '@domain/exceptions/common/user.exception'
+import type { AuthTokens, JwtPayload } from '@domain/models/auth/auth.model'
 import { UserBeforeAuthentication } from '@domain/models/common/user.model'
-import type { SignInDto } from '@dto/auth/auth.dto'
-import { SignUpDto } from '@dto/auth/auth.dto'
+import type { AuthDto } from '@dto/auth/auth.dto'
 import { ResetPasswordDto, UserDetailsDto } from '@dto/common/user.dto'
 import type { User } from '@entities/common/user.entity'
-import { BadRequestException, Injectable, InternalServerErrorException, UnauthorizedException } from '@nestjs/common'
+import { BadRequestException, Injectable, UnauthorizedException, UnprocessableEntityException } from '@nestjs/common'
 import { MailService } from '@services/common/mail.service'
 import { TokenService } from '@services/common/token.service'
 import { UserService } from '@services/common/user.service'
 import * as bcrypt from 'bcrypt'
 import { v4 as uuid } from 'uuid'
+import { Token } from '@entities/common/token.entity'
 
 @Injectable()
 export class AuthService {
@@ -23,92 +22,74 @@ export class AuthService {
     private readonly mailService: MailService
   ) {}
 
-  public async signup(dto: SignUpDto) {
+  public async signup(dto: AuthDto): Promise<AuthTokens> {
+    const errorResponse = {
+      errors: {}
+    }
     const withSameEmail = await this.userService.getOneByAuthType(dto.email, 'jwt')
     if (withSameEmail) {
-      throw new UserWithEmailAlreadyExistsException(dto.email)
+      errorResponse.errors['email'] = 'the email address is already taken'
+      throw new UnprocessableEntityException(errorResponse)
     }
     const hashedPassword = await this.hashPassword(dto.password)
     const verify_link = uuid()
     const info: UserBeforeAuthentication = {
       email: dto.email,
-      username: null,
       password: hashedPassword,
       auth_type: 'jwt',
-      photo: null,
       is_verified: false,
       verify_link
     }
     const user = await this.userService.createOne(info)
     await this.mailService.sendVerifyMail(user.email, verify_link)
 
-    const tokens = await this.buildUserInfoAndTokens(user)
-    return {
-      message: 'User is redirected to Welcome page',
-      body: {
-        user,
-        tokens
-      }
-    }
+    return this.buildUserInfoAndTokens(user)
+    // return {
+    //   message: 'User is redirected to Welcome page',
+    //   body: {
+    //     user,
+    //     tokens
+    //   }
+    // }
   }
 
-  // todo: на клієнті зробити функцію, яка перевіряє, якщо юзер авторизований, але не пройшов велкам пейдж - тоді редірект на велком пейдж
-  // якщо не авторизований, то на /login
-  public async welcome(token: string, details: UserDetailsDto) {
+  public async welcomePage(token: string, details: UserDetailsDto): Promise<AuthTokens> {
     const welcomePageUser = this.tokenService.validateAccessToken(token)
 
     const user = await this.userService.updateOne(welcomePageUser.id, details)
-    const tokens = await this.buildUserInfoAndTokens(user)
-    return {
-      message: 'User is redirected to Home page',
-      body: {
-        user,
-        tokens
-      }
-    }
+    return this.buildUserInfoAndTokens(user)
+    // return {
+    //   message: 'User is redirected to Home page',
+    //   body: {
+    //     user,
+    //     tokens
+    //   }
+    // }
   }
 
-  public async login(userDto: SignInDto) {
+  public async login(userDto: AuthDto): Promise<AuthTokens> {
     const user = await this.validateUser(userDto)
-    const tokens = await this.buildUserInfoAndTokens(user)
+    return this.buildUserInfoAndTokens(user)
 
-    if (!(user.username || user.country || user.mail_subscribe)) {
-      return {
-        message: 'User is redirected to Welcome page',
-        body: {
-          user,
-          tokens
-        }
-      }
-    }
-
-    return { message: 'User is redirected to Home page', body: { user, tokens } }
+    // if (!(user.username || user.country || user.mail_subscribe)) {
+    //   return {
+    //     message: 'User is redirected to Welcome page',
+    //     body: {
+    //       user,
+    //       tokens
+    //     }
+    //   }
+    // }
+    //
+    // return { message: 'User is redirected to Home page', body: { user, tokens } }
   }
 
-  public async logout(refreshToken: string) {
-    const removedToken = await this.tokenService.removeByToken(refreshToken)
-    const user = await this.userService.getOneById(removedToken.user_id)
-    return {
-      message: 'User is logged out',
-      body: {
-        user
-      }
-    }
+  public logout(refreshToken: string): Promise<Token> {
+    return this.tokenService.removeByToken(refreshToken)
   }
 
-  public async status(tokens: AuthTokens) {
-    const user = await this.tokenService.validateAccessToken(tokens.access_token)
-    if (user) {
-      const ifPassedWelcomePage = user.country || user.username || user.mail_subscribe
-      return {
-        message: ifPassedWelcomePage ? 'User is finished registration' : 'User is redirected to welcome page',
-        body: {
-          user,
-          tokens
-        }
-      }
-    }
-    throw new InternalServerErrorException('папєрєджіваю про памілку')
+  public status(tokens: AuthTokens): JwtPayload {
+    return this.tokenService.validateAccessToken(tokens.access_token)
   }
 
   public async refresh(refreshToken: string): Promise<AuthTokens> {
@@ -127,9 +108,13 @@ export class AuthService {
   }
 
   public async verify(link: string): Promise<AuthTokens> {
+    const errorResponse = {
+      errors: {}
+    }
     const user = await this.userService.getOneByVerifyLink(link)
 
     if (!user) {
+      errorResponse.errors['link'] = 'Incorrect verification link'
       throw new BadRequestException('Incorrect verification link')
     }
     if (user.is_verified) {
@@ -139,10 +124,14 @@ export class AuthService {
     return this.buildUserInfoAndTokens(updated)
   }
 
-  public async forgot(email: string) {
+  public async forgot(email: string): Promise<string> {
+    const errorResponse = {
+      errors: {}
+    }
     const user = await this.userService.getOneByAuthType(email, 'jwt')
     if (!user) {
-      throw new UserDoesNotExistException()
+      errorResponse.errors['email'] = 'Incorrect email'
+      throw new UserNotFoundException()
     }
     const payload = {
       id: user.id,
@@ -151,24 +140,29 @@ export class AuthService {
     }
     const token = this.tokenService.generateTempToken(payload)
     const link = `${this.config.getClientUrl()}/auth/reset/${user.id}/${token}`
-    console.log(link)
     await this.mailService.sendForgotPasswordLink(user.email, link)
 
     return link
   }
 
   public async reset(id: string, token: string, dto: ResetPasswordDto): Promise<AuthTokens> {
+    const errorResponse = {
+      errors: {}
+    }
     const user = await this.userService.getOneById(id)
+
     if (!user) {
-      throw new UserDoesNotExistException()
+      throw new UserNotFoundException()
     }
     const compare = await this.comparePassword(dto.password, user.password)
     if (compare) {
-      throw new BadRequestException('Password is equal to old password')
+      errorResponse.errors['password'] = 'Password is equal to old password'
+      throw new BadRequestException(errorResponse)
     }
     this.tokenService.validateTempToken(token)
     if (dto.password !== dto.confirmPassword) {
-      throw new BadRequestException('Passwords do not match')
+      errorResponse.errors['password'] = "Password don't match"
+      throw new BadRequestException(errorResponse)
     }
     const hashedPassword = await this.hashPassword(dto.password)
     const updated = await this.userService.updateOne(id, { password: hashedPassword })
@@ -181,13 +175,20 @@ export class AuthService {
     return tokens
   }
 
-  private async validateUser(userDto: SignInDto): Promise<User> {
+  private async validateUser(userDto: AuthDto): Promise<User> {
+    const errorResponse = {
+      errors: {}
+    }
     const user = await this.userService.getOneByAuthType(userDto.email, 'jwt')
-    if (!user) throw new AuthIncorrectEmailException()
+    if (!user) {
+      errorResponse.errors['email'] = 'Incorrect email'
+      throw new UnprocessableEntityException(errorResponse)
+    }
 
     const passwordEquals = await this.comparePassword(userDto.password, user.password)
     if (!passwordEquals) {
-      throw new AuthIncorrectPasswordException()
+      errorResponse.errors['password'] = 'Incorrect password'
+      throw new UnprocessableEntityException(errorResponse)
     }
 
     return user

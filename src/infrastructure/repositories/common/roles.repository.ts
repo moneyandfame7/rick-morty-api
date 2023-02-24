@@ -5,7 +5,7 @@ import type { CreateRoleDto } from '@dto/common/roles.dto'
 
 @Injectable()
 export class RolesRepository extends Repository<Role> {
-  constructor(private readonly dataSource: DataSource) {
+  public constructor(private readonly dataSource: DataSource) {
     super(Role, dataSource.createEntityManager())
   }
 

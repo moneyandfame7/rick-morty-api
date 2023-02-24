@@ -12,7 +12,7 @@ export class MailService {
   private readonly user: string
   private readonly password: string
 
-  constructor(private readonly config: EnvironmentConfigService, private readonly userService: UserService) {
+  public constructor(private readonly config: EnvironmentConfigService, private readonly userService: UserService) {
     this.host = config.getMailerHost()
     this.port = config.getMailerPort()
     this.user = config.getMailerUser()
@@ -28,7 +28,7 @@ export class MailService {
     })
   }
 
-  async sendVerifyMail(email: string, link: string): Promise<void> {
+  public async sendVerifyMail(email: string, link: string): Promise<void> {
     await this.transporter.sendMail({
       from: this.user,
       to: email,
@@ -45,7 +45,7 @@ export class MailService {
         `
     })
   }
-  async sendForgotPasswordLink(email: string, link: string) {
+  public async sendForgotPasswordLink(email: string, link: string): Promise<void> {
     await this.transporter.sendMail({
       from: this.user,
       to: email,

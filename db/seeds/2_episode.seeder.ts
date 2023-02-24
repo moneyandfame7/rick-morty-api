@@ -1,8 +1,8 @@
 import { type DataSource } from 'typeorm'
 import { type Seeder } from 'typeorm-extension'
-import { type CreateEpisodeDto } from 'src/infrastructure/dto/main/episode.dto'
-import { Episode } from 'src/infrastructure/entities/main/episode.entity'
-import { fetchData } from 'src/infrastructure/common/utils/fetch-data'
+import { type CreateEpisodeDto } from '@dto/main/episode.dto'
+import { Episode } from '@entities/main/episode.entity'
+import { fetchData } from '@common/utils/fetch-data'
 
 export interface IEpisode {
   id: number

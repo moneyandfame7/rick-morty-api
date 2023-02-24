@@ -1,9 +1,9 @@
 import { type DataSource } from 'typeorm'
 import { type Seeder } from 'typeorm-extension'
 import { type IEpisode } from './2_episode.seeder'
-import { Episode } from 'src/infrastructure/entities/main/episode.entity'
-import { fetchData } from 'src/infrastructure/common/utils/fetch-data'
-import { getIdFromUrl } from 'src/infrastructure/common/utils/get-id-from-url'
+import { Episode } from '@entities/main/episode.entity'
+import { fetchData } from '@common/utils/fetch-data'
+import { getIdFromUrl } from '@common/utils/get-id-from-url'
 
 export class CharacterToEpisodeSeeder implements Seeder {
   public async run(dataSource: DataSource): Promise<void> {

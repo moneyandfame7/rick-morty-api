@@ -1,9 +1,9 @@
 import type { DataSource } from 'typeorm'
 import type { Seeder } from 'typeorm-extension'
-import type { CreateCharacterDto } from 'src/infrastructure/dto/main/character.dto'
-import { Character } from 'src/infrastructure/entities/main/character.entity'
-import { fetchData } from 'src/infrastructure/common/utils/fetch-data'
-import { getIdFromUrl } from 'src/infrastructure/common/utils/get-id-from-url'
+import type { CreateCharacterDto } from '@dto/main/character.dto'
+import { Character } from '@entities/main/character.entity'
+import { fetchData } from '@common/utils/fetch-data'
+import { getIdFromUrl } from '@common/utils/get-id-from-url'
 import type { ILocation } from './1_location.seeder'
 
 export interface ICharacter {

@@ -1,19 +1,23 @@
-import { NotFoundException, UnprocessableEntityException } from '@nestjs/common'
+import { HttpException, HttpStatus, Injectable } from '@nestjs/common'
+import { ApiErrorService } from '@services/common/api-error.service'
 
-export class CharactersNotFoundException extends NotFoundException {
-  constructor() {
-    super('Characters not found')
+@Injectable()
+export class CharactersException {
+  public constructor(private readonly apiErrorService: ApiErrorService) {}
+
+  public manyNotFound(): HttpException {
+    return this.apiErrorService.throwErrorResponse('character', 'Characters not found', HttpStatus.NOT_FOUND)
   }
-}
 
-export class CharacterWithIdNotFoundException extends NotFoundException {
-  constructor(id: number) {
-    super(`Character with id ${id} not found`)
+  public withIdNotFound(id: number): HttpException {
+    return this.apiErrorService.throwErrorResponse('character', `Character with ${id} not found`, HttpStatus.NOT_FOUND)
   }
-}
 
-export class CharacterAlreadyExistException extends UnprocessableEntityException {
-  constructor(name: string) {
-    super(`Episode ${name} already exists`)
+  public alreadyExists(): HttpException {
+    return this.apiErrorService.throwErrorResponse('character', 'Character with similar characteristics already exists', HttpStatus.UNPROCESSABLE_ENTITY)
+  }
+
+  public emptyFile(): HttpException {
+    return this.apiErrorService.throwErrorResponse('file', 'The field file cannot be empty', HttpStatus.UNPROCESSABLE_ENTITY)
   }
 }

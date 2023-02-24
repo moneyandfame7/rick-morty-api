@@ -1,4 +1,4 @@
-import { BadRequestException, Injectable } from '@nestjs/common'
+import { Injectable, UnauthorizedException } from '@nestjs/common'
 import { PassportStrategy } from '@nestjs/passport'
 import { type Profile, Strategy } from 'passport-github2'
 import { EnvironmentConfigService } from '@config/environment-config.service'
@@ -15,20 +15,16 @@ export class GithubStrategy extends PassportStrategy(Strategy, 'github') {
     })
   }
 
-  public async validate(accessToken: string, refreshToken: string, profile: Profile) {
+  public validate(accessToken: string, refreshToken: string, profile: Profile): UserBeforeAuthentication {
     if (!profile.emails) {
-      throw new BadRequestException('Email is required')
+      throw new UnauthorizedException('An error has occurred. Try another authorization method.')
     }
-    const userInfo: UserBeforeAuthentication = {
+    return {
       username: profile.username || profile.displayName,
       email: profile.emails[0].value,
-      password: null,
       auth_type: profile.provider,
-      photo: profile.photos ? (profile.photos[0] as any).value : null,
-      is_verified: true,
-      verify_link: null
+      photo: profile.photos ? (profile.photos[0] as any).value : undefined, // eslint-disable-line
+      is_verified: true
     }
-
-    return userInfo
   }
 }

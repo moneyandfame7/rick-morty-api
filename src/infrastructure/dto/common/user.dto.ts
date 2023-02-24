@@ -9,11 +9,11 @@ export class CreateUserDto {
   @MaxLength(20)
   @IsNotEmpty()
   @Type(() => String)
-  readonly username: string | null
+  public readonly username?: string
 
   @ApiProperty({ example: 'user@gmail.com', description: 'The email of the user.' })
   @IsEmail()
-  readonly email: string
+  public readonly email: string
 
   @ApiProperty({
     example: '$2b$05$oSq9tOJGxOvmDpj7KLaJP.t0BGI6ic4OrOSCf/493ZsG9z/JoC3ki',
@@ -22,69 +22,61 @@ export class CreateUserDto {
   @MinLength(3)
   @MaxLength(32)
   @Type(() => String)
-  readonly password: string | null
+  public readonly password?: string
 
   @IsIn(['google', 'instagram', 'discord', 'github', 'jwt'])
-  readonly auth_type: string
+  public readonly auth_type: string
 
   @IsOptional()
-  readonly photo: string | null
+  public readonly photo?: string
 
   @IsUUID()
   @IsOptional()
-  readonly verify_link: string | null
+  public readonly verify_link?: string
 
   @IsBoolean()
-  readonly is_verified?: boolean = false
+  public readonly is_verified?: boolean = false
 
   @IsBoolean()
-  readonly mail_subscribe?: boolean
+  public readonly mail_subscribe?: boolean
 
   @IsString()
-  readonly country?: string
+  public readonly country?: string
 }
 
 export class UpdateUserDto extends PartialType(CreateUserDto) {}
 
 export class AddRoleDto {
   @IsEnum(RolesEnum)
-  readonly value: RolesEnum
+  public readonly value: RolesEnum
 
   @IsUUID()
-  readonly userId: string
+  public readonly userId: string
 }
 
 export class BanUserDto {
   @IsUUID()
-  readonly userId: string
+  public readonly userId: string
 
   @IsNotEmpty()
-  readonly banReason: string
-}
-
-export class SetUsernameDto {
-  @MinLength(2)
-  @MaxLength(20)
-  @Type(() => String)
-  @IsNotEmpty()
-  username: string
+  public readonly banReason: string
 }
 
 export class EmailDto {
   @IsEmail()
-  email: string
+  public email: string
 }
 
 export class ResetPasswordDto {
   @MinLength(3)
   @MaxLength(32)
   @Type(() => String)
-  readonly password: string
+  public readonly password: string
 
   @MinLength(3)
   @MaxLength(32)
   @Type(() => String)
-  readonly confirmPassword: string
+  public readonly confirmPassword: string
 }
 
 export class UserDetailsDto {
@@ -92,13 +84,13 @@ export class UserDetailsDto {
   @MaxLength(20)
   @Type(() => String)
   @IsNotEmpty()
-  username: string
+  public username: string
 
   @IsBoolean()
   @Type(() => Boolean)
-  mail_subscribe: boolean
+  public mail_subscribe: boolean
 
   @IsNotEmpty()
   @IsString()
-  country: string
+  public country: string
 }

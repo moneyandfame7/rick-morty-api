@@ -1,25 +1,23 @@
+import { Role } from '@entities/common/role.entity'
+
 export interface AuthTokens {
   readonly refresh_token: string
   readonly access_token: string
 }
 
-export interface AuthRedirect {
-  readonly url: string
-}
-
 export interface JwtPayload {
-  id: string
-  email: string
-  username: string
-  auth_type: string
-  is_verified: boolean
+  readonly id: string
+  readonly email: string
+  readonly username: string | null
+  readonly auth_type: string
+  readonly banned: boolean
+  readonly role: Role
+  readonly country: string | null
+  readonly mail_subscribe: boolean | null
 }
 
-export interface TempUserPayload {
-  email: string
-  password: string | null
-  username: string | null
-  auth_type: string
-  is_verified: boolean
-  photo: string | null
+export interface TempJwtPayload {
+  readonly id: string
+  readonly email: string
+  readonly username: string
 }

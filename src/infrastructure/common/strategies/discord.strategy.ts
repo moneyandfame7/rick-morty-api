@@ -17,21 +17,17 @@ export class DiscordStrategy extends PassportStrategy(Strategy, 'discord') {
     })
   }
 
-  public async validate(accessToken: string, refreshToken: string, profile: Profile) {
+  public validate(accessToken: string, refreshToken: string, profile: Profile): UserBeforeAuthentication {
     if (!profile.email) {
-      throw new BadRequestException('Error is required')
+      throw new BadRequestException('An error has occurred. Try another authorization method.')
     }
-    const userInfo: UserBeforeAuthentication = {
+    return {
       email: profile.email,
       username: profile.username,
-      password: null,
       auth_type: profile.provider,
       /* https://stackoverflow.com/questions/65450055/how-to-get-avatar-from-discord-api */
       photo: `${this.DISCORD_AVATARS_URL}/${profile.id}/${profile.avatar}`,
-      is_verified: true,
-      verify_link: null
+      is_verified: true
     }
-
-    return userInfo
   }
 }

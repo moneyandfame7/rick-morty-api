@@ -3,10 +3,11 @@ import { Request, Response } from 'express'
 import { GithubAuthGuard } from '@common/guards/auth/github.guard'
 import { EnvironmentConfigService } from '@config/environment-config.service'
 import { AuthService } from '@services/auth/auth.service'
-import { BaseController } from '@domain/controllers/auth/base-controller.abstract'
+import { BaseController } from '@domain/controllers/auth/base-controller'
 import { UserService } from '@services/common/user.service'
 import { UserBeforeAuthentication } from '@domain/models/common/user.model'
 import { TokenService } from '@services/common/token.service'
+import { AuthTokens } from '@domain/models/auth/auth.model'
 
 @Controller('/auth/github')
 export class GithubController extends BaseController {
@@ -25,10 +26,10 @@ export class GithubController extends BaseController {
 
   @Get('/redirect')
   @UseGuards(GithubAuthGuard)
-  public async redirect(@Req() req: Request, @Res({ passthrough: true }) res: Response) {
+  public async redirect(@Req() req: Request, @Res({ passthrough: true }) res: Response): Promise<AuthTokens> {
     const user = req.user as UserBeforeAuthentication
-    const info = await this.socialLogin(user)
-    this.setCookies(res, info.tokens.refresh_token, info.tokens.access_token)
-    return info
+    const tokens = await this.socialLogin(user)
+    this.setCookies(res, tokens.refresh_token, tokens.access_token)
+    return tokens
   }
 }

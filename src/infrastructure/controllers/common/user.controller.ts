@@ -14,7 +14,7 @@ import type { User } from '@entities/common/user.entity'
 @Controller('api/users')
 @ApiTags('users')
 export class UserController {
-  constructor(private readonly userService: UserService) {}
+  public constructor(private readonly userService: UserService) {}
 
   @Post()
   @UseGuards(JwtAuthGuard)

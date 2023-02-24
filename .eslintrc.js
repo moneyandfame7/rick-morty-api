@@ -1,7 +1,7 @@
 module.exports = {
   env: {
-    browser: true,
-    es2021: true
+    node: true,
+    es6: true
   },
   parser: '@typescript-eslint/parser',
   extends: ['eslint:recommended', 'plugin:@typescript-eslint/eslint-recommended', 'plugin:@typescript-eslint/recommended'],
@@ -18,8 +18,20 @@ module.exports = {
     'no-undef': 'off',
     'no-return-await': 'error',
     'spaced-comment': 'off',
-    'array-callback-return': 'warn',
-    '@typescript-eslint/no-empty-function': 'warn',
+    'array-callback-return': 'off',
+    '@typescript-eslint/explicit-module-boundary-types': [
+      'error',
+      {
+        allowArgumentsExplicitlyTypedAsAny: true,
+        allowDirectConstAssertionInArrowFunctions: true,
+        allowedNames: [],
+        allowHigherOrderFunctions: true,
+        allowTypedFunctionExpressions: true
+      }
+    ],
+    '@typescript-eslint/no-empty-function': 'off',
+    '@typescript-eslint/ban-types': 'off',
+    '@typescript-eslint/brace-style': ['error', '1tbs', { allowSingleLine: false }],
     '@typescript-eslint/restrict-plus-operands': 'off',
     '@typescript-eslint/no-explicit-any': 'warn',
     '@typescript-eslint/no-floating-promises': 'off',
@@ -28,7 +40,6 @@ module.exports = {
     '@typescript-eslint/return-await': 'off',
     '@typescript-eslint/type-annotation-spacing': 'off',
     '@typescript-eslint/space-infix-ops': 'off',
-    // '@typescript-eslint/prefer-nullish-coalescing': 'off',
     '@typescript-eslint/consistent-type-import': 'off',
     '@typescript-eslint/restrict-template-expressions': 'off',
     '@typescript-eslint/naming-convention': 'off',

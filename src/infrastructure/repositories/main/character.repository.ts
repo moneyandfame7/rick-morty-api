@@ -3,17 +3,21 @@ import { Injectable } from '@nestjs/common'
 import { Character } from '@entities/main/character.entity'
 import { BaseRepository } from '@domain/repositories/base-repository.abstract'
 import type { CreateCharacterDto, QueryCharacterDto, UpdateCharacterDto } from '@dto/main/character.dto'
-import type { QueryPaginationDto } from 'src/infrastructure/dto/common/pagination.dto'
-import type { GetManyCharacters } from 'src/domain/models/main/character.model'
+import type { QueryPaginationDto } from '@dto/common/pagination.dto'
+import type { GetManyCharacters } from '@domain/models/main/character.model'
 
 @Injectable()
 export class CharacterRepository extends BaseRepository<Character, QueryCharacterDto, CreateCharacterDto, UpdateCharacterDto, GetManyCharacters> {
-  constructor(protected dataSource: DataSource) {
+  public constructor(protected dataSource: DataSource) {
     super(dataSource, 'character', Character)
   }
 
   protected buildQueries(builder: SelectQueryBuilder<Character>, queries: QueryCharacterDto): void {
-    queries.id ? builder.where('character.id IN (:...ids)', { ids: queries.id }) : null
+    if (queries.id) {
+      const ids = this.toCorrectQuerieIds(queries.id)
+
+      queries.id ? builder.where('character.id IN (:...ids)', { ids }) : null
+    }
 
     queries.name ? builder.andWhere('character.name ilike :name', { name: `%${queries.name}%` }) : null
 

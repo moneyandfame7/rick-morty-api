@@ -1,9 +1,14 @@
 import { type DataSource, type EntityTarget, type ObjectLiteral, Repository, type SelectQueryBuilder } from 'typeorm'
 import type { QueryPaginationDto } from '@dto/common/pagination.dto'
+import { toCorrectId } from '@common/transforms/to-correct-id.transform'
 
 export abstract class BaseRepository<Entity extends ObjectLiteral, QueryEntityDto, CreateEntityDto, UpdateEntityDto, GetManyEntities> extends Repository<Entity> {
   protected constructor(protected dataSource: DataSource, protected alias: string, protected En: EntityTarget<Entity>) {
     super(En, dataSource.createEntityManager())
+  }
+
+  protected toCorrectQuerieIds(id: string): number[] {
+    return toCorrectId(id)
   }
 
   protected get builder(): SelectQueryBuilder<Entity> {

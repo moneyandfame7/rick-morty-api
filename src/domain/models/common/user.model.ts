@@ -1,9 +1,9 @@
 export interface UserBeforeAuthentication {
   readonly email: string
-  readonly username: string | null
-  readonly password: string | null
+  readonly username?: string
+  readonly password?: string
   readonly auth_type: string
-  readonly photo: string | null
+  readonly photo?: string
   readonly is_verified: boolean
-  readonly verify_link: string | null
+  readonly verify_link?: string
 }

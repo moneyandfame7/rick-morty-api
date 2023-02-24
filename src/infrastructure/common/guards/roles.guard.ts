@@ -6,9 +6,9 @@ import type { Request } from 'express'
 
 @Injectable()
 export class RolesGuard implements CanActivate {
-  constructor(private readonly tokenService: TokenService, private readonly reflector: Reflector) {}
+  public constructor(private readonly tokenService: TokenService, private readonly reflector: Reflector) {}
 
-  async canActivate(context: ExecutionContext): Promise<boolean> {
+  public async canActivate(context: ExecutionContext): Promise<boolean> {
     try {
       const requiredRoles = this.reflector.getAllAndOverride<string[]>(ROLES_KEY, [context.getHandler(), context.getClass()])
       if (!requiredRoles) {
@@ -35,8 +35,7 @@ export class RolesGuard implements CanActivate {
       }
       throw new UnauthorizedException()
     } catch (e) {
-      console.log(e)
-      throw new UnauthorizedException(e.response)
+      throw new UnauthorizedException(e)
     }
   }
 }

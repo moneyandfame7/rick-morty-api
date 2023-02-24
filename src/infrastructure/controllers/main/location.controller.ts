@@ -1,4 +1,4 @@
-import { Body, Controller, Delete, Get, Param, ParseIntPipe, Patch, Post, Query, Req, UseGuards } from '@nestjs/common'
+import { Body, Controller, Delete, Get, Param, ParseIntPipe, Patch, Post, Query, Req, UseGuards, ValidationPipe } from '@nestjs/common'
 import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger'
 import { Request } from 'express'
 import * as _ from 'lodash'
@@ -9,13 +9,13 @@ import { JwtAuthGuard } from '@common/guards/auth/jwt.guard'
 import { Roles } from '@common/decorators/roles.decorator'
 import { RolesEnum } from '@common/constants/roles.enum'
 import { RolesGuard } from '@common/guards/roles.guard'
-import type { Payload } from '@services/common/pagination.service'
+import type { Response } from '@services/common/pagination.service'
 import type { QueryPaginationDto } from '@dto/common/pagination.dto'
 
 @Controller('api/locations')
 @ApiTags('locations')
 export class LocationController {
-  constructor(private readonly locationService: LocationService) {}
+  public constructor(private readonly locationService: LocationService) {}
 
   @Post()
   @ApiOperation({ summary: 'A new location is created.' })
@@ -32,13 +32,13 @@ export class LocationController {
   })
   @ApiResponse({ status: 200, type: [Location] })
   @UseGuards(JwtAuthGuard)
-  public async getMany(@Query() query: QueryLocationDto, @Req() req: Request): Promise<Payload<Location>> {
+  public async getMany(@Query(new ValidationPipe({ transform: true })) query: QueryLocationDto, @Req() req: Request): Promise<Response<Location>> {
     const queryPaginationDto: QueryPaginationDto = {
       take: query.take,
       page: query.page,
       order: query.order,
       skip: query.skip,
-      otherQuery: req.originalUrl,
+      otherQuery: req.originalUrl.split('?')[1],
       endpoint: 'locations'
     }
     const queryLocationDto = _.omitBy(

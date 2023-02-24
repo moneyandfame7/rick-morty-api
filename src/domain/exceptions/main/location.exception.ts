@@ -1,19 +1,24 @@
-import { NotFoundException, UnprocessableEntityException } from '@nestjs/common'
+import { HttpException, HttpStatus, Injectable } from '@nestjs/common'
+import { ApiErrorService } from '@services/common/api-error.service'
 
-export class LocationsNotFoundException extends NotFoundException {
-  constructor() {
-    super('Locations not found')
-  }
-}
+@Injectable()
+export class LocationException {
+  public constructor(private readonly apiErrorService: ApiErrorService) {}
 
-export class LocationWithIdNotFoundException extends NotFoundException {
-  constructor(id: number) {
-    super(`Location with id ${id} not found`)
+  public manyNotFound(): HttpException {
+    return this.apiErrorService.throwErrorResponse('location', 'Locations not found', HttpStatus.NOT_FOUND)
   }
-}
 
-export class LocationAlreadyExistsException extends UnprocessableEntityException {
-  constructor(name: string) {
-    super(`Location ${name} already exists`)
+  public withIdNotFound(id: number): HttpException {
+    return this.apiErrorService.throwErrorResponse('location', `Location with ${id} not found`, HttpStatus.NOT_FOUND)
   }
+
+  public alreadyExists(name: string): HttpException {
+    return this.apiErrorService.throwErrorResponse('location', `Location with name ${name} already exists`, HttpStatus.UNPROCESSABLE_ENTITY)
+  }
+
+  //
+  // public emptyFile(): HttpException {
+  //   return this.apiErrorService.throwErrorResponse('file', 'The field file cannot be empty', HttpStatus.UNPROCESSABLE_ENTITY)
+  // }
 }
