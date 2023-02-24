@@ -1,8 +1,7 @@
 import 'dotenv/config'
 import { DataSource, DataSourceOptions } from 'typeorm'
 import { SeederOptions } from 'typeorm-extension'
-
-import { MainSeeder } from './seeds/0_main.seeder'
+import { MainSeeder } from './seeds'
 
 export const dataSourceOptions: DataSourceOptions & SeederOptions = {
   type: 'postgres',

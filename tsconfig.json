@@ -24,7 +24,8 @@
       "@config/*": ["src/config/*"],
       "@core/*": ["src/core/*"],
       "@infrastructure/*": ["src/infrastructure/*"],
-      "@modules/*": ["src/modules/*"]
+      "@modules/*": ["src/modules/*"],
+//      "@database/*": ["database/*"]
     }
   }
 }

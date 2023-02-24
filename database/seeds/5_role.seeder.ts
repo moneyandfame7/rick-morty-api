@@ -1,6 +1,7 @@
 import { DataSource } from 'typeorm'
-import { Seeder } from 'typeorm-extension'
-import { Role } from '@infrastructure/entities/common/role.entity'
+import type { Seeder } from 'typeorm-extension'
+
+import { Role } from '@infrastructure/entities/common'
 
 export class RoleSeeder implements Seeder {
   public async run(dataSource: DataSource): Promise<void> {

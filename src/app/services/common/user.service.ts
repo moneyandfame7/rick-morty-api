@@ -5,13 +5,7 @@ import type { PutObjectCommandInput } from '@aws-sdk/client-s3'
 import { RolesService, S3Service, TokenService } from '@app/services/common'
 import { AddRoleDto, BanUserDto, CreateUserDto, UpdateUserDto } from '@app/dto/common'
 
-import {
-  UserNotFoundException,
-  UsersNotFoundException,
-  UserWithEmailAlreadyExistsException,
-  UserWithIdNotFoundException,
-  UserWithUsernameAlreadyExistsException
-} from '@common/exceptions/common/user.exception'
+import { UserException } from '@common/exceptions/common'
 
 import { UserRepository } from '@infrastructure/repositories/common/user.repository'
 import { User } from '@infrastructure/entities/common/user.entity'
@@ -22,18 +16,15 @@ export class UserService {
     private readonly userRepository: UserRepository,
     private readonly rolesService: RolesService,
     private readonly tokenService: TokenService,
-    private readonly s3Service: S3Service
+    private readonly s3Service: S3Service,
+    private readonly userException: UserException
   ) {}
 
   public async createOne(dto: CreateUserDto): Promise<User> {
     const userWithSameEmail = await this.getOneByAuthType(dto.email, dto.auth_type)
     if (userWithSameEmail && userWithSameEmail.auth_type === 'jwt') {
-      throw new UserWithEmailAlreadyExistsException(dto.email)
+      throw this.userException.alreadyExistsWithEmail(dto.email)
     }
-    // const userWithSameUsername = await this.getOneByUsername(dto.username)
-    // if (userWithSameUsername) {
-    //   throw new UserWithUsernameAlreadyExistsException(dto.username)
-    // }
 
     const user = await this.userRepository.createOne(dto)
     user.role = await this.rolesService.getOne('user')
@@ -44,7 +35,7 @@ export class UserService {
     const users = await this.userRepository.getMany()
 
     if (!users.length) {
-      throw new UsersNotFoundException()
+      throw this.userException.manyNotFound()
     }
 
     return users
@@ -54,7 +45,7 @@ export class UserService {
     const user = await this.userRepository.getOneById(id)
 
     if (!user) {
-      throw new UserWithIdNotFoundException(id)
+      throw this.userException.withIdNotFound(id)
     }
 
     return user
@@ -75,7 +66,7 @@ export class UserService {
   public async getOneByVerifyLink(link: string): Promise<User> {
     const user = await this.userRepository.getOneByVerifyLink(link)
     if (!user) {
-      throw new UserNotFoundException()
+      throw this.userException.notFound()
     }
 
     return user
@@ -85,7 +76,7 @@ export class UserService {
     const user = await this.userRepository.getOneById(id)
 
     if (!user) {
-      throw new UserWithIdNotFoundException(id)
+      throw this.userException.withIdNotFound(id)
     }
 
     return this.userRepository.updateOne(id, updateUserDto)
@@ -94,7 +85,7 @@ export class UserService {
   public async changeUsername(id: string, username: string): Promise<User> {
     const user = await this.userRepository.getOneByUsername(username)
     if (user) {
-      throw new UserWithUsernameAlreadyExistsException(username)
+      throw this.userException.alreadyExistsWithUsername(username)
     }
 
     return this.updateOne(id, { username })
@@ -125,7 +116,7 @@ export class UserService {
     const user = await this.userRepository.getOneById(id)
 
     if (!user) {
-      throw new UserWithIdNotFoundException(id)
+      throw this.userException.withIdNotFound(id)
     }
 
     await this.tokenService.removeByUserId(user.id)
@@ -146,7 +137,7 @@ export class UserService {
   public async ban(dto: BanUserDto): Promise<User> {
     const user = await this.userRepository.getOneById(dto.userId)
     if (!user) {
-      throw new UserWithIdNotFoundException(dto.userId)
+      throw this.userException.withIdNotFound(dto.userId)
     }
 
     return this.userRepository.ban(dto.userId, dto.banReason)

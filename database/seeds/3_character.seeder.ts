@@ -1,43 +1,21 @@
 import { DataSource } from 'typeorm'
-import { Seeder } from 'typeorm-extension'
+import type { Seeder } from 'typeorm-extension'
 
-import { CreateCharacterDto } from '@app/dto/main/character.dto'
+import type { CharacterResponse, LocationResponse } from '../interfaces'
 
-import { Character } from '@infrastructure/entities/main/character.entity'
+import { CreateCharacterDto } from '@app/dto/main'
 
-import { fetchData } from '@common/utils/fetch-data'
-import { getIdFromUrl } from '@common/utils/get-id-from-url'
+import { Character } from '@infrastructure/entities/main'
 
-import { ILocation } from './1_location.seeder'
-
-export interface ICharacter {
-  id: number
-  name: string
-  created: string
-  url: string
-  episode: string[]
-  gender: string
-  image: string
-  type: string
-  location: {
-    name: string
-    url: string
-  }
-  origin: {
-    name: string
-    url: string
-  }
-  species: string
-  status: string
-}
+import { fetchData, getIdFromUrl } from '@common/utils'
 
 export class CharacterSeeder implements Seeder {
   public async run(dataSource: DataSource): Promise<void> {
     try {
       const characterRepository = dataSource.getRepository(Character)
       const characters: CreateCharacterDto[] = []
-      const responseLocation = await fetchData<ILocation>('https://rickandmortyapi.com/api/location')
-      const responseCharacter = await fetchData<ICharacter>('https://rickandmortyapi.com/api/character')
+      const responseLocation = await fetchData<LocationResponse>('https://rickandmortyapi.com/api/location')
+      const responseCharacter = await fetchData<CharacterResponse>('https://rickandmortyapi.com/api/character')
 
       responseCharacter.map(async character => {
         characters.push({

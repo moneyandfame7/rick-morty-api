@@ -3,7 +3,7 @@ import { type HttpException, HttpStatus, Injectable } from '@nestjs/common'
 import { ApiErrorService } from '@app/services/common'
 
 @Injectable()
-export class CharactersException {
+export class CharacterException {
   public constructor(private readonly apiErrorService: ApiErrorService) {}
 
   public manyNotFound(): HttpException {

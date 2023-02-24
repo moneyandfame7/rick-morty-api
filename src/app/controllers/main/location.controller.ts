@@ -13,7 +13,7 @@ import { Location } from '@infrastructure/entities/main'
 
 import { JwtAuthGuard } from '@common/guards/authorization'
 import { Roles } from '@common/decorators'
-import { RolesEnum } from '@common/constants'
+import { ROLES } from '@common/constants'
 import { RolesGuard } from '@common/guards/common'
 
 @Controller('/api/locations')
@@ -24,7 +24,7 @@ export class LocationController {
   @Post()
   @ApiOperation({ summary: 'A new location is created.' })
   @ApiResponse({ status: 200, type: Location })
-  @Roles(RolesEnum.ADMIN)
+  @Roles(ROLES.ADMIN)
   @UseGuards(JwtAuthGuard, RolesGuard)
   public async createOne(@Body() createLocationDto: CreateLocationDto): Promise<Location> {
     return this.locationService.createOne(createLocationDto)
@@ -69,7 +69,7 @@ export class LocationController {
   @Patch(':id')
   @ApiOperation({ summary: 'Updates the location with the specified body by id.' })
   @ApiResponse({ status: 200, type: Location })
-  @Roles(RolesEnum.ADMIN)
+  @Roles(ROLES.ADMIN)
   @UseGuards(JwtAuthGuard, RolesGuard)
   public async updateOne(@Param('id', ParseIntPipe) id: number, @Body() updateLocationDto: UpdateLocationDto): Promise<Location> {
     return this.locationService.updateOne(id, updateLocationDto)
@@ -78,7 +78,7 @@ export class LocationController {
   @Delete(':id')
   @ApiOperation({ summary: 'This method removes the location by id.' })
   @ApiResponse({ status: 200, type: Location })
-  @Roles(RolesEnum.ADMIN)
+  @Roles(ROLES.ADMIN)
   @UseGuards(JwtAuthGuard, RolesGuard)
   public async removeOne(@Param('id', ParseIntPipe) id: number): Promise<Location> {
     return this.locationService.removeOne(id)

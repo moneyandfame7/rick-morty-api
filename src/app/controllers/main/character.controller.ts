@@ -13,7 +13,7 @@ import type { Presenter } from '@core/services/common'
 
 import { Character } from '@infrastructure/entities/main'
 
-import { RolesEnum } from '@common/constants'
+import { ROLES } from '@common/constants'
 import { JwtAuthGuard } from '@common/guards/authorization'
 import { RolesGuard } from '@common/guards/common'
 import { Roles } from '@common/decorators'
@@ -27,7 +27,7 @@ export class CharacterController {
   @ApiOperation({ summary: 'create and save a new character to collection' })
   @ApiResponse({ status: 200, type: Character })
   @UseInterceptors(FileInterceptor('image', { storage: memoryStorage() }))
-  @Roles(RolesEnum.ADMIN)
+  @Roles(ROLES.ADMIN)
   @UseGuards(JwtAuthGuard, RolesGuard)
   public async createOne(@Body() character: CreateCharacterDto, @UploadedFile() file: Express.Multer.File): Promise<Character> {
     return this.characterService.createOne(character, file)
@@ -72,7 +72,7 @@ export class CharacterController {
   @Patch(':id')
   @ApiOperation({ summary: 'update one character with specified id' })
   @ApiResponse({ status: 200, type: Character })
-  @Roles(RolesEnum.ADMIN)
+  @Roles(ROLES.ADMIN)
   @UseGuards(JwtAuthGuard, RolesGuard)
   public async updateOne(@Param('id', ParseIntPipe) id: number, @Body() updateCharacterDto: UpdateCharacterDto): Promise<Character> {
     return this.characterService.updateOne(id, updateCharacterDto)
@@ -81,7 +81,7 @@ export class CharacterController {
   @Delete(':id')
   @ApiOperation({ summary: 'remove one character with specified id' })
   @ApiResponse({ status: 200, type: Character })
-  @Roles(RolesEnum.ADMIN)
+  @Roles(ROLES.ADMIN)
   @UseGuards(JwtAuthGuard, RolesGuard)
   public async removeOne(@Param('id', ParseIntPipe) id: number): Promise<Character> {
     return this.characterService.removeOne(id)

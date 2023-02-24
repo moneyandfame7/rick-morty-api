@@ -7,12 +7,13 @@ import { UserController } from '@app/controllers/common'
 import { UserRepository } from '@infrastructure/repositories/common'
 import { Character } from '@infrastructure/entities/main'
 
-import { RolesModule, S3Module, TokenModule } from '@modules/common'
+import { ApiErrorModule, RolesModule, S3Module, TokenModule } from '@modules/common'
+import { UserException } from '@common/exceptions/common'
 
 @Module({
-  imports: [TypeOrmModule.forFeature([Character]), RolesModule, forwardRef(() => TokenModule), S3Module],
+  imports: [TypeOrmModule.forFeature([Character]), RolesModule, forwardRef(() => TokenModule), S3Module, ApiErrorModule],
   controllers: [UserController],
-  providers: [UserService, UserRepository],
+  providers: [UserService, UserRepository, UserException],
   exports: [UserService]
 })
 export class UserModule {}

@@ -13,7 +13,7 @@ import type { Presenter } from '@core/services/common'
 import { Episode } from '@infrastructure/entities/main'
 
 import { Roles } from '@common/decorators'
-import { RolesEnum } from '@common/constants'
+import { ROLES } from '@common/constants'
 import { JwtAuthGuard } from '@common/guards/authorization'
 import { RolesGuard } from '@common/guards/common'
 
@@ -25,7 +25,7 @@ export class EpisodeController {
   @Post()
   @ApiOperation({ summary: 'create and save a new episode to collection' })
   @ApiResponse({ status: 200, type: Episode })
-  @Roles(RolesEnum.ADMIN)
+  @Roles(ROLES.ADMIN)
   @UseGuards(JwtAuthGuard, RolesGuard)
   public async createOne(@Body() createEpisodeDto: CreateEpisodeDto): Promise<Episode> {
     return this.episodeService.createOne(createEpisodeDto)
@@ -66,7 +66,7 @@ export class EpisodeController {
   @Patch(':id')
   @ApiOperation({ summary: 'update one episode with specified id' })
   @ApiResponse({ status: 200, type: Episode })
-  @Roles(RolesEnum.ADMIN)
+  @Roles(ROLES.ADMIN)
   @UseGuards(JwtAuthGuard, RolesGuard)
   public async updateOne(@Param('id', ParseIntPipe) id: number, @Body() updateEpisodeDto: UpdateEpisodeDto): Promise<Episode> {
     return this.episodeService.updateOne(id, updateEpisodeDto)
@@ -75,7 +75,7 @@ export class EpisodeController {
   @Delete(':id')
   @ApiOperation({ summary: 'remove one episode with specified id' })
   @ApiResponse({ status: 200, type: Episode })
-  @Roles(RolesEnum.ADMIN)
+  @Roles(ROLES.ADMIN)
   @UseGuards(JwtAuthGuard, RolesGuard)
   public async removeOne(@Param('id', ParseIntPipe) id: number): Promise<Episode> {
     return this.episodeService.removeOne(id)

@@ -1,28 +1,20 @@
 import { DataSource } from 'typeorm'
-import { Seeder } from 'typeorm-extension'
+import type { Seeder } from 'typeorm-extension'
 
-import { CreateLocationDto } from '@app/dto/main/location.dto'
+import type { LocationResponse } from '../interfaces'
 
-import { Location } from '@infrastructure/entities/main/location.entity'
+import { CreateLocationDto } from '@app/dto/main'
 
-import { fetchData } from '@common/utils/fetch-data'
+import { Location } from '@infrastructure/entities/main'
 
-export interface ILocation {
-  id: number
-  name: string
-  created: string
-  url: string
-  type: string
-  dimension: string
-  residents: string[]
-}
+import { fetchData } from '@common/utils'
 
 export class LocationSeeder implements Seeder {
   public async run(dataSource: DataSource): Promise<void> {
     try {
       const locationRepository = dataSource.getRepository(Location)
       const locations: CreateLocationDto[] = []
-      const responseLocation = await fetchData<ILocation>('https://rickandmortyapi.com/api/location')
+      const responseLocation = await fetchData<LocationResponse>('https://rickandmortyapi.com/api/location')
       responseLocation.map(location => {
         locations.push({
           name: location.name,

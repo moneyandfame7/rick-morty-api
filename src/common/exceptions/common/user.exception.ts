@@ -1,31 +1,28 @@
-import { BadRequestException, NotFoundException } from '@nestjs/common'
+import { HttpException, HttpStatus, Injectable } from '@nestjs/common'
 
-export class UsersNotFoundException extends NotFoundException {
-  public constructor() {
-    super('Users not found')
+import { ApiErrorService } from '@app/services/common'
+
+@Injectable()
+export class UserException {
+  public constructor(private readonly apiErrorService: ApiErrorService) {}
+
+  public manyNotFound(): HttpException {
+    return this.apiErrorService.throwErrorResponse('users', 'Users not found', HttpStatus.NOT_FOUND)
   }
-}
 
-export class UserWithIdNotFoundException extends NotFoundException {
-  public constructor(id: string) {
-    super(`User with ${id} not found`)
+  public notFound(): HttpException {
+    return this.apiErrorService.throwErrorResponse('user', 'User not found', HttpStatus.NOT_FOUND)
   }
-}
 
-export class UserNotFoundException extends NotFoundException {
-  public constructor() {
-    super('User does not exist')
+  public withIdNotFound(id: string): HttpException {
+    return this.apiErrorService.throwErrorResponse('id', `User with id ${id} not found`, HttpStatus.NOT_FOUND)
   }
-}
 
-export class UserWithEmailAlreadyExistsException extends BadRequestException {
-  public constructor(email: string) {
-    super(`User with email ${email} already exists`)
+  public alreadyExistsWithEmail(email: string): HttpException {
+    return this.apiErrorService.throwErrorResponse('value', `User with email ${email} already exists`, HttpStatus.UNPROCESSABLE_ENTITY)
   }
-}
 
-export class UserWithUsernameAlreadyExistsException extends BadRequestException {
-  public constructor(username: string) {
-    super(`User with username ${username} already exists`)
+  public alreadyExistsWithUsername(username: string): HttpException {
+    return this.apiErrorService.throwErrorResponse('username', `User with username ${username} already exists`, HttpStatus.UNPROCESSABLE_ENTITY)
   }
 }
