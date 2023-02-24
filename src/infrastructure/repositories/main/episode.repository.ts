@@ -1,13 +1,13 @@
 import { DataSource, SelectQueryBuilder } from 'typeorm'
 import { Injectable } from '@nestjs/common'
 
-import type { CreateEpisodeDto, QueryEpisodeDto, UpdateEpisodeDto } from '@app/dto/main/episode.dto'
-import type { QueryPaginationDto } from '@app/dto/common/pagination.dto'
+import type { CreateEpisodeDto, QueryEpisodeDto, UpdateEpisodeDto } from '@app/dto/main'
+import type { QueryPaginationDto } from '@app/dto/common'
 
-import type { GetManyEpisodes } from '@core/models/main/episode.model'
-import { MainRepositoryAbstract } from '@core/repositories/main-repository.abstract'
+import type { GetManyEpisodes } from '@core/models/main'
+import { MainRepositoryAbstract } from '@core/repositories/main'
 
-import { Episode } from '@infrastructure/entities/main/episode.entity'
+import { Episode } from '@infrastructure/entities/main'
 
 @Injectable()
 export class EpisodeRepository extends MainRepositoryAbstract<Episode, QueryEpisodeDto, CreateEpisodeDto, UpdateEpisodeDto, GetManyEpisodes> {
@@ -17,7 +17,7 @@ export class EpisodeRepository extends MainRepositoryAbstract<Episode, QueryEpis
 
   protected buildQueries(builder: SelectQueryBuilder<Episode>, queries: QueryEpisodeDto): void {
     if (queries.id) {
-      const ids = this.toCorrectQuerieIds(queries.id)
+      const ids = this.toCorrectQueriesId(queries.id)
 
       queries.id ? builder.where('episode.id IN (:...ids)', { ids }) : null
     }

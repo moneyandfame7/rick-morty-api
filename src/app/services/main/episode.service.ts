@@ -1,21 +1,24 @@
 import { Injectable } from '@nestjs/common'
-import { PaginationService, Presenter } from '../common/pagination.service'
-import { CreateEpisodeDto, QueryEpisodeDto, UpdateEpisodeDto } from '@app/dto/main/episode.dto'
-import { QueryPaginationDto } from '@app/dto/common/pagination.dto'
-import { EpisodeException } from '@common/exceptions/main/episode.exception'
-import { MainServiceAbstract } from '@core/services/main/main-service.abstract'
-import { Episode } from '@infrastructure/entities/main/episode.entity'
-import { EpisodeRepository } from '@infrastructure/repositories/main/episode.repository'
+
+import { PaginationService } from '@app/services/common'
+import { CreateEpisodeDto, QueryEpisodeDto, UpdateEpisodeDto } from '@app/dto/main'
+import { QueryPaginationDto } from '@app/dto/common'
+
+import type { BaseService } from '@core/services/main'
+import type { Presenter } from '@core/services/common'
+
+import { Episode } from '@infrastructure/entities/main'
+import { EpisodeRepository } from '@infrastructure/repositories/main'
+
+import { EpisodeException } from '@common/exceptions/main'
 
 @Injectable()
-export class EpisodeService extends MainServiceAbstract<Episode, CreateEpisodeDto, UpdateEpisodeDto, QueryEpisodeDto> {
+export class EpisodeService implements BaseService<Episode, CreateEpisodeDto, UpdateEpisodeDto, QueryEpisodeDto> {
   public constructor(
     private readonly episodeRepository: EpisodeRepository,
     private readonly paginationService: PaginationService<Episode>,
     private readonly episodesException: EpisodeException
-  ) {
-    super()
-  }
+  ) {}
 
   public async createOne(createEpisodeDto: CreateEpisodeDto): Promise<Episode> {
     const exists = await this.episodeRepository.findOneBy({ name: createEpisodeDto.name })

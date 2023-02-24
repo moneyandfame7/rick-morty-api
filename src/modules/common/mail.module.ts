@@ -1,14 +1,12 @@
 import { Module } from '@nestjs/common'
 
-import { MailService } from '@app/services/common/mail.service'
-import { MailController } from '@app/controllers/common/mail.controller'
+import { MailService } from '@app/services/common'
+import { MailController } from '@app/controllers/common'
 
-import { EnvironmentConfigModule } from '@modules/common/environment-config.module'
-
-import { UserModule } from './user.module'
+import { EnvironmentConfigModule } from '@modules/common'
 
 @Module({
-  imports: [EnvironmentConfigModule, UserModule],
+  imports: [EnvironmentConfigModule],
   providers: [MailService],
   controllers: [MailController],
   exports: [MailService]

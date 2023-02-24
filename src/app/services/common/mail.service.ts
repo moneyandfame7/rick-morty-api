@@ -1,10 +1,8 @@
 import { Injectable } from '@nestjs/common'
+import type { Transporter } from 'nodemailer'
 import * as nodemailer from 'nodemailer'
-import { Transporter } from 'nodemailer'
 
-import { UserService } from './user.service'
-
-import { EnvironmentConfigService } from '@app/services/common/environment-config.service'
+import { EnvironmentConfigService } from '@app/services/common'
 
 @Injectable()
 export class MailService {
@@ -14,7 +12,7 @@ export class MailService {
   private readonly user: string
   private readonly password: string
 
-  public constructor(private readonly config: EnvironmentConfigService, private readonly userService: UserService) {
+  public constructor(private readonly config: EnvironmentConfigService) {
     this.host = config.getMailerHost()
     this.port = config.getMailerPort()
     this.user = config.getMailerUser()

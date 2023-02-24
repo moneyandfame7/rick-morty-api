@@ -1,32 +1,14 @@
-import { HttpStatus, Injectable } from '@nestjs/common'
+import { Injectable } from '@nestjs/common'
 
-import { ApiErrorService } from '@app/services/common/api-error.service'
-import { QueryPaginationDto } from '@app/dto/common/pagination.dto'
+import { EnvironmentConfigService } from '@app/services/common'
 
-import { EnvironmentConfigService } from '@app/services/common/environment-config.service'
+import type { BuildPaginationOptions, PaginationOptions, Presenter } from '@core/services/common'
 
-export interface PaginationOptions {
-  queryPaginationDto: QueryPaginationDto
-  count: number
-}
-
-export interface BuildPaginationOptions {
-  page: number
-  take: number
-  count: number
-  pages: number
-  prev: string | null
-  next: string | null
-}
-
-export interface Presenter<Entity> {
-  info: BuildPaginationOptions
-  results: Entity[]
-}
+import { PaginationException } from '@common/exceptions/common'
 
 @Injectable()
 export class PaginationService<Entity> {
-  public constructor(private readonly config: EnvironmentConfigService, private readonly apiErrorService: ApiErrorService) {}
+  public constructor(private readonly config: EnvironmentConfigService, private readonly paginationException: PaginationException) {}
 
   private queryString(query: string | undefined, current: number, page: number, endpoint: string): string | null {
     if (!query) {
@@ -45,7 +27,7 @@ export class PaginationService<Entity> {
     const pages = Math.ceil(count / take)
 
     if (page > pages) {
-      throw this.apiErrorService.throwErrorResponse('page', `Page ${page} does not exist`, HttpStatus.NOT_FOUND)
+      throw this.paginationException.notFound(page)
     }
     return {
       page,

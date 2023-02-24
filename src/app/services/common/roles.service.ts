@@ -1,19 +1,21 @@
 import { Injectable } from '@nestjs/common'
 
-import { CreateRoleDto } from '@app/dto/common/roles.dto'
+import { CreateRoleDto } from '@app/dto/common'
 
-import { RoleAlreadyExistException, RoleDoesNotExistException, RolesNotFoundException } from '@common/exceptions/common/role.exception'
+import { RolesException } from '@common/exceptions/common'
 
-import { Role } from '@infrastructure/entities/common/role.entity'
-import { RolesRepository } from '@infrastructure/repositories/common/roles.repository'
+import { Role } from '@infrastructure/entities/common'
+import { RolesRepository } from '@infrastructure/repositories/common'
 
 @Injectable()
 export class RolesService {
-  public constructor(private readonly roleRepository: RolesRepository) {}
+  public constructor(private readonly roleRepository: RolesRepository, private readonly rolesException: RolesException) {}
 
   public async createRole(createRoleDto: CreateRoleDto): Promise<Role> {
-    const withSameValue = await this.roleRepository.getOne(createRoleDto.value)
-    if (withSameValue) throw new RoleAlreadyExistException(createRoleDto.value)
+    const exists = await this.roleRepository.getOne(createRoleDto.value)
+    if (exists) {
+      throw this.rolesException.alreadyExists(exists.value)
+    }
 
     const role = this.roleRepository.create(createRoleDto)
     return this.roleRepository.save(role)
@@ -21,14 +23,18 @@ export class RolesService {
 
   public async getMany(): Promise<Role[]> {
     const roles = await this.roleRepository.getMany()
-    if (!roles) throw new RolesNotFoundException()
+    if (!roles) {
+      throw this.rolesException.manyNotFound()
+    }
 
     return roles
   }
 
   public async getOne(value: string): Promise<Role> {
     const role = await this.roleRepository.getOne(value)
-    if (!role) throw new RoleDoesNotExistException(value)
+    if (!role) {
+      throw this.rolesException.withValueNotFound(value)
+    }
 
     return role
   }

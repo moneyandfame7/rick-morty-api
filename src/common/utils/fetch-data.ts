@@ -1,5 +1,5 @@
 import axios from 'axios'
-import { fillArray } from './fill-array'
+import { fillArray } from '@common/utils'
 
 export const fetchData = async <T>(url: string): Promise<T[]> => {
   const response = await axios.get(url)

@@ -1,6 +1,6 @@
 import { Module } from '@nestjs/common'
 
-import { ApiErrorService } from '@app/services/common/api-error.service'
+import { ApiErrorService } from '@app/services/common'
 
 @Module({
   imports: [],

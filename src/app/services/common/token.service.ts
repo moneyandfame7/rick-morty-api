@@ -1,13 +1,13 @@
 import { BadRequestException, Injectable } from '@nestjs/common'
 import { JwtService } from '@nestjs/jwt'
 
-import { GeneratedTokens, JwtPayload, TempJwtPayload } from '@core/models'
+import { EnvironmentConfigService } from '@app/services/common'
 
-import { TokenRepository } from '@infrastructure/repositories/common/token.repository'
-import { User } from '@infrastructure/entities/common/user.entity'
-import { Token } from '@infrastructure/entities/common/token.entity'
+import type { GeneratedTokens } from '@core/models/common'
+import type { JwtPayload, TempJwtPayload } from '@core/models/authorization'
 
-import { EnvironmentConfigService } from '@app/services/common/environment-config.service'
+import { TokenRepository } from '@infrastructure/repositories/common'
+import { Token, User } from '@infrastructure/entities/common'
 
 @Injectable()
 export class TokenService {

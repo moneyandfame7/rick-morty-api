@@ -1,10 +1,13 @@
 import { DataSource, type SelectQueryBuilder } from 'typeorm'
 import { Injectable } from '@nestjs/common'
-import { MainRepositoryAbstract } from '@core/repositories/main-repository.abstract'
-import type { CreateLocationDto, QueryLocationDto, UpdateLocationDto } from '@app/dto/main/location.dto'
-import type { QueryPaginationDto } from '@app/dto/common/pagination.dto'
-import type { GetManyLocations } from '@core/models/main/location.model'
-import { Location } from '@infrastructure/entities/main/location.entity'
+
+import { CreateLocationDto, QueryLocationDto, UpdateLocationDto } from '@app/dto/main'
+import { QueryPaginationDto } from '@app/dto/common'
+
+import { MainRepositoryAbstract } from '@core/repositories/main'
+import type { GetManyLocations } from '@core/models/main'
+
+import { Location } from '@infrastructure/entities/main'
 
 @Injectable()
 export class LocationRepository extends MainRepositoryAbstract<Location, QueryLocationDto, CreateLocationDto, UpdateLocationDto, GetManyLocations> {
@@ -14,7 +17,7 @@ export class LocationRepository extends MainRepositoryAbstract<Location, QueryLo
 
   protected buildQueries(builder: SelectQueryBuilder<Location>, queries: QueryLocationDto): void {
     if (queries.id) {
-      const ids = this.toCorrectQuerieIds(queries.id)
+      const ids = this.toCorrectQueriesId(queries.id)
 
       queries.id ? builder.where('location.id IN (:...ids)', { ids }) : null
     }

@@ -1,17 +1,19 @@
-import { Module } from '@nestjs/common'
+import { forwardRef, Module } from '@nestjs/common'
 import { TypeOrmModule } from '@nestjs/typeorm'
 
-import { RolesService } from '@app/services/common/roles.service'
-import { RolesController } from '@app/controllers/common/roles.controller'
+import { RolesService } from '@app/services/common'
+import { RolesController } from '@app/controllers/common'
 
-import { Role } from '@infrastructure/entities/common/role.entity'
-import { RolesRepository } from '@infrastructure/repositories/common/roles.repository'
+import { Role } from '@infrastructure/entities/common'
+import { RolesRepository } from '@infrastructure/repositories/common'
 
-import { TokenModule } from './token.module'
+import { RolesException } from '@common/exceptions/common'
+
+import { ApiErrorModule, TokenModule } from '@modules/common'
 
 @Module({
-  imports: [TypeOrmModule.forFeature([Role]), TokenModule],
-  providers: [RolesService, RolesRepository],
+  imports: [TypeOrmModule.forFeature([Role]), forwardRef(() => TokenModule), ApiErrorModule],
+  providers: [RolesService, RolesRepository, RolesException],
   controllers: [RolesController],
   exports: [RolesService]
 })

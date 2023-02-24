@@ -1,31 +1,21 @@
 import { Module } from '@nestjs/common'
 import { TypeOrmModule } from '@nestjs/typeorm'
-import { PassportModule } from '@nestjs/passport'
 import { ConfigModule } from '@nestjs/config'
-import { dataSourceOptions } from '../../database/data-source'
-import { EpisodeModule } from '@modules/main/episode.module'
-import { CharacterModule } from '@modules/main/character.module'
-import { LocationModule } from '@modules/main/location.module'
-import { S3Module } from '@modules/common/s3.module'
-import { UserModule } from '@modules/common/user.module'
-import { RolesModule } from '@modules/common/roles.module'
-import { AuthModule } from '@modules/auth/auth.module'
-import { TokenModule } from '@modules/common/token.module'
-import { EnvironmentConfigModule } from '@modules/common/environment-config.module'
-import { DiscordModule } from '@modules/auth/discord.module'
-import { GoogleModule } from '@modules/auth/google.module'
-import { SpotifyModule } from '@modules/auth/spotify.module'
-import { GithubModule } from '@modules/auth/github.module'
-import { MailModule } from '@modules/common/mail.module'
-import { ApiErrorModule } from '@modules/common/api-error.module'
+import { PassportModule } from '@nestjs/passport'
 
-const configs = [EnvironmentConfigModule, ConfigModule.forRoot({ isGlobal: true }), TypeOrmModule.forRoot(dataSourceOptions)]
-const auth = [PassportModule, AuthModule, DiscordModule, GoogleModule, GithubModule, SpotifyModule]
-const commons = [UserModule, TokenModule, RolesModule, S3Module, MailModule, ApiErrorModule]
+import { dataSourceOptions } from '../../database/data-source'
+
+import { CharacterModule, EpisodeModule, LocationModule } from '@modules/main'
+import { AuthModule, DiscordModule, GithubModule, GoogleModule, SpotifyModule } from '@modules/authorization'
+import { ApiErrorModule, EnvironmentConfigModule, MailModule, RolesModule, S3Module, TokenModule, UserModule } from '@modules/common'
+
+const configs = [ConfigModule.forRoot({ isGlobal: true }), TypeOrmModule.forRoot(dataSourceOptions)]
 const main = [CharacterModule, EpisodeModule, LocationModule]
+const authorization = [AuthModule, DiscordModule, GithubModule, GoogleModule, SpotifyModule, PassportModule]
+const commons = [ApiErrorModule, EnvironmentConfigModule, MailModule, RolesModule, S3Module, TokenModule, UserModule]
 
 @Module({
-  imports: [...configs, ...auth, ...commons, ...main],
+  imports: [...configs, ...authorization, ...commons, ...main],
   controllers: [],
   providers: []
 })

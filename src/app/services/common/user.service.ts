@@ -1,9 +1,10 @@
 import { BadRequestException, Injectable } from '@nestjs/common'
 import * as sharp from 'sharp'
-import { PutObjectCommandInput } from '@aws-sdk/client-s3'
-import { RolesService } from './roles.service'
-import { TokenService } from './token.service'
-import { S3Service } from './s3.service'
+import type { PutObjectCommandInput } from '@aws-sdk/client-s3'
+
+import { RolesService, S3Service, TokenService } from '@app/services/common'
+import { AddRoleDto, BanUserDto, CreateUserDto, UpdateUserDto } from '@app/dto/common'
+
 import {
   UserNotFoundException,
   UsersNotFoundException,
@@ -11,9 +12,9 @@ import {
   UserWithIdNotFoundException,
   UserWithUsernameAlreadyExistsException
 } from '@common/exceptions/common/user.exception'
+
 import { UserRepository } from '@infrastructure/repositories/common/user.repository'
 import { User } from '@infrastructure/entities/common/user.entity'
-import { AddRoleDto, BanUserDto, CreateUserDto, UpdateUserDto } from '@app/dto/common/user.dto'
 
 @Injectable()
 export class UserService {

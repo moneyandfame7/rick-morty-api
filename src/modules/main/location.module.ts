@@ -1,17 +1,15 @@
 import { Module } from '@nestjs/common'
 import { TypeOrmModule } from '@nestjs/typeorm'
 
-import { LocationService } from '@app/services/main/location.service'
-import { LocationController } from '@app/controllers/main/location.controller'
+import { LocationService } from '@app/services/main'
+import { LocationController } from '@app/controllers/main'
 
-import { LocationRepository } from '@infrastructure/repositories/main/location.repository'
-import { Location } from '@infrastructure/entities/main/location.entity'
+import { LocationRepository } from '@infrastructure/repositories/main'
+import { Location } from '@infrastructure/entities/main'
 
-import { LocationException } from '@common/exceptions/main/location.exception'
+import { LocationException } from '@common/exceptions/main'
 
-import { TokenModule } from '@modules/common/token.module'
-import { PaginationModule } from '@modules/common/pagination.module'
-import { ApiErrorModule } from '@modules/common/api-error.module'
+import { ApiErrorModule, PaginationModule, TokenModule } from '@modules/common'
 
 @Module({
   imports: [TypeOrmModule.forFeature([Location]), TokenModule, PaginationModule, ApiErrorModule],

@@ -2,10 +2,10 @@ import { IsArray, IsDate, IsIn, IsNotEmpty, IsNumber, IsObject, IsOptional, IsSt
 import { ApiProperty } from '@nestjs/swagger'
 import { PartialType } from '@nestjs/mapped-types'
 
-import { CreateLocationDto } from './location.dto'
-import { QueryPaginationDto } from '../common/pagination.dto'
+import { CreateLocationDto } from '@app/dto/main'
+import { QueryPaginationDto } from '@app/dto/common'
 
-import type { Episode } from '@infrastructure/entities/main/episode.entity'
+import { Episode } from '@infrastructure/entities/main/episode.entity'
 
 export class CreateCharacterDto {
   @IsNumber()

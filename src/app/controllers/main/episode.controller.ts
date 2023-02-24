@@ -3,18 +3,19 @@ import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger'
 import type { Request } from 'express'
 import * as _ from 'lodash'
 
-import { EpisodeService } from '@app/services/main/episode.service'
-import type { Presenter } from '@app/services/common/pagination.service'
+import { EpisodeService } from '@app/services/main'
 
-import type { CreateEpisodeDto, QueryEpisodeDto, UpdateEpisodeDto } from '@app/dto/main/episode.dto'
-import type { QueryPaginationDto } from '@app/dto/common/pagination.dto'
+import type { CreateEpisodeDto, QueryEpisodeDto, UpdateEpisodeDto } from '@app/dto/main'
+import type { QueryPaginationDto } from '@app/dto/common'
 
-import { Episode } from '@infrastructure/entities/main/episode.entity'
+import type { Presenter } from '@core/services/common'
 
-import { Roles } from '@common/decorators/roles.decorator'
-import { RolesEnum } from '@common/constants/roles.enum'
-import { JwtAuthGuard } from '@common/guards/auth/jwt.guard'
-import { RolesGuard } from '@common/guards/roles.guard'
+import { Episode } from '@infrastructure/entities/main'
+
+import { Roles } from '@common/decorators'
+import { RolesEnum } from '@common/constants'
+import { JwtAuthGuard } from '@common/guards/authorization'
+import { RolesGuard } from '@common/guards/common'
 
 @Controller('/api/episodes')
 @ApiTags('/episodes')

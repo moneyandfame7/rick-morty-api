@@ -3,17 +3,18 @@ import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger'
 import type { Request } from 'express'
 import * as _ from 'lodash'
 
-import { LocationService } from '@app/services/main/location.service'
-import type { Presenter } from '@app/services/common/pagination.service'
-import type { CreateLocationDto, QueryLocationDto, UpdateLocationDto } from '@app/dto/main/location.dto'
-import type { QueryPaginationDto } from '@app/dto/common/pagination.dto'
+import { LocationService } from '@app/services/main'
+import { CreateLocationDto, QueryLocationDto, UpdateLocationDto } from '@app/dto/main'
+import { QueryPaginationDto } from '@app/dto/common'
 
-import { Location } from '@infrastructure/entities/main/location.entity'
+import type { Presenter } from '@core/services/common'
 
-import { JwtAuthGuard } from '@common/guards/auth/jwt.guard'
-import { Roles } from '@common/decorators/roles.decorator'
-import { RolesEnum } from '@common/constants/roles.enum'
-import { RolesGuard } from '@common/guards/roles.guard'
+import { Location } from '@infrastructure/entities/main'
+
+import { JwtAuthGuard } from '@common/guards/authorization'
+import { Roles } from '@common/decorators'
+import { RolesEnum } from '@common/constants'
+import { RolesGuard } from '@common/guards/common'
 
 @Controller('/api/locations')
 @ApiTags('/locations')

@@ -1,14 +1,14 @@
 import { Module } from '@nestjs/common'
 
-import { PaginationService } from '@app/services/common/pagination.service'
+import { PaginationService } from '@app/services/common'
 
-import { EnvironmentConfigModule } from '@modules/common/environment-config.module'
+import { PaginationException } from '@common/exceptions/common'
 
-import { ApiErrorModule } from './api-error.module'
+import { ApiErrorModule, EnvironmentConfigModule } from '@modules/common'
 
 @Module({
   imports: [EnvironmentConfigModule, ApiErrorModule],
-  providers: [PaginationService],
+  providers: [PaginationService, PaginationException],
   exports: [PaginationService]
 })
 export class PaginationModule {}

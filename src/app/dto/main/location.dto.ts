@@ -2,7 +2,7 @@ import { ApiProperty } from '@nestjs/swagger'
 import { PartialType } from '@nestjs/mapped-types'
 import { IsNotEmpty, IsOptional, IsString } from 'class-validator'
 
-import { QueryPaginationDto } from '../common/pagination.dto'
+import { QueryPaginationDto } from '@app/dto/common'
 
 export class CreateLocationDto {
   @ApiProperty({ example: 'Earth (C-137)', description: 'The name of the location.' })

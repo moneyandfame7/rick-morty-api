@@ -2,7 +2,7 @@ import { ApiProperty, PartialType } from '@nestjs/swagger'
 import { IsBoolean, IsEmail, IsEnum, IsIn, IsNotEmpty, IsOptional, IsString, IsUUID, MaxLength, MinLength } from 'class-validator'
 import { Type } from 'class-transformer'
 
-import { RolesEnum } from '@common/constants/roles.enum'
+import { RolesEnum } from '@common/constants'
 
 export class CreateUserDto {
   @ApiProperty({ example: 'User_228', description: 'The username of the user.' })
