@@ -1,11 +1,11 @@
 import { PassportStrategy } from '@nestjs/passport'
 import { Injectable } from '@nestjs/common'
 import { ExtractJwt, Strategy } from 'passport-jwt'
-import { Request } from 'express'
+import type { Request } from 'express'
 
-import { JwtPayload } from '@core/models'
+import { EnvironmentConfigService } from '@app/services/common'
 
-import { EnvironmentConfigService } from '@app/services/common/environment-config.service'
+import type { JwtPayload } from '@core/models/authorization'
 
 @Injectable()
 export class JwtStrategy extends PassportStrategy(Strategy) {

@@ -1,18 +1,15 @@
 import { Module } from '@nestjs/common'
 import { TypeOrmModule } from '@nestjs/typeorm'
 
-import { CharacterService } from '@app/services/main/character.service'
-import { CharacterController } from '@app/controllers/main/character.controller'
+import { CharacterService } from '@app/services/main'
+import { CharacterController } from '@app/controllers/main'
 
-import { Character } from '@infrastructure/entities/main/character.entity'
-import { CharacterRepository } from '@infrastructure/repositories/main/character.repository'
+import { Character } from '@infrastructure/entities/main'
+import { CharacterRepository } from '@infrastructure/repositories/main'
 
-import { CharactersException } from '@common/exceptions/main/characters.exception'
+import { CharactersException } from '@common/exceptions/main'
 
-import { S3Module } from '@modules/common/s3.module'
-import { TokenModule } from '@modules/common/token.module'
-import { PaginationModule } from '@modules/common/pagination.module'
-import { ApiErrorModule } from '@modules/common/api-error.module'
+import { ApiErrorModule, PaginationModule, S3Module, TokenModule } from '@modules/common'
 
 @Module({
   imports: [TypeOrmModule.forFeature([Character]), S3Module, TokenModule, PaginationModule, ApiErrorModule],

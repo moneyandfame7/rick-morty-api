@@ -2,7 +2,7 @@ import { PartialType } from '@nestjs/mapped-types'
 import { ApiProperty } from '@nestjs/swagger'
 import { IsNotEmpty, IsOptional, IsString } from 'class-validator'
 
-import { QueryPaginationDto } from '../common/pagination.dto'
+import { QueryPaginationDto } from '@app/dto/common'
 
 export class CreateEpisodeDto {
   @ApiProperty({ example: 'Pilot', description: 'The name of the episode.' })

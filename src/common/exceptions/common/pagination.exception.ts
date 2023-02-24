@@ -1,7 +1,12 @@
-import { BadRequestException } from '@nestjs/common'
+import { HttpException, HttpStatus, Injectable } from '@nestjs/common'
 
-export class PageDoesNotExistException extends BadRequestException {
-  public constructor(page: number) {
-    super(`Page ${page} does not exist`)
+import { ApiErrorService } from '@app/services/common'
+
+@Injectable()
+export class PaginationException {
+  public constructor(private readonly apiErrorService: ApiErrorService) {}
+
+  public notFound(page: number): HttpException {
+    return this.apiErrorService.throwErrorResponse('page', `Page ${page} not found`, HttpStatus.NOT_FOUND)
   }
 }

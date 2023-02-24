@@ -1,10 +1,10 @@
 import { Injectable, InternalServerErrorException } from '@nestjs/common'
 import { ConfigService } from '@nestjs/config'
 
-import { AuthConfig, DatabaseConfig, S3BucketConfig } from '@core/config'
+import type { AuthorizationConfig, DatabaseConfig, S3BucketConfig } from '@core/config'
 
 @Injectable()
-export class EnvironmentConfigService implements AuthConfig, S3BucketConfig, DatabaseConfig {
+export class EnvironmentConfigService implements AuthorizationConfig, S3BucketConfig, DatabaseConfig {
   public constructor(private readonly configService: ConfigService) {}
 
   private getStringEnv(env: string): string {

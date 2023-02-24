@@ -1,22 +1,24 @@
 import { Injectable } from '@nestjs/common'
-import type { Presenter } from '../common/pagination.service'
-import { PaginationService } from '../common/pagination.service'
-import { MainServiceAbstract } from '@core/services/main/main-service.abstract'
-import type { CreateLocationDto, QueryLocationDto, UpdateLocationDto } from '@app/dto/main/location.dto'
-import type { QueryPaginationDto } from '@app/dto/common/pagination.dto'
-import { LocationException } from '@common/exceptions/main/location.exception'
-import { LocationRepository } from '@infrastructure/repositories/main/location.repository'
-import type { Location } from '@infrastructure/entities/main/location.entity'
+
+import { PaginationService } from '@app/services/common'
+import type { CreateLocationDto, QueryLocationDto, UpdateLocationDto } from '@app/dto/main'
+import type { QueryPaginationDto } from '@app/dto/common'
+
+import type { BaseService } from '@core/services/main'
+import type { Presenter } from '@core/services/common'
+
+import { LocationRepository } from '@infrastructure/repositories/main'
+import { Location } from '@infrastructure/entities/main'
+
+import { LocationException } from '@common/exceptions/main'
 
 @Injectable()
-export class LocationService extends MainServiceAbstract<Location, CreateLocationDto, UpdateLocationDto, QueryLocationDto> {
+export class LocationService implements BaseService<Location, CreateLocationDto, UpdateLocationDto, QueryLocationDto> {
   public constructor(
     private readonly locationRepository: LocationRepository,
     private readonly paginationService: PaginationService<Location>,
     private readonly locationsException: LocationException
-  ) {
-    super()
-  }
+  ) {}
 
   public async createOne(createLocationDto: CreateLocationDto): Promise<Location> {
     const exists = await this.locationRepository.findOneBy({ name: createLocationDto.name })

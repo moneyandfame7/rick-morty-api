@@ -1,10 +1,10 @@
 import { PassportStrategy } from '@nestjs/passport'
 import { Injectable, UnauthorizedException } from '@nestjs/common'
-import { Profile, Strategy, VerifyCallback } from 'passport-spotify'
+import { type Profile, Strategy, type VerifyCallback } from 'passport-spotify'
 
-import { UserBeforeAuthentication } from '@core/models'
+import { EnvironmentConfigService } from '@app/services/common'
 
-import { EnvironmentConfigService } from '@app/services/common/environment-config.service'
+import type { UserBeforeAuthentication } from '@core/models/common'
 
 @Injectable()
 export class SpotifyStrategy extends PassportStrategy(Strategy, 'spotify') {

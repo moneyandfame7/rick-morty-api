@@ -5,7 +5,7 @@ import * as cookieParser from 'cookie-parser'
 
 import { AppModule } from '@app/app.module'
 
-import { CustomValidationPipe } from '@common/pipes/backend-validation.pipe'
+import { CustomValidationPipe } from '@common/pipes'
 
 async function bootstrap(): Promise<void> {
   const PORT = process.env.PORT ?? 3000

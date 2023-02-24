@@ -4,15 +4,15 @@ import { FileInterceptor } from '@nestjs/platform-express'
 import { memoryStorage } from 'multer'
 import type { Request } from 'express'
 
-import { UserService } from '@app/services/common/user.service'
-import type { AddRoleDto, BanUserDto, CreateUserDto, UpdateUserDto } from '@app/dto/common/user.dto'
+import { UserService } from '@app/services/common'
+import { AddRoleDto, BanUserDto, CreateUserDto, UpdateUserDto } from '@app/dto/common'
 
-import type { User } from '@infrastructure/entities/common/user.entity'
+import { User } from '@infrastructure/entities/common'
 
-import { Roles } from '@common/decorators/roles.decorator'
-import { RolesGuard } from '@common/guards/roles.guard'
-import { RolesEnum } from '@common/constants/roles.enum'
-import { JwtAuthGuard } from '@common/guards/auth/jwt.guard'
+import { Roles } from '@common/decorators'
+import { RolesGuard } from '@common/guards/common'
+import { RolesEnum } from '@common/constants'
+import { JwtAuthGuard } from '@common/guards/authorization'
 
 @Controller('api/users')
 @ApiTags('users')

@@ -1,13 +1,13 @@
 import { DataSource, type SelectQueryBuilder } from 'typeorm'
 import { Injectable } from '@nestjs/common'
 
-import type { CreateCharacterDto, QueryCharacterDto, UpdateCharacterDto } from '@app/dto/main/character.dto'
-import type { QueryPaginationDto } from '@app/dto/common/pagination.dto'
+import { CreateCharacterDto, QueryCharacterDto, UpdateCharacterDto } from '@app/dto/main'
+import { QueryPaginationDto } from '@app/dto/common'
 
-import { MainRepositoryAbstract } from '@core/repositories/main-repository.abstract'
-import type { GetManyCharacters } from '@core/models/main/character.model'
+import { MainRepositoryAbstract } from '@core/repositories/main'
+import type { GetManyCharacters } from '@core/models/main'
 
-import { Character } from '@infrastructure/entities/main/character.entity'
+import { Character } from '@infrastructure/entities/main'
 
 @Injectable()
 export class CharacterRepository extends MainRepositoryAbstract<Character, QueryCharacterDto, CreateCharacterDto, UpdateCharacterDto, GetManyCharacters> {
@@ -17,7 +17,7 @@ export class CharacterRepository extends MainRepositoryAbstract<Character, Query
 
   protected buildQueries(builder: SelectQueryBuilder<Character>, queries: QueryCharacterDto): void {
     if (queries.id) {
-      const ids = this.toCorrectQuerieIds(queries.id)
+      const ids = this.toCorrectQueriesId(queries.id)
 
       queries.id ? builder.where('character.id IN (:...ids)', { ids }) : null
     }

@@ -1,4 +1,4 @@
-import type { Location } from '@infrastructure/entities/main/location.entity'
+import type { Location } from '@infrastructure/entities/main'
 
 export interface GetManyLocations {
   locations: Location[] | null

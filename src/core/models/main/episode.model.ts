@@ -1,4 +1,4 @@
-import type { Episode } from '@infrastructure/entities/main/episode.entity'
+import type { Episode } from '@infrastructure/entities/main'
 
 export interface GetManyEpisodes {
   episodes: Episode[] | null

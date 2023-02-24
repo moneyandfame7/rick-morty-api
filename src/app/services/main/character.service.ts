@@ -1,17 +1,21 @@
 import { Injectable } from '@nestjs/common'
 import * as sharp from 'sharp'
-import { PutObjectCommandInput } from '@aws-sdk/client-s3'
-import { MainServiceAbstract } from '@core/services/main/main-service.abstract'
-import { Character } from '@infrastructure/entities/main/character.entity'
-import { QueryPaginationDto } from '@app/dto/common/pagination.dto'
-import { CharactersException } from '@common/exceptions/main/characters.exception'
-import { CharacterRepository } from '@infrastructure/repositories/main/character.repository'
-import { CreateCharacterDto, QueryCharacterDto, UpdateCharacterDto } from '@app/dto/main/character.dto'
-import { PaginationService, Presenter } from '@app/services/common/pagination.service'
-import { S3Service } from '@app/services/common/s3.service'
+import type { PutObjectCommandInput } from '@aws-sdk/client-s3'
+
+import { PaginationService, S3Service } from '@app/services/common'
+import { QueryPaginationDto } from '@app/dto/common'
+import { CreateCharacterDto, QueryCharacterDto, UpdateCharacterDto } from '@app/dto/main'
+
+import type { BaseService } from '@core/services/main'
+import type { Presenter } from '@core/services/common'
+
+import { Character } from '@infrastructure/entities/main'
+import { CharacterRepository } from '@infrastructure/repositories/main'
+
+import { CharactersException } from '@common/exceptions/main'
 
 @Injectable()
-export class CharacterService implements MainServiceAbstract<Character, CreateCharacterDto, UpdateCharacterDto, QueryCharacterDto> {
+export class CharacterService implements BaseService<Character, CreateCharacterDto, UpdateCharacterDto, QueryCharacterDto> {
   public constructor(
     private readonly characterRepository: CharacterRepository,
     private readonly s3Service: S3Service,

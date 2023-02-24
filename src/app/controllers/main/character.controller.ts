@@ -5,17 +5,18 @@ import type { Request } from 'express'
 import * as _ from 'lodash'
 import { memoryStorage } from 'multer'
 
-import { CharacterService } from '@app/services/main/character.service'
-import type { Presenter } from '@app/services/common/pagination.service'
-import type { CreateCharacterDto, QueryCharacterDto, UpdateCharacterDto } from '@app/dto/main/character.dto'
-import type { QueryPaginationDto } from '@app/dto/common/pagination.dto'
+import { CharacterService } from '@app/services/main'
+import { CreateCharacterDto, QueryCharacterDto, UpdateCharacterDto } from '@app/dto/main'
+import { QueryPaginationDto } from '@app/dto/common'
 
-import { Character } from '@infrastructure/entities/main/character.entity'
+import type { Presenter } from '@core/services/common'
 
-import { RolesEnum } from '@common/constants/roles.enum'
-import { JwtAuthGuard } from '@common/guards/auth/jwt.guard'
-import { RolesGuard } from '@common/guards/roles.guard'
-import { Roles } from '@common/decorators/roles.decorator'
+import { Character } from '@infrastructure/entities/main'
+
+import { RolesEnum } from '@common/constants'
+import { JwtAuthGuard } from '@common/guards/authorization'
+import { RolesGuard } from '@common/guards/common'
+import { Roles } from '@common/decorators'
 
 @Controller('/api/characters')
 @ApiTags('characters')
