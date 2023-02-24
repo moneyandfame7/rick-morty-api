@@ -1,5 +1,5 @@
-import { Controller, Get, Req, Res, UseGuards } from '@nestjs/common'
-import type { Request, Response } from 'express'
+import { Controller, Get, Res, UseGuards } from '@nestjs/common'
+import type { Response } from 'express'
 
 import { EnvironmentConfigService, TokenService, UserService } from '@app/services/common'
 import { AuthorizationService } from '@app/services/authorization'
@@ -8,6 +8,7 @@ import { BaseAuthorizationController } from '@core/controllers/authorization'
 import type { UserBeforeAuthentication } from '@core/models/common'
 import type { AuthorizationTokens } from '@core/models/authorization'
 
+import { GetUser } from '@common/decorators'
 import { GoogleAuthGuard } from '@common/guards/authorization'
 
 @Controller('/auth/google')
@@ -27,8 +28,7 @@ export class GoogleController extends BaseAuthorizationController {
 
   @Get('/redirect')
   @UseGuards(GoogleAuthGuard)
-  public async redirect(@Req() req: Request, @Res({ passthrough: true }) res: Response): Promise<AuthorizationTokens> {
-    const user = req.user as UserBeforeAuthentication
+  public async redirect(@GetUser() user: UserBeforeAuthentication, @Res({ passthrough: true }) res: Response): Promise<AuthorizationTokens> {
     const tokens = await this.socialLogin(user)
     this.setCookies(res, tokens.refresh_token, tokens.access_token)
     return tokens
