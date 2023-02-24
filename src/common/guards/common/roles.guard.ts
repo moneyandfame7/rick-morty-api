@@ -2,9 +2,9 @@ import { CanActivate, ExecutionContext, Injectable, UnauthorizedException } from
 import { Reflector } from '@nestjs/core'
 import { Request } from 'express'
 
-import { TokenService } from '@app/services/common/token.service'
+import { TokenService } from '@app/services/common'
 
-import { ROLES_KEY } from '../../decorators/roles.decorator'
+import { ROLES_KEY } from '@common/decorators'
 
 @Injectable()
 export class RolesGuard implements CanActivate {

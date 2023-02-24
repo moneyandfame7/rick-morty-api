@@ -8,7 +8,7 @@ import { Role } from '@infrastructure/entities/common'
 
 import { JwtAuthGuard } from '@common/guards/authorization'
 import { Roles } from '@common/decorators'
-import { RolesEnum } from '@common/constants'
+import { ROLES } from '@common/constants'
 import { RolesGuard } from '@common/guards/common'
 
 @Controller('api/roles')
@@ -17,7 +17,7 @@ export class RolesController {
   public constructor(private readonly rolesService: RolesService) {}
 
   @Post()
-  @Roles(RolesEnum.ADMIN)
+  @Roles(ROLES.ADMIN)
   @UseGuards(JwtAuthGuard, RolesGuard)
   public async create(@Body() createRoleDto: CreateRoleDto): Promise<Role> {
     return this.rolesService.createRole(createRoleDto)

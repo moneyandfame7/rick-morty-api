@@ -12,7 +12,7 @@ import type { Presenter } from '@core/services/common'
 import { Character } from '@infrastructure/entities/main'
 import { CharacterRepository } from '@infrastructure/repositories/main'
 
-import { CharactersException } from '@common/exceptions/main'
+import { CharacterException } from '@common/exceptions/main'
 
 @Injectable()
 export class CharacterService implements BaseService<Character, CreateCharacterDto, UpdateCharacterDto, QueryCharacterDto> {
@@ -20,7 +20,7 @@ export class CharacterService implements BaseService<Character, CreateCharacterD
     private readonly characterRepository: CharacterRepository,
     private readonly s3Service: S3Service,
     private readonly paginationService: PaginationService<Character>,
-    private readonly charactersException: CharactersException
+    private readonly charactersException: CharacterException
   ) {}
 
   public async createOne(createCharacterDto: CreateCharacterDto, file: Express.Multer.File): Promise<Character> {

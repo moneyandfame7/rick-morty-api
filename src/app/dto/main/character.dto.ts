@@ -1,11 +1,13 @@
-import { IsArray, IsDate, IsIn, IsNotEmpty, IsNumber, IsObject, IsOptional, IsString } from 'class-validator'
+import { IsArray, IsDate, IsEnum, IsNotEmpty, IsNumber, IsObject, IsOptional, IsString } from 'class-validator'
 import { ApiProperty } from '@nestjs/swagger'
 import { PartialType } from '@nestjs/mapped-types'
 
 import { CreateLocationDto } from '@app/dto/main'
 import { QueryPaginationDto } from '@app/dto/common'
 
-import { Episode } from '@infrastructure/entities/main/episode.entity'
+import { Episode } from '@infrastructure/entities/main'
+
+import { CHARACTER_GENDER, CHARACTER_STATUS } from '@common/constants'
 
 export class CreateCharacterDto {
   @IsNumber()
@@ -21,14 +23,14 @@ export class CreateCharacterDto {
   public type: string
 
   @ApiProperty({ example: 'Alive', description: "The status of the character ('Alive', 'Dead' or 'unknown')." })
-  @IsIn(['Alive', 'Dead', 'unknown'])
+  @IsEnum(CHARACTER_STATUS)
   public status: string
 
   @ApiProperty({
     example: 'Male',
     description: "The gender of the character ('Female', 'Male', 'Genderless' or 'unknown')."
   })
-  @IsIn(['Female', 'Male', 'Genderless', 'unknown'])
+  @IsEnum(CHARACTER_GENDER)
   public gender: string
 
   @ApiProperty({ example: 'Human', description: 'The species of the character.' })
@@ -97,7 +99,7 @@ export class QueryCharacterDto extends QueryPaginationDto {
     required: false
   })
   @IsOptional()
-  @IsIn(['Alive', 'Dead', 'unknown'])
+  @IsEnum(CHARACTER_STATUS)
   @IsString()
   public status?: string
 
@@ -121,8 +123,7 @@ export class QueryCharacterDto extends QueryPaginationDto {
     description: "The gender of the character ('Female', 'Male', 'Genderless' or 'unknown').",
     required: false
   })
-  @IsIn(['Female', 'Male', 'Genderless', 'unknown'])
-  @IsString()
+  @IsEnum(CHARACTER_GENDER)
   public gender?: string
 
   @ApiProperty({ example: 'Pilot', description: 'The name of the episode.', required: false })

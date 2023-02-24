@@ -1,4 +1,4 @@
-import { BadRequestException, Injectable, UnauthorizedException, UnprocessableEntityException } from '@nestjs/common'
+import { Injectable, UnauthorizedException } from '@nestjs/common'
 import * as bcrypt from 'bcrypt'
 import { v4 as uuid } from 'uuid'
 
@@ -9,9 +9,9 @@ import { ResetPasswordDto, UserDetailsDto } from '@app/dto/common'
 import { Token, User } from '@infrastructure/entities/common'
 
 import type { UserBeforeAuthentication } from '@core/models/common'
-import { AuthorizationTokens, JwtPayload } from '@core/models/authorization'
-
-import { UserNotFoundException } from '@common/exceptions/common'
+import type { AuthorizationTokens, JwtPayload } from '@core/models/authorization'
+import { AuthorizationException } from '@common/exceptions/authorization'
+import { UserException } from '@common/exceptions/common'
 
 @Injectable()
 export class AuthorizationService {
@@ -19,17 +19,15 @@ export class AuthorizationService {
     private readonly config: EnvironmentConfigService,
     private readonly userService: UserService,
     private readonly tokenService: TokenService,
-    private readonly mailService: MailService
+    private readonly mailService: MailService,
+    private readonly authorizationException: AuthorizationException,
+    private readonly userException: UserException
   ) {}
 
   public async signup(dto: AuthorizationDto): Promise<AuthorizationTokens> {
-    const errorResponse = {
-      errors: {}
-    }
-    const withSameEmail = await this.userService.getOneByAuthType(dto.email, 'jwt')
-    if (withSameEmail) {
-      errorResponse.errors['email'] = 'the email address is already taken'
-      throw new UnprocessableEntityException(errorResponse)
+    const exists = await this.userService.getOneByAuthType(dto.email, 'jwt')
+    if (exists) {
+      throw this.authorizationException.alreadyUsedEmail(exists.email)
     }
     const hashedPassword = await this.hashPassword(dto.password)
     const verify_link = uuid()
@@ -108,30 +106,22 @@ export class AuthorizationService {
   }
 
   public async verify(link: string): Promise<AuthorizationTokens> {
-    const errorResponse = {
-      errors: {}
-    }
     const user = await this.userService.getOneByVerifyLink(link)
 
     if (!user) {
-      errorResponse.errors['link'] = 'Incorrect verification link'
-      throw new BadRequestException('Incorrect verification link')
+      throw this.authorizationException.incorrectVerificationLink()
     }
     if (user.is_verified) {
-      throw new BadRequestException('User already verified')
+      throw this.authorizationException.alreadyVerified()
     }
     const updated = await this.userService.updateOne(user.id, { is_verified: true })
     return this.buildUserInfoAndTokens(updated)
   }
 
   public async forgot(email: string): Promise<string> {
-    const errorResponse = {
-      errors: {}
-    }
     const user = await this.userService.getOneByAuthType(email, 'jwt')
     if (!user) {
-      errorResponse.errors['email'] = 'Incorrect email'
-      throw new UserNotFoundException()
+      throw this.authorizationException.incorrectEmail()
     }
     const payload = {
       id: user.id,
@@ -146,23 +136,18 @@ export class AuthorizationService {
   }
 
   public async reset(id: string, token: string, dto: ResetPasswordDto): Promise<AuthorizationTokens> {
-    const errorResponse = {
-      errors: {}
-    }
     const user = await this.userService.getOneById(id)
 
     if (!user) {
-      throw new UserNotFoundException()
+      throw this.userException.withIdNotFound(id)
     }
     const compare = await this.comparePassword(dto.password, user.password)
     if (compare) {
-      errorResponse.errors['password'] = 'Password is equal to old password'
-      throw new BadRequestException(errorResponse)
+      throw this.authorizationException.passwordIsEqualToOld()
     }
     this.tokenService.validateTempToken(token)
     if (dto.password !== dto.confirmPassword) {
-      errorResponse.errors['password'] = "Password don't match"
-      throw new BadRequestException(errorResponse)
+      throw this.authorizationException.passwordDontMatch()
     }
     const hashedPassword = await this.hashPassword(dto.password)
     const updated = await this.userService.updateOne(id, { password: hashedPassword })
@@ -176,19 +161,14 @@ export class AuthorizationService {
   }
 
   private async validateUser(userDto: AuthorizationDto): Promise<User> {
-    const errorResponse = {
-      errors: {}
-    }
     const user = await this.userService.getOneByAuthType(userDto.email, 'jwt')
     if (!user) {
-      errorResponse.errors['email'] = 'Incorrect email'
-      throw new UnprocessableEntityException(errorResponse)
+      throw this.authorizationException.incorrectEmail()
     }
 
     const passwordEquals = await this.comparePassword(userDto.password, user.password)
     if (!passwordEquals) {
-      errorResponse.errors['password'] = 'Incorrect password'
-      throw new UnprocessableEntityException(errorResponse)
+      throw this.authorizationException.incorrectPassword()
     }
 
     return user

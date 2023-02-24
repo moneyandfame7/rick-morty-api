@@ -1,19 +1,18 @@
 import { DataSource } from 'typeorm'
-import { Seeder } from 'typeorm-extension'
+import type { Seeder } from 'typeorm-extension'
 
-import { Episode } from '@infrastructure/entities/main/episode.entity'
+import type { EpisodeResponse } from '../interfaces'
 
-import { fetchData } from '@common/utils/fetch-data'
-import { getIdFromUrl } from '@common/utils/get-id-from-url'
+import { Episode } from '@infrastructure/entities/main'
 
-import { IEpisode } from './2_episode.seeder'
+import { fetchData, getIdFromUrl } from '@common/utils'
 
 export class CharacterToEpisodeSeeder implements Seeder {
   public async run(dataSource: DataSource): Promise<void> {
     try {
       const episodeRepository = dataSource.getRepository(Episode)
 
-      const responseEpisode = await fetchData<IEpisode>('https://rickandmortyapi.com/api/episode')
+      const responseEpisode = await fetchData<EpisodeResponse>('https://rickandmortyapi.com/api/episode')
       const _episodes = await episodeRepository.find()
       for (let i = 0; i < responseEpisode.length; i++) {
         for (let j = 0; j < responseEpisode[i].characters.length; j++) {

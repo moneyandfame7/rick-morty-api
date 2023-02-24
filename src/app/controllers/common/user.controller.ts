@@ -11,7 +11,7 @@ import { User } from '@infrastructure/entities/common'
 
 import { Roles } from '@common/decorators'
 import { RolesGuard } from '@common/guards/common'
-import { RolesEnum } from '@common/constants'
+import { ROLES } from '@common/constants'
 import { JwtAuthGuard } from '@common/guards/authorization'
 
 @Controller('api/users')
@@ -44,7 +44,7 @@ export class UserController {
   }
 
   @Delete(':id')
-  @Roles(RolesEnum.ADMIN)
+  @Roles(ROLES.ADMIN)
   @UseGuards(JwtAuthGuard, RolesGuard)
   public async removeOne(@Param('id') id: string): Promise<User> {
     return this.userService.removeOne(id)
@@ -52,7 +52,7 @@ export class UserController {
 
   @ApiOperation({ summary: 'Give a role' })
   @ApiResponse({ status: 200 })
-  @Roles(RolesEnum.ADMIN)
+  @Roles(ROLES.ADMIN)
   @UseGuards(JwtAuthGuard, RolesGuard)
   @Post('/role')
   public async addRole(@Body() addRoleDto: AddRoleDto): Promise<User> {
@@ -61,7 +61,7 @@ export class UserController {
 
   @ApiOperation({ summary: 'Ban a user' })
   @ApiResponse({ status: 200 })
-  @Roles(RolesEnum.ADMIN)
+  @Roles(ROLES.ADMIN)
   @UseGuards(JwtAuthGuard, RolesGuard)
   @Post('/ban')
   public async ban(@Body() banUserDto: BanUserDto): Promise<User> {

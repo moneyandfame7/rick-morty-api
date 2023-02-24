@@ -1,12 +1,12 @@
-import { IsIn, IsInt, IsOptional, IsString, Max, Min } from 'class-validator'
+import { IsEnum, IsInt, IsOptional, IsString, Max, Min } from 'class-validator'
 import { Type } from 'class-transformer'
 
-import { Order } from '@common/constants'
+import { ORDER } from '@common/constants'
 
 export class QueryPaginationDto {
-  @IsIn(['DESC', 'ASC'])
+  @IsEnum(ORDER)
   @IsOptional()
-  public readonly order?: Order = Order.ASC
+  public readonly order?: ORDER = ORDER.ASC
 
   @Type(() => Number)
   @IsInt()
