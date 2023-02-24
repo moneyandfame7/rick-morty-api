@@ -19,15 +19,12 @@
     "forceConsistentCasingInFileNames": false,
     "noFallthroughCasesInSwitch": false,
     "paths": {
-      "@common/*": ["src/infrastructure/common/*"],
-      "@config/*": ["src/infrastructure/config/*"],
-      "@dto/*": ["src/infrastructure/dto/*"],
-      "@controllers/*": ["src/infrastructure/controllers/*"],
-      "@services/*": ["src/infrastructure/services/*"],
-      "@repositories/*": ["src/infrastructure/repositories/*"],
-      "@entities/*": ["src/infrastructure/entities/*"],
-      "@modules/*": ["src/infrastructure/modules/*"],
-      "@domain/*": ["src/domain/*"],
-    },
+      "@app/*": ["src/app/*"],
+      "@common/*": ["src/common/*"],
+      "@config/*": ["src/config/*"],
+      "@core/*": ["src/core/*"],
+      "@infrastructure/*": ["src/infrastructure/*"],
+      "@modules/*": ["src/modules/*"]
+    }
   }
 }

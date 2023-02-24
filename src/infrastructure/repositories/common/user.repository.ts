@@ -1,7 +1,9 @@
-import { DataSource, Repository, type SelectQueryBuilder } from 'typeorm'
+import { DataSource, Repository, SelectQueryBuilder } from 'typeorm'
 import { Injectable } from '@nestjs/common'
-import { User } from '@entities/common/user.entity'
-import type { CreateUserDto, UpdateUserDto } from '@dto/common/user.dto'
+
+import { CreateUserDto, UpdateUserDto } from '@app/dto/common/user.dto'
+
+import { User } from '@infrastructure/entities/common/user.entity'
 
 @Injectable()
 export class UserRepository extends Repository<User> {

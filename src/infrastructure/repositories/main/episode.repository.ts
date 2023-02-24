@@ -1,13 +1,16 @@
-import { DataSource, type SelectQueryBuilder } from 'typeorm'
+import { DataSource, SelectQueryBuilder } from 'typeorm'
 import { Injectable } from '@nestjs/common'
-import { Episode } from '@entities/main/episode.entity'
-import type { QueryPaginationDto } from '@dto/common/pagination.dto'
-import type { CreateEpisodeDto, QueryEpisodeDto, UpdateEpisodeDto } from '@dto/main/episode.dto'
-import { BaseRepository } from '@domain/repositories/base-repository.abstract'
-import type { GetManyEpisodes } from '@domain/models/main/episode.model'
+
+import type { CreateEpisodeDto, QueryEpisodeDto, UpdateEpisodeDto } from '@app/dto/main/episode.dto'
+import type { QueryPaginationDto } from '@app/dto/common/pagination.dto'
+
+import type { GetManyEpisodes } from '@core/models/main/episode.model'
+import { MainRepositoryAbstract } from '@core/repositories/main-repository.abstract'
+
+import { Episode } from '@infrastructure/entities/main/episode.entity'
 
 @Injectable()
-export class EpisodeRepository extends BaseRepository<Episode, QueryEpisodeDto, CreateEpisodeDto, UpdateEpisodeDto, GetManyEpisodes> {
+export class EpisodeRepository extends MainRepositoryAbstract<Episode, QueryEpisodeDto, CreateEpisodeDto, UpdateEpisodeDto, GetManyEpisodes> {
   public constructor(protected dataSource: DataSource) {
     super(dataSource, 'episode', Episode)
   }

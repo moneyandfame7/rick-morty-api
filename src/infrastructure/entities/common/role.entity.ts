@@ -1,5 +1,6 @@
 import { ApiProperty } from '@nestjs/swagger'
 import { Column, Entity, JoinTable, OneToMany, PrimaryGeneratedColumn } from 'typeorm'
+
 import { User } from './user.entity'
 
 @Entity('roles')

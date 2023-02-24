@@ -40,12 +40,13 @@ module.exports = {
     '@typescript-eslint/return-await': 'off',
     '@typescript-eslint/type-annotation-spacing': 'off',
     '@typescript-eslint/space-infix-ops': 'off',
-    '@typescript-eslint/consistent-type-import': 'off',
+    '@typescript-eslint/consistent-type-imports': 'off',
     '@typescript-eslint/restrict-template-expressions': 'off',
     '@typescript-eslint/naming-convention': 'off',
     '@typescript-eslint/indent': 'off',
     '@typescript-eslint/no-unused-expressions': 'off',
     '@typescript-eslint/no-unused-vars': 'warn',
-    '@typescript-eslint/explicit-member-accessibility': 'error'
+    '@typescript-eslint/explicit-member-accessibility': 'error',
+    '@typescript-eslint/explicit-function-return-type': 'off'
   }
 }

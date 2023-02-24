@@ -1,6 +1,7 @@
-import { DataSource, Repository, type SelectQueryBuilder } from 'typeorm'
+import { DataSource, Repository, SelectQueryBuilder } from 'typeorm'
 import { Injectable } from '@nestjs/common'
-import { Token } from '@entities/common/token.entity'
+
+import { Token } from '@infrastructure/entities/common/token.entity'
 
 @Injectable()
 export class TokenRepository extends Repository<Token> {

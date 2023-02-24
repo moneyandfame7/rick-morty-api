@@ -1,13 +1,16 @@
 import { DataSource, type SelectQueryBuilder } from 'typeorm'
 import { Injectable } from '@nestjs/common'
-import { Character } from '@entities/main/character.entity'
-import { BaseRepository } from '@domain/repositories/base-repository.abstract'
-import type { CreateCharacterDto, QueryCharacterDto, UpdateCharacterDto } from '@dto/main/character.dto'
-import type { QueryPaginationDto } from '@dto/common/pagination.dto'
-import type { GetManyCharacters } from '@domain/models/main/character.model'
+
+import type { CreateCharacterDto, QueryCharacterDto, UpdateCharacterDto } from '@app/dto/main/character.dto'
+import type { QueryPaginationDto } from '@app/dto/common/pagination.dto'
+
+import { MainRepositoryAbstract } from '@core/repositories/main-repository.abstract'
+import type { GetManyCharacters } from '@core/models/main/character.model'
+
+import { Character } from '@infrastructure/entities/main/character.entity'
 
 @Injectable()
-export class CharacterRepository extends BaseRepository<Character, QueryCharacterDto, CreateCharacterDto, UpdateCharacterDto, GetManyCharacters> {
+export class CharacterRepository extends MainRepositoryAbstract<Character, QueryCharacterDto, CreateCharacterDto, UpdateCharacterDto, GetManyCharacters> {
   public constructor(protected dataSource: DataSource) {
     super(dataSource, 'character', Character)
   }

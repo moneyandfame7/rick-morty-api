@@ -1,7 +1,7 @@
-import { DataSource, Repository, type SelectQueryBuilder } from 'typeorm'
+import { DataSource, Repository, SelectQueryBuilder } from 'typeorm'
 import { Injectable } from '@nestjs/common'
-import { Role } from '@entities/common/role.entity'
-import type { CreateRoleDto } from '@dto/common/roles.dto'
+import { Role } from '@infrastructure/entities/common/role.entity'
+import { CreateRoleDto } from '@app/dto/common/roles.dto'
 
 @Injectable()
 export class RolesRepository extends Repository<Role> {

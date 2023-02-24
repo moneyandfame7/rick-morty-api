@@ -1,7 +1,7 @@
 import { ApiProperty } from '@nestjs/swagger'
 import { Column, CreateDateColumn, Entity, JoinTable, ManyToMany, ManyToOne, PrimaryGeneratedColumn } from 'typeorm'
-import { Episode } from '@entities/main/episode.entity'
-import { Location } from '@entities/main/location.entity'
+import { Episode } from './episode.entity'
+import { Location } from './location.entity'
 
 @Entity('characters')
 export class Character {
