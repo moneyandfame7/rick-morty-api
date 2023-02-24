@@ -1,19 +1,26 @@
 import { DataSource, type SelectQueryBuilder } from 'typeorm'
 import { Injectable } from '@nestjs/common'
-import { Character } from '@entities/main/character.entity'
-import { BaseRepository } from '@domain/repositories/base-repository.abstract'
-import type { CreateCharacterDto, QueryCharacterDto, UpdateCharacterDto } from '@dto/main/character.dto'
-import type { QueryPaginationDto } from 'src/infrastructure/dto/common/pagination.dto'
-import type { GetManyCharacters } from 'src/domain/models/main/character.model'
+
+import type { CreateCharacterDto, QueryCharacterDto, UpdateCharacterDto } from '@app/dto/main/character.dto'
+import type { QueryPaginationDto } from '@app/dto/common/pagination.dto'
+
+import { MainRepositoryAbstract } from '@core/repositories/main-repository.abstract'
+import type { GetManyCharacters } from '@core/models/main/character.model'
+
+import { Character } from '@infrastructure/entities/main/character.entity'
 
 @Injectable()
-export class CharacterRepository extends BaseRepository<Character, QueryCharacterDto, CreateCharacterDto, UpdateCharacterDto, GetManyCharacters> {
-  constructor(protected dataSource: DataSource) {
+export class CharacterRepository extends MainRepositoryAbstract<Character, QueryCharacterDto, CreateCharacterDto, UpdateCharacterDto, GetManyCharacters> {
+  public constructor(protected dataSource: DataSource) {
     super(dataSource, 'character', Character)
   }
 
   protected buildQueries(builder: SelectQueryBuilder<Character>, queries: QueryCharacterDto): void {
-    queries.id ? builder.where('character.id IN (:...ids)', { ids: queries.id }) : null
+    if (queries.id) {
+      const ids = this.toCorrectQuerieIds(queries.id)
+
+      queries.id ? builder.where('character.id IN (:...ids)', { ids }) : null
+    }
 
     queries.name ? builder.andWhere('character.name ilike :name', { name: `%${queries.name}%` }) : null
 

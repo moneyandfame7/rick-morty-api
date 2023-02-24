@@ -1,11 +1,13 @@
-import { DataSource, Repository, type SelectQueryBuilder } from 'typeorm'
+import { DataSource, Repository, SelectQueryBuilder } from 'typeorm'
 import { Injectable } from '@nestjs/common'
-import { User } from '@entities/common/user.entity'
-import type { CreateUserDto, UpdateUserDto } from '@dto/common/user.dto'
+
+import { CreateUserDto, UpdateUserDto } from '@app/dto/common/user.dto'
+
+import { User } from '@infrastructure/entities/common/user.entity'
 
 @Injectable()
 export class UserRepository extends Repository<User> {
-  constructor(private readonly dataSource: DataSource) {
+  public constructor(private readonly dataSource: DataSource) {
     super(User, dataSource.createEntityManager())
   }
 
@@ -20,12 +22,7 @@ export class UserRepository extends Repository<User> {
   public async createOne(createUserDto: CreateUserDto): Promise<User> {
     const queryBuilder = this.builder
     // todo: fix any
-    const created = await queryBuilder
-      .insert()
-      .into(User)
-      .values(createUserDto as any)
-      .returning('*')
-      .execute()
+    const created = await queryBuilder.insert().into(User).values(createUserDto).returning('*').execute()
 
     return created.raw[0]
   }
@@ -47,13 +44,7 @@ export class UserRepository extends Repository<User> {
   public async updateOne(id: User['id'], updateUserDto: UpdateUserDto): Promise<User> {
     const queryBuilder = this.builder
     this.buildRelations(queryBuilder)
-    // todo: fix any
-    const updated = await queryBuilder
-      .update(User)
-      .set(updateUserDto as any)
-      .where('id = :id', { id })
-      .returning('*')
-      .execute()
+    const updated = await queryBuilder.update(User).set(updateUserDto).where('id = :id', { id }).returning('*').execute()
 
     return updated.raw[0]
   }

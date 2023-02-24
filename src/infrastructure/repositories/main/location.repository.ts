@@ -1,19 +1,23 @@
 import { DataSource, type SelectQueryBuilder } from 'typeorm'
 import { Injectable } from '@nestjs/common'
-import { Location } from '@entities/main/location.entity'
-import { BaseRepository } from '@domain/repositories/base-repository.abstract'
-import type { QueryPaginationDto } from '@dto/common/pagination.dto'
-import type { CreateLocationDto, QueryLocationDto, UpdateLocationDto } from '@dto/main/location.dto'
-import type { GetManyLocations } from '@domain/models/main/location.model'
+import { MainRepositoryAbstract } from '@core/repositories/main-repository.abstract'
+import type { CreateLocationDto, QueryLocationDto, UpdateLocationDto } from '@app/dto/main/location.dto'
+import type { QueryPaginationDto } from '@app/dto/common/pagination.dto'
+import type { GetManyLocations } from '@core/models/main/location.model'
+import { Location } from '@infrastructure/entities/main/location.entity'
 
 @Injectable()
-export class LocationRepository extends BaseRepository<Location, QueryLocationDto, CreateLocationDto, UpdateLocationDto, GetManyLocations> {
-  constructor(protected dataSource: DataSource) {
+export class LocationRepository extends MainRepositoryAbstract<Location, QueryLocationDto, CreateLocationDto, UpdateLocationDto, GetManyLocations> {
+  public constructor(protected dataSource: DataSource) {
     super(dataSource, 'location', Location)
   }
 
   protected buildQueries(builder: SelectQueryBuilder<Location>, queries: QueryLocationDto): void {
-    queries.id ? builder.where('location.id IN (:...ids)', { ids: queries.id }) : null
+    if (queries.id) {
+      const ids = this.toCorrectQuerieIds(queries.id)
+
+      queries.id ? builder.where('location.id IN (:...ids)', { ids }) : null
+    }
 
     queries.name ? builder.andWhere('location.name ilike :name', { name: `%${queries.name}%` }) : null
 
