@@ -1,5 +1,5 @@
 <p align="center">
-  <a href="https://rick-morty-sand.vercel.app" target="blank"><img src="https://www.freepnglogos.com/uploads/rick-and-morty-png/rick-and-morty-portal-shoes-white-clothing-zavvi-23.png" width="300" alt="Nest Logo" /></a>
+  <a href="https://rick-morty-sand.vercel.app" target="_blank"><img src="https://www.freepnglogos.com/uploads/rick-and-morty-png/rick-and-morty-portal-shoes-white-clothing-zavvi-23.png" width="300" alt="Nest Logo" /></a>
 </p>
 
 # The Rick&Morty API
