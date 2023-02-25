@@ -2,7 +2,7 @@ import { Module } from '@nestjs/common'
 import { PassportModule } from '@nestjs/passport'
 import { JwtModule } from '@nestjs/jwt'
 
-import { AuthController } from '@app/controllers/authorization'
+import { AuthorizationController } from '@app/controllers/authorization'
 import { AuthorizationService } from '@app/services/authorization'
 
 import { AuthorizationException } from '@common/exceptions/authorization'
@@ -13,7 +13,7 @@ import { ApiErrorModule, EnvironmentConfigModule, MailModule, TokenModule, UserM
 
 @Module({
   imports: [JwtModule.register({ secret: process.env.AT_SECRET }), EnvironmentConfigModule, UserModule, PassportModule, TokenModule, MailModule, ApiErrorModule],
-  controllers: [AuthController],
+  controllers: [AuthorizationController],
   providers: [AuthorizationService, AuthorizationException, UserException, JwtStrategy, GoogleStrategy, GithubStrategy, DiscordStrategy, SpotifyStrategy],
   exports: [AuthorizationService, JwtModule]
 })

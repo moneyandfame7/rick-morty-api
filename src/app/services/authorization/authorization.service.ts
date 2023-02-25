@@ -13,6 +13,7 @@ import type { AuthorizationTokens, JwtPayload } from '@core/models/authorization
 
 import { AuthorizationException } from '@common/exceptions/authorization'
 import { UserException } from '@common/exceptions/common'
+import { AUTHORIZATION_PROVIDER } from '@common/constants'
 
 @Injectable()
 export class AuthorizationService {
@@ -26,7 +27,7 @@ export class AuthorizationService {
   ) {}
 
   public async signup(dto: AuthorizationDto): Promise<AuthorizationTokens> {
-    const exists = await this.userService.getOneByAuthType(dto.email, 'jwt')
+    const exists = await this.userService.getOneByAuthType(dto.email, AUTHORIZATION_PROVIDER.JWT)
     if (exists) {
       throw this.authorizationException.alreadyUsedEmail(exists.email)
     }
@@ -35,7 +36,7 @@ export class AuthorizationService {
     const info: UserBeforeAuthentication = {
       email: dto.email,
       password: hashedPassword,
-      auth_type: 'jwt',
+      auth_type: AUTHORIZATION_PROVIDER.JWT,
       is_verified: false,
       verify_link
     }
@@ -120,7 +121,7 @@ export class AuthorizationService {
   }
 
   public async forgot(email: string): Promise<string> {
-    const user = await this.userService.getOneByAuthType(email, 'jwt')
+    const user = await this.userService.getOneByAuthType(email, AUTHORIZATION_PROVIDER.JWT)
     if (!user) {
       throw this.authorizationException.incorrectEmail()
     }
@@ -162,7 +163,7 @@ export class AuthorizationService {
   }
 
   private async validateUser(userDto: AuthorizationDto): Promise<User> {
-    const user = await this.userService.getOneByAuthType(userDto.email, 'jwt')
+    const user = await this.userService.getOneByAuthType(userDto.email, AUTHORIZATION_PROVIDER.JWT)
     if (!user) {
       throw this.authorizationException.incorrectEmail()
     }

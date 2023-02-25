@@ -10,8 +10,10 @@ import type { AuthorizationTokens } from '@core/models/authorization'
 
 import { GetUser } from '@common/decorators'
 import { GithubAuthGuard } from '@common/guards/authorization'
+import { ApiTags } from '@nestjs/swagger'
 
 @Controller('/auth/github')
+@ApiTags('github auth')
 export class GithubController extends BaseAuthorizationController {
   public constructor(
     protected readonly config: EnvironmentConfigService,

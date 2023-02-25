@@ -1,5 +1,5 @@
-import { Body, Controller, Delete, Get, Param, ParseIntPipe, Patch, Post, Query, Req, UseGuards, ValidationPipe } from '@nestjs/common'
-import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger'
+import { Body, Controller, Param, ParseIntPipe, Query, Req, ValidationPipe } from '@nestjs/common'
+import { ApiTags } from '@nestjs/swagger'
 import type { Request } from 'express'
 import * as _ from 'lodash'
 
@@ -12,28 +12,20 @@ import type { Presenter } from '@core/services/common'
 
 import { Episode } from '@infrastructure/entities/main'
 
-import { Roles } from '@common/decorators'
-import { ROLES } from '@common/constants'
-import { JwtAuthGuard } from '@common/guards/authorization'
-import { RolesGuard } from '@common/guards/common'
+import { EPISODE_OPERATION } from '@common/swagger/main'
+import { ApiEntitiesOperation } from '@common/decorators'
 
 @Controller('/api/episodes')
 @ApiTags('/episodes')
 export class EpisodeController {
   public constructor(private readonly episodeService: EpisodeService) {}
 
-  @Post()
-  @ApiOperation({ summary: 'create and save a new episode to collection' })
-  @ApiResponse({ status: 200, type: Episode })
-  @Roles(ROLES.ADMIN)
-  @UseGuards(JwtAuthGuard, RolesGuard)
+  @ApiEntitiesOperation(EPISODE_OPERATION.CREATE)
   public async createOne(@Body() createEpisodeDto: CreateEpisodeDto): Promise<Episode> {
     return this.episodeService.createOne(createEpisodeDto)
   }
 
-  @Get()
-  @ApiOperation({ summary: 'get all episodes by queries' })
-  @ApiResponse({ status: 200, type: [Episode] })
+  @ApiEntitiesOperation(EPISODE_OPERATION.GET_MANY)
   public async getMany(@Query(new ValidationPipe({ transform: true })) query: QueryEpisodeDto, @Req() req: Request): Promise<Presenter<Episode>> {
     const queryPaginationDto: QueryPaginationDto = {
       take: query.take,
@@ -55,28 +47,17 @@ export class EpisodeController {
     return this.episodeService.getMany(queryPaginationDto, queryEpisodeDto as QueryEpisodeDto)
   }
 
-  @Get(':id')
-  @ApiOperation({ summary: 'get one episode with specified id' })
-  @ApiResponse({ status: 200, type: Episode })
-  @UseGuards(JwtAuthGuard)
+  @ApiEntitiesOperation(EPISODE_OPERATION.GET_ONE)
   public async getOne(@Param('id', ParseIntPipe) id: number): Promise<Episode> {
     return this.episodeService.getOne(id)
   }
 
-  @Patch(':id')
-  @ApiOperation({ summary: 'update one episode with specified id' })
-  @ApiResponse({ status: 200, type: Episode })
-  @Roles(ROLES.ADMIN)
-  @UseGuards(JwtAuthGuard, RolesGuard)
+  @ApiEntitiesOperation(EPISODE_OPERATION.UPDATE)
   public async updateOne(@Param('id', ParseIntPipe) id: number, @Body() updateEpisodeDto: UpdateEpisodeDto): Promise<Episode> {
     return this.episodeService.updateOne(id, updateEpisodeDto)
   }
 
-  @Delete(':id')
-  @ApiOperation({ summary: 'remove one episode with specified id' })
-  @ApiResponse({ status: 200, type: Episode })
-  @Roles(ROLES.ADMIN)
-  @UseGuards(JwtAuthGuard, RolesGuard)
+  @ApiEntitiesOperation(EPISODE_OPERATION.REMOVE)
   public async removeOne(@Param('id', ParseIntPipe) id: number): Promise<Episode> {
     return this.episodeService.removeOne(id)
   }

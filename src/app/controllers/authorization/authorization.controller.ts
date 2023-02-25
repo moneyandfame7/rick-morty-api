@@ -7,16 +7,16 @@ import { EnvironmentConfigService, TokenService, UserService } from '@app/servic
 import { EmailDto, ResetPasswordDto, UserDetailsDto } from '@app/dto/common'
 import { AuthorizationDto } from '@app/dto/authorization'
 
+import { Token } from '@infrastructure/entities/common'
+
 import { BaseAuthorizationController } from '@core/controllers/authorization'
 import type { AuthorizationTokens, JwtPayload } from '@core/models/authorization'
-
-import { Token } from '@infrastructure/entities/common'
 
 import { JwtAuthGuard } from '@common/guards/authorization'
 
 @Controller('/auth')
 @ApiTags('/auth')
-export class AuthController extends BaseAuthorizationController {
+export class AuthorizationController extends BaseAuthorizationController {
   public constructor(
     protected readonly config: EnvironmentConfigService,
     protected readonly authService: AuthorizationService,

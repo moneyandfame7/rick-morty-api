@@ -10,8 +10,10 @@ import type { AuthorizationTokens } from '@core/models/authorization'
 
 import { GetUser } from '@common/decorators'
 import { GoogleAuthGuard } from '@common/guards/authorization'
+import { ApiTags } from '@nestjs/swagger'
 
 @Controller('/auth/google')
+@ApiTags('google auth')
 export class GoogleController extends BaseAuthorizationController {
   public constructor(
     protected readonly config: EnvironmentConfigService,
