@@ -4,5 +4,18 @@
   "tabWidth": 2,
   "arrowParens": "avoid",
   "semi": false,
-  "printWidth": 180
+  "printWidth": 140,
+  "plugins": [
+    "prettier-plugin-sort-imports"
+  ],
+  "importOrder": [
+    ",^@app/(.*)$",
+    "^@infrastructure/(.*)$",
+    ",^@core/(.*)$",
+    ",^@common/(.*)$",
+    "^@modules/(.*)$",
+    "^[./]"
+  ],
+  "importOrderSeparation": true,
+  "importOrderSortSpecifiers": true
 }

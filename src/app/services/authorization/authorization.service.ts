@@ -10,6 +10,7 @@ import { Token, User } from '@infrastructure/entities/common'
 
 import type { UserBeforeAuthentication } from '@core/models/common'
 import type { AuthorizationTokens, JwtPayload } from '@core/models/authorization'
+
 import { AuthorizationException } from '@common/exceptions/authorization'
 import { UserException } from '@common/exceptions/common'
 
@@ -22,7 +23,8 @@ export class AuthorizationService {
     private readonly mailService: MailService,
     private readonly authorizationException: AuthorizationException,
     private readonly userException: UserException
-  ) {}
+  ) {
+  }
 
   public async signup(dto: AuthorizationDto): Promise<AuthorizationTokens> {
     const exists = await this.userService.getOneByAuthType(dto.email, 'jwt')

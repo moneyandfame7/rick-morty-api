@@ -6,11 +6,11 @@ import { PaginationService, S3Service } from '@app/services/common'
 import { QueryPaginationDto } from '@app/dto/common'
 import { CreateCharacterDto, QueryCharacterDto, UpdateCharacterDto } from '@app/dto/main'
 
-import type { BaseService } from '@core/services/main'
-import type { Presenter } from '@core/services/common'
-
 import { Character } from '@infrastructure/entities/main'
 import { CharacterRepository } from '@infrastructure/repositories/main'
+
+import type { BaseService } from '@core/services/main'
+import type { Presenter } from '@core/services/common'
 
 import { CharacterException } from '@common/exceptions/main'
 

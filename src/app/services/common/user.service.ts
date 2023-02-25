@@ -5,10 +5,10 @@ import type { PutObjectCommandInput } from '@aws-sdk/client-s3'
 import { RolesService, S3Service, TokenService } from '@app/services/common'
 import { AddRoleDto, BanUserDto, CreateUserDto, UpdateUserDto } from '@app/dto/common'
 
-import { UserException } from '@common/exceptions/common'
+import { UserRepository } from '@infrastructure/repositories/common'
+import { User } from '@infrastructure/entities/common'
 
-import { UserRepository } from '@infrastructure/repositories/common/user.repository'
-import { User } from '@infrastructure/entities/common/user.entity'
+import { UserException } from '@common/exceptions/common'
 
 @Injectable()
 export class UserService {

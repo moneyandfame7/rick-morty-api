@@ -4,11 +4,11 @@ import { PaginationService } from '@app/services/common'
 import type { CreateLocationDto, QueryLocationDto, UpdateLocationDto } from '@app/dto/main'
 import type { QueryPaginationDto } from '@app/dto/common'
 
-import type { BaseService } from '@core/services/main'
-import type { Presenter } from '@core/services/common'
-
 import { LocationRepository } from '@infrastructure/repositories/main'
 import { Location } from '@infrastructure/entities/main'
+
+import type { BaseService } from '@core/services/main'
+import type { Presenter } from '@core/services/common'
 
 import { LocationException } from '@common/exceptions/main'
 

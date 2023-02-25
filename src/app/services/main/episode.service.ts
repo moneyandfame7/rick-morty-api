@@ -4,11 +4,11 @@ import { PaginationService } from '@app/services/common'
 import { CreateEpisodeDto, QueryEpisodeDto, UpdateEpisodeDto } from '@app/dto/main'
 import { QueryPaginationDto } from '@app/dto/common'
 
-import type { BaseService } from '@core/services/main'
-import type { Presenter } from '@core/services/common'
-
 import { Episode } from '@infrastructure/entities/main'
 import { EpisodeRepository } from '@infrastructure/repositories/main'
+
+import type { BaseService } from '@core/services/main'
+import type { Presenter } from '@core/services/common'
 
 import { EpisodeException } from '@common/exceptions/main'
 

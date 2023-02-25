@@ -3,11 +3,11 @@ import { JwtService } from '@nestjs/jwt'
 
 import { EnvironmentConfigService } from '@app/services/common'
 
-import type { GeneratedTokens } from '@core/models/common'
-import type { JwtPayload, TempJwtPayload } from '@core/models/authorization'
-
 import { TokenRepository } from '@infrastructure/repositories/common'
 import { Token, User } from '@infrastructure/entities/common'
+
+import type { GeneratedTokens } from '@core/models/common'
+import type { JwtPayload, TempJwtPayload } from '@core/models/authorization'
 
 @Injectable()
 export class TokenService {
