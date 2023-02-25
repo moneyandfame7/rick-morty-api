@@ -15,7 +15,7 @@ export class CharacterException {
   }
 
   public alreadyExists(): HttpException {
-    return this.apiErrorService.throwErrorResponse('character', 'Character with similar characteristics already exists', HttpStatus.UNPROCESSABLE_ENTITY)
+    return this.apiErrorService.throwErrorResponse('character', 'Character with similar characteristics already exists', HttpStatus.CONFLICT)
   }
 
   public emptyFile(): HttpException {

@@ -21,7 +21,6 @@ export class UserRepository extends Repository<User> {
 
   public async createOne(createUserDto: CreateUserDto): Promise<User> {
     const queryBuilder = this.builder
-    // todo: fix any
     const created = await queryBuilder.insert().into(User).values(createUserDto).returning('*').execute()
 
     return created.raw[0]

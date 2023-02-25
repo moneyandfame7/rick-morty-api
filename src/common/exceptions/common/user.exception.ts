@@ -19,10 +19,10 @@ export class UserException {
   }
 
   public alreadyExistsWithEmail(email: string): HttpException {
-    return this.apiErrorService.throwErrorResponse('value', `User with email ${email} already exists`, HttpStatus.UNPROCESSABLE_ENTITY)
+    return this.apiErrorService.throwErrorResponse('value', `User with email ${email} already exists`, HttpStatus.CONFLICT)
   }
 
   public alreadyExistsWithUsername(username: string): HttpException {
-    return this.apiErrorService.throwErrorResponse('username', `User with username ${username} already exists`, HttpStatus.UNPROCESSABLE_ENTITY)
+    return this.apiErrorService.throwErrorResponse('username', `User with username ${username} already exists`, HttpStatus.CONFLICT)
   }
 }

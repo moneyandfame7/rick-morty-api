@@ -15,7 +15,7 @@ export class EpisodeException {
   }
 
   public alreadyExists(name: string): HttpException {
-    return this.apiErrorService.throwErrorResponse('episode', `Episode with name ${name} already exists`, HttpStatus.UNPROCESSABLE_ENTITY)
+    return this.apiErrorService.throwErrorResponse('episode', `Episode with name ${name} already exists`, HttpStatus.CONFLICT)
   }
 
   //

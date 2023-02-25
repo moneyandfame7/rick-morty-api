@@ -15,7 +15,7 @@ export class LocationException {
   }
 
   public alreadyExists(name: string): HttpException {
-    return this.apiErrorService.throwErrorResponse('location', `Location with name ${name} already exists`, HttpStatus.UNPROCESSABLE_ENTITY)
+    return this.apiErrorService.throwErrorResponse('location', `Location with name ${name} already exists`, HttpStatus.CONFLICT)
   }
 
   //

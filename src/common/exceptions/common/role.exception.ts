@@ -15,6 +15,6 @@ export class RolesException {
   }
 
   public alreadyExists(value: string): HttpException {
-    return this.apiErrorService.throwErrorResponse('value', `Role ${value} already exists`, HttpStatus.UNPROCESSABLE_ENTITY)
+    return this.apiErrorService.throwErrorResponse('value', `Role ${value} already exists`, HttpStatus.CONFLICT)
   }
 }
