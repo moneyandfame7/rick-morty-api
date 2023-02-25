@@ -23,8 +23,7 @@ export class AuthorizationService {
     private readonly mailService: MailService,
     private readonly authorizationException: AuthorizationException,
     private readonly userException: UserException
-  ) {
-  }
+  ) {}
 
   public async signup(dto: AuthorizationDto): Promise<AuthorizationTokens> {
     const exists = await this.userService.getOneByAuthType(dto.email, 'jwt')
