@@ -1,4 +1,4 @@
-import { Module } from '@nestjs/common'
+import { forwardRef, Module } from '@nestjs/common'
 
 import { SpotifyController } from '@app/controllers/authorization'
 import { SpotifyService } from '@app/services/authorization'
@@ -7,7 +7,7 @@ import { EnvironmentConfigModule, TokenModule, UserModule } from '@modules/commo
 import { AuthModule } from '@modules/authorization'
 
 @Module({
-  imports: [AuthModule, EnvironmentConfigModule, UserModule, TokenModule],
+  imports: [AuthModule, EnvironmentConfigModule, forwardRef(() => UserModule), TokenModule],
   controllers: [SpotifyController],
   providers: [SpotifyService],
   exports: [SpotifyService]

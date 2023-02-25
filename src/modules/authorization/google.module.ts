@@ -1,4 +1,4 @@
-import { Module } from '@nestjs/common'
+import { forwardRef, Module } from '@nestjs/common'
 
 import { GoogleController } from '@app/controllers/authorization'
 import { GoogleService } from '@app/services/authorization'
@@ -7,7 +7,7 @@ import { EnvironmentConfigModule, TokenModule, UserModule } from '@modules/commo
 import { AuthModule } from '@modules/authorization'
 
 @Module({
-  imports: [AuthModule, EnvironmentConfigModule, UserModule, TokenModule],
+  imports: [AuthModule, EnvironmentConfigModule, forwardRef(() => UserModule), TokenModule],
   controllers: [GoogleController],
   providers: [GoogleService],
   exports: [GoogleService]

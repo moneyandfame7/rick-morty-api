@@ -31,7 +31,7 @@ export class TokenService {
     }
     const access_token = this.jwtService.sign(payload, {
       secret: this.ACCESS_SECRET,
-      expiresIn: '25m'
+      expiresIn: '30m'
     })
     const refresh_token = this.jwtService.sign(payload, {
       secret: this.REFRESH_SECRET,
@@ -75,6 +75,9 @@ export class TokenService {
     return this.tokenRepository.findByToken(refreshToken)
   }
 
+  public async getOneByUserId(user_id: string): Promise<Token | null> {
+    return this.tokenRepository.getOneByUserId(user_id)
+  }
   public validateAccessToken(token: string): JwtPayload {
     try {
       return this.jwtService.verify(token, { secret: this.ACCESS_SECRET })

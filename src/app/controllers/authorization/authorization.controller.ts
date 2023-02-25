@@ -1,4 +1,4 @@
-import { Body, Controller, Get, Param, Post, Req, Res, UnauthorizedException, UseGuards } from '@nestjs/common'
+import { Body, Controller, Get, Param, Post, Redirect, Req, Res, UnauthorizedException, UseGuards } from '@nestjs/common'
 import { ApiTags } from '@nestjs/swagger'
 import type { Request, Response } from 'express'
 
@@ -87,13 +87,13 @@ export class AuthorizationController extends BaseAuthorizationController {
   }
 
   @Post('/welcome')
+  @Redirect('', 301)
   @UseGuards(JwtAuthGuard)
-  public async welcomePage(@Body() details: UserDetailsDto, @Req() req: Request, @Res({ passthrough: true }) res: Response): Promise<AuthorizationTokens> {
+  public async welcomePage(@Body() details: UserDetailsDto, @Req() req: Request, @Res({ passthrough: true }) res: Response): Promise<{ url: string }> {
     const { access_token } = this.getCookies(req)
     const tokens = await this.authService.welcomePage(access_token, details)
-
     this.setCookies(res, tokens.refresh_token, tokens.access_token)
-    return tokens
+    return { url: 'refresh' }
   }
 
   @Post('/forgot')

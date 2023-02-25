@@ -1,22 +1,31 @@
-import { Body, Controller, Param, Post, Req, UploadedFile, UseGuards, UseInterceptors } from '@nestjs/common'
+import { Body, Controller, ForbiddenException, InternalServerErrorException, Param, Post, Req, Res, UploadedFile, UseGuards, UseInterceptors } from '@nestjs/common'
 import { ApiTags } from '@nestjs/swagger'
 import { FileInterceptor } from '@nestjs/platform-express'
 import { memoryStorage } from 'multer'
-import type { Request } from 'express'
+import type { Request, Response } from 'express'
 
-import { UserService } from '@app/services/common'
+import { EnvironmentConfigService, TokenService, UserService } from '@app/services/common'
 import { AddRoleDto, BanUserDto, CreateUserDto, UpdateUserDto } from '@app/dto/common'
 
 import { User } from '@infrastructure/entities/common'
 
 import { JwtAuthGuard } from '@common/guards/authorization'
 import { USER_OPERATION } from '@common/swagger/common'
-import { ApiEntitiesOperation } from '@common/decorators'
+import { ApiEntitiesOperation, GetUser } from '@common/decorators'
+import { JwtPayload } from '@core/models/authorization'
+import { AuthorizationService } from '@app/services/authorization'
+import { UserException } from '@common/exceptions/common'
 
 @Controller('api/users')
 @ApiTags('users')
 export class UserController {
-  public constructor(private readonly userService: UserService) {}
+  public constructor(
+    private readonly userService: UserService,
+    private readonly tokenService: TokenService,
+    private readonly authorizationService: AuthorizationService,
+    private readonly config: EnvironmentConfigService,
+    private readonly userException: UserException
+  ) {}
 
   @ApiEntitiesOperation(USER_OPERATION.CREATE)
   public async createOne(@Body() createUserDto: CreateUserDto): Promise<User> {
@@ -39,8 +48,29 @@ export class UserController {
   }
 
   @ApiEntitiesOperation(USER_OPERATION.REMOVE)
-  public async removeOne(@Param('id') id: string): Promise<User> {
-    return this.userService.removeOne(id)
+  public async removeOne(@Param('id') id: string, @GetUser() user: JwtPayload, @Res({ passthrough: true }) res: Response): Promise<User> {
+    const exist = await this.userService.getOneById(id)
+    const isAdmin = user.role.value === 'admin'
+
+    if (!exist) {
+      throw this.userException.withIdNotFound(id)
+    }
+
+    if (user.id === id) {
+      const token = await this.tokenService.getOneByUserId(id)
+      if (!token) {
+        throw new InternalServerErrorException('token aboboaosdoasd')
+      }
+      res.clearCookie(this.config.getJwtRefreshCookie())
+      res.clearCookie(this.config.getJwtAccessCookie())
+      await this.authorizationService.logout(token.refresh_token)
+      return this.userService.removeOne(id)
+    }
+    if (isAdmin) {
+      return this.userService.removeOne(id)
+    }
+
+    throw new ForbiddenException()
   }
 
   @ApiEntitiesOperation(USER_OPERATION.ADD_ROLE)
