@@ -10,8 +10,10 @@ import { BaseAuthorizationController } from '@core/controllers/authorization'
 
 import { SpotifyAuthGuard } from '@common/guards/authorization'
 import { GetUser } from '@common/decorators/user.decorator'
+import { ApiTags } from '@nestjs/swagger'
 
 @Controller('/auth/spotify')
+@ApiTags('spotify auth')
 export class SpotifyController extends BaseAuthorizationController {
   public constructor(
     protected readonly config: EnvironmentConfigService,

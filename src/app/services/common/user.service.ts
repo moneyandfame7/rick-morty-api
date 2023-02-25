@@ -9,6 +9,7 @@ import { UserRepository } from '@infrastructure/repositories/common'
 import { User } from '@infrastructure/entities/common'
 
 import { UserException } from '@common/exceptions/common'
+import { AUTHORIZATION_PROVIDER } from '@common/constants'
 
 @Injectable()
 export class UserService {
@@ -22,7 +23,7 @@ export class UserService {
 
   public async createOne(dto: CreateUserDto): Promise<User> {
     const userWithSameEmail = await this.getOneByAuthType(dto.email, dto.auth_type)
-    if (userWithSameEmail && userWithSameEmail.auth_type === 'jwt') {
+    if (userWithSameEmail && userWithSameEmail.auth_type === AUTHORIZATION_PROVIDER.JWT) {
       throw this.userException.alreadyExistsWithEmail(dto.email)
     }
 

@@ -1,5 +1,5 @@
-import { Body, Controller, Delete, Get, Param, Patch, Post, Req, UploadedFile, UseGuards, UseInterceptors } from '@nestjs/common'
-import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger'
+import { Body, Controller, Param, Post, Req, UploadedFile, UseGuards, UseInterceptors } from '@nestjs/common'
+import { ApiTags } from '@nestjs/swagger'
 import { FileInterceptor } from '@nestjs/platform-express'
 import { memoryStorage } from 'multer'
 import type { Request } from 'express'
@@ -9,61 +9,46 @@ import { AddRoleDto, BanUserDto, CreateUserDto, UpdateUserDto } from '@app/dto/c
 
 import { User } from '@infrastructure/entities/common'
 
-import { Roles } from '@common/decorators'
-import { RolesGuard } from '@common/guards/common'
-import { ROLES } from '@common/constants'
 import { JwtAuthGuard } from '@common/guards/authorization'
+import { USER_OPERATION } from '@common/swagger/common'
+import { ApiEntitiesOperation } from '@common/decorators'
 
 @Controller('api/users')
 @ApiTags('users')
 export class UserController {
   public constructor(private readonly userService: UserService) {}
 
-  @Post()
-  @UseGuards(JwtAuthGuard)
+  @ApiEntitiesOperation(USER_OPERATION.CREATE)
   public async createOne(@Body() createUserDto: CreateUserDto): Promise<User> {
     return this.userService.createOne(createUserDto)
   }
 
-  @Get()
-  @UseGuards(JwtAuthGuard)
+  @ApiEntitiesOperation(USER_OPERATION.GET_MANY)
   public async getMany(): Promise<User[]> {
     return this.userService.getMany()
   }
 
-  @Get(':id')
-  @UseGuards(JwtAuthGuard)
+  @ApiEntitiesOperation(USER_OPERATION.GET_ONE)
   public async getOne(@Param('id') id: string): Promise<User> {
     return this.userService.getOneById(id)
   }
 
-  @Patch(':id')
-  @UseGuards(JwtAuthGuard)
+  @ApiEntitiesOperation(USER_OPERATION.UPDATE)
   public async updateOne(@Param('id') id: string, @Body() updateUserDto: UpdateUserDto): Promise<User> {
     return this.userService.updateOne(id, updateUserDto)
   }
 
-  @Delete(':id')
-  @Roles(ROLES.ADMIN)
-  @UseGuards(JwtAuthGuard, RolesGuard)
+  @ApiEntitiesOperation(USER_OPERATION.REMOVE)
   public async removeOne(@Param('id') id: string): Promise<User> {
     return this.userService.removeOne(id)
   }
 
-  @ApiOperation({ summary: 'Give a role' })
-  @ApiResponse({ status: 200 })
-  @Roles(ROLES.ADMIN)
-  @UseGuards(JwtAuthGuard, RolesGuard)
-  @Post('/role')
+  @ApiEntitiesOperation(USER_OPERATION.ADD_ROLE)
   public async addRole(@Body() addRoleDto: AddRoleDto): Promise<User> {
     return this.userService.addRole(addRoleDto)
   }
 
-  @ApiOperation({ summary: 'Ban a user' })
-  @ApiResponse({ status: 200 })
-  @Roles(ROLES.ADMIN)
-  @UseGuards(JwtAuthGuard, RolesGuard)
-  @Post('/ban')
+  @ApiEntitiesOperation(USER_OPERATION.BAN)
   public async ban(@Body() banUserDto: BanUserDto): Promise<User> {
     return this.userService.ban(banUserDto)
   }

@@ -10,8 +10,10 @@ import { BaseAuthorizationController } from '@core/controllers/authorization'
 
 import { GetUser } from '@common/decorators'
 import { DiscordAuthGuard } from '@common/guards/authorization'
+import { ApiTags } from '@nestjs/swagger'
 
 @Controller('/auth/discord')
+@ApiTags('discord auth')
 export class DiscordController extends BaseAuthorizationController {
   public constructor(
     protected readonly config: EnvironmentConfigService,
