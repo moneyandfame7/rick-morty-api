@@ -51,7 +51,7 @@ export const USER_OPERATION: UserOperation = {
     status: HttpStatus.OK,
     type: User,
     method: HttpMethod.DELETE(':id'),
-    role: Roles(ROLES.ADMIN),
+    role: Roles(ROLES.ADMIN, ROLES.USER),
     guard: UseGuards(JwtAuthGuard, RolesGuard)
   },
   ADD_ROLE: {

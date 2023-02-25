@@ -1,4 +1,4 @@
-import { Module } from '@nestjs/common'
+import { forwardRef, Module } from '@nestjs/common'
 import { PassportModule } from '@nestjs/passport'
 import { JwtModule } from '@nestjs/jwt'
 
@@ -12,7 +12,7 @@ import { DiscordStrategy, GithubStrategy, GoogleStrategy, JwtStrategy, SpotifySt
 import { ApiErrorModule, EnvironmentConfigModule, MailModule, TokenModule, UserModule } from '@modules/common'
 
 @Module({
-  imports: [JwtModule.register({ secret: process.env.AT_SECRET }), EnvironmentConfigModule, UserModule, PassportModule, TokenModule, MailModule, ApiErrorModule],
+  imports: [JwtModule.register({ secret: process.env.AT_SECRET }), EnvironmentConfigModule, forwardRef(() => UserModule), PassportModule, TokenModule, MailModule, ApiErrorModule],
   controllers: [AuthorizationController],
   providers: [AuthorizationService, AuthorizationException, UserException, JwtStrategy, GoogleStrategy, GithubStrategy, DiscordStrategy, SpotifyStrategy],
   exports: [AuthorizationService, JwtModule]

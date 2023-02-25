@@ -10,7 +10,7 @@ export class User {
   public id: string
 
   @ApiProperty({ example: 'User_228', description: 'The username of the user' })
-  @Column({ nullable: true, type: 'varchar', unique: true })
+  @Column({ nullable: true, type: 'varchar' })
   public username: string
 
   @ApiProperty({ example: 'user@gmail.com', description: 'The email of the user' })
