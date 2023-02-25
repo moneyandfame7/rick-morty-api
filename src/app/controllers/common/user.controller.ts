@@ -1,4 +1,4 @@
-import { Body, Controller, ForbiddenException, InternalServerErrorException, Param, Post, Req, Res, UploadedFile, UseGuards, UseInterceptors } from '@nestjs/common'
+import { Body, Controller, ForbiddenException, InternalServerErrorException, Param, Post, Req, Res, UploadedFile, UseInterceptors } from '@nestjs/common'
 import { ApiTags } from '@nestjs/swagger'
 import { FileInterceptor } from '@nestjs/platform-express'
 import { memoryStorage } from 'multer'
@@ -9,7 +9,6 @@ import { AddRoleDto, BanUserDto, CreateUserDto, UpdateUserDto } from '@app/dto/c
 
 import { User } from '@infrastructure/entities/common'
 
-import { JwtAuthGuard } from '@common/guards/authorization'
 import { USER_OPERATION } from '@common/swagger/common'
 import { ApiEntitiesOperation, GetUser } from '@common/decorators'
 import { JwtPayload } from '@core/models/authorization'
@@ -84,7 +83,7 @@ export class UserController {
   }
 
   @Post(':id/photo')
-  @UseGuards(JwtAuthGuard)
+  @ApiEntitiesOperation(USER_OPERATION.CHANGE_IMAGE)
   @UseInterceptors(FileInterceptor('photo', { storage: memoryStorage() }))
   public async changeImage(@Req() req: Request, @UploadedFile() file: Express.Multer.File): Promise<User> {
     const id = (req.user as User).id

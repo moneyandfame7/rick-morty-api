@@ -5,8 +5,8 @@ import * as _ from 'lodash'
 
 import { EpisodeService } from '@app/services/main'
 
-import type { CreateEpisodeDto, QueryEpisodeDto, UpdateEpisodeDto } from '@app/dto/main'
-import type { QueryPaginationDto } from '@app/dto/common'
+import { CreateEpisodeDto, QueryEpisodeDto, UpdateEpisodeDto } from '@app/dto/main'
+import { QueryPaginationDto } from '@app/dto/common'
 
 import type { Presenter } from '@core/services/common'
 
