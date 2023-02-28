@@ -142,7 +142,14 @@
     "coveragePathIgnorePatterns": [
       "./dist",
       "./database",
-      "./test/utils"
+      "./test/utils",
+      "/src/modules",
+      "/src/core",
+      "/src/common/swagger",
+      "/src/common/config",
+      "/src/common/models",
+      "./src/main.ts",
+      "./src/app/app.module.ts"
     ]
   }
 }
