@@ -19,6 +19,6 @@ export class CharacterException {
   }
 
   public emptyFile(): HttpException {
-    return this.apiErrorService.throwErrorResponse('file', 'The field file cannot be empty', HttpStatus.UNPROCESSABLE_ENTITY)
+    return this.apiErrorService.throwErrorResponse('file', 'The field "image" cannot be empty', HttpStatus.UNPROCESSABLE_ENTITY)
   }
 }

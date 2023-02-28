@@ -1,26 +1,20 @@
-import { LocationController } from '@app/controllers/main'
 import { Test, TestingModule } from '@nestjs/testing'
+
 import { LocationService } from '@app/services/main'
+import { LocationController } from '@app/controllers/main'
+import { QueryLocationDto, UpdateLocationDto } from '@app/dto/main'
+
+import { ORDER } from '@common/constants'
+
+import { mockLocationService } from '../../utils/mock/main/location.mock'
 
 jest.mock('@common/decorators', () => ({
   ...jest.requireActual('@common/decorators'),
   ApiEntitiesOperation: () => jest.fn()
 }))
 
-describe('LocationController', () => {
+describe('[Location] Controller', () => {
   let controller: LocationController
-  let counter = 0
-
-  const mockLocationService = {
-    createOne: jest.fn(async dto => ({ id: ++counter, ...dto, createdAt: new Date() })),
-    getMany: jest.fn(async (pagination, dto) => [
-      { name: dto.name, type: dto.type },
-      { name: dto.name, type: dto.type }
-    ]),
-    getOne: jest.fn(async id => ({ id, name: 'test' })),
-    updateOne: jest.fn(async (id, dto) => ({ id, ...dto })),
-    removeOne: jest.fn(async id => ({ id, name: 'test' }))
-  }
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
@@ -35,7 +29,7 @@ describe('LocationController', () => {
     expect(controller).toBeDefined()
   })
 
-  it('should create a new location', async () => {
+  it('[CREATE] - should return a created location', async () => {
     const dto: any = {
       name: 'test',
       type: 'test'
@@ -50,58 +44,62 @@ describe('LocationController', () => {
     })
   })
 
-  it('should return list of locations', async () => {
-    const query: any = {
-      name: 'test',
-      type: 'Primary',
-      skip: null
-    }
+  it('[GET MANY] - should return page info and results [array of locations]', async () => {
+    const query = new QueryLocationDto()
+    query.name = 'Location'
+    query.type = 'Primary'
+    query.order = ORDER.DESC
     const req: any = {
-      originalUrl: 'location?name=test&type=Primary'
+      originalUrl: 'location?name=Location&type=Primary'
     }
 
     const result = await controller.getMany(query, req)
     expect(mockLocationService.getMany).toHaveBeenCalledWith(
       {
-        otherQuery: 'name=test&type=Primary',
+        otherQuery: 'name=Location&type=Primary',
         endpoint: 'locations',
-        skip: null
+        order: ORDER.DESC,
+        page: 1,
+        skip: 0,
+        take: 20
       },
       {
-        name: 'test',
+        name: 'Location',
         type: 'Primary'
       }
     )
-    expect(result).toStrictEqual([
-      { name: 'test', type: 'Primary' },
-      { name: 'test', type: 'Primary' }
-    ])
+
+    expect(result.results).toBeInstanceOf(Array)
+    expect(result.info).toBeInstanceOf(Object)
   })
 
-  it('should return location with specified id', async () => {
+  it('[GET ONE] - should return location with id: 5', async () => {
     const id = 5
 
     const result = await controller.getOne(id)
 
     expect(mockLocationService.getOne).toHaveBeenCalledWith(5)
-    expect(result).toStrictEqual({ id: 5, name: 'test' })
+    expect(result).toHaveProperty('id', 5)
   })
 
-  it('should update location with specified id', async () => {
+  it('[UPDATE} - should updated location with id: 6', async () => {
     const id = 6
-    const dto: any = {
+    const dto: UpdateLocationDto = {
       name: 'upd',
       type: 'upd'
     }
+
     const result = await controller.updateOne(id, dto)
+
     expect(mockLocationService.updateOne).toHaveBeenCalledWith(6, { name: 'upd', type: 'upd' })
     expect(result).toStrictEqual({ id: 6, name: 'upd', type: 'upd' })
   })
 
-  it('should remove location with specified id', async () => {
+  it('[REMOVE] - should return a removed location with id: 5', async () => {
     const id = 5
     const result = await controller.removeOne(id)
+
     expect(mockLocationService.removeOne).toHaveBeenCalledWith(5)
-    expect(result).toStrictEqual({ id: 5, name: 'test' })
+    expect(result).toHaveProperty('id', 5)
   })
 })

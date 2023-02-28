@@ -1,44 +1,21 @@
 import { Test, TestingModule } from '@nestjs/testing'
 
 import { CharacterController } from '@app/controllers/main'
-import { CreateCharacterDto } from '@app/dto/main'
 import { CharacterService } from '@app/services/main'
+import { QueryCharacterDto, UpdateCharacterDto } from '@app/dto/main'
+
+import { ORDER } from '@common/constants'
+
+import { mockExpressFile } from '../../utils/mock/common'
+import { mockCharacterService, mockCreateCharacterDto } from '../../utils/mock/main/character.mock'
 
 jest.mock('@common/decorators', () => ({
   ...jest.requireActual('@common/decorators'),
   ApiEntitiesOperation: () => jest.fn()
 }))
 
-describe('CharacterController', () => {
+describe('[Character] Controller', () => {
   let controller: CharacterController
-  let counter = 0
-  const mockCharacterService = {
-    createOne: jest.fn(dto => ({
-      id: ++counter,
-      ...dto,
-      createdAt: new Date()
-    })),
-    getMany: jest.fn(async (pagination, dto) => [
-      {
-        name: dto.name,
-        status: dto.status
-      },
-      {
-        name: dto.name,
-        status: dto.status
-      }
-    ]),
-    getOne: jest.fn(async id => ({
-      id,
-      name: 'morty'
-    })),
-    updateOne: jest.fn(async (id, dto) => ({
-      id,
-      ...dto
-    })),
-    removeOne: jest.fn(async id => ({ id }))
-  }
-
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
       controllers: [CharacterController],
@@ -56,120 +33,81 @@ describe('CharacterController', () => {
     expect(controller).toBeDefined()
   })
 
-  it('should create a character', () => {
-    const dto: CreateCharacterDto = {
-      name: 'fuck niggaaaa',
-      status: 'Suka',
-      type: 'pidor',
-      gender: 'tej',
-      species: 'ne eby'
-    }
-    const file: any = {}
-    expect(controller.createOne(dto, file)).toStrictEqual({
+  it('should return a promise', async () => {
+    const id = 255
+
+    const result = controller.getOne(id)
+    expect(mockCharacterService.getOne).toHaveBeenCalledWith(id)
+    expect(result).toBeInstanceOf(Promise)
+  })
+
+  it('[CREATE] - should return a created character', async () => {
+    expect(await controller.createOne(mockCreateCharacterDto, mockExpressFile)).toEqual({
       id: expect.any(Number),
-      ...dto,
+      ...mockCreateCharacterDto,
       createdAt: expect.any(Date)
     })
-    expect(mockCharacterService.createOne).toBeCalledWith(dto, file)
+    expect(mockCharacterService.createOne).toBeCalledWith(mockCreateCharacterDto, mockExpressFile)
   })
 
-  describe('find all characters', () => {
-    it('should return array of characters', () => {
-      const query: any = {
-        name: 'aboba',
-        status: null,
-        skip: null
-      }
-      const req: any = {
-        originalUrl: 'characters?id=5'
-      }
-      controller.getMany(query, req)
-      expect(mockCharacterService.getMany).toBeCalledWith(
-        {
-          otherQuery: 'id=5',
-          endpoint: 'characters',
-          skip: null
-        },
-        { name: 'aboba' }
-      )
-    })
-
-    it('should returns array of characters async', async () => {
-      const query: any = {
-        name: 'Rick',
-        take: 50,
-        status: 'Alive'
-      }
-
-      const req: any = {
-        originalUrl: 'characters?name=Rick'
-      }
-      const result = await controller.getMany(query, req)
-      expect(mockCharacterService.getMany).toBeCalledWith(
-        {
-          otherQuery: 'name=Rick',
-          endpoint: 'characters',
-          take: 50
-        },
-        {
-          name: 'Rick',
-          status: 'Alive'
-        }
-      )
-      expect(result).toStrictEqual([
-        {
-          name: query.name,
-          status: query.status
-        },
-        {
-          name: query.name,
-          status: query.status
-        }
-      ])
-    })
-  })
-
-  describe('get by specified id', () => {
-    it('should return character', async () => {
-      const id = 255
-
-      const result = await controller.getOne(id)
-      expect(result).toStrictEqual({
-        id,
-        name: 'morty'
-      })
-      expect(mockCharacterService.getOne).toHaveBeenCalledWith(id)
-    })
-
-    it('should return promise', async () => {
-      const id = 255
-
-      const result = controller.getOne(id)
-      expect(mockCharacterService.getOne).toHaveBeenCalledWith(id)
-      expect(result).toBeInstanceOf(Promise)
-    })
-  })
-
-  it('should update a character', async () => {
-    const dto = {
-      name: 'fuck niggaaaa',
-      status: 'Suka',
-      type: 'pidor',
-      gender: 'tej',
-      species: 'ne eby'
+  it('[GET MANY] - should return page info and results [array of characters]', async () => {
+    const query = new QueryCharacterDto()
+    query.name = 'Morty'
+    query.status = 'Dead'
+    query.take = 70
+    query.order = ORDER.DESC
+    const req: any = {
+      originalUrl: 'characters?name=Morty&status=Alive'
     }
-    const result = await controller.updateOne(1337, dto)
-    expect(result).toStrictEqual({
-      id: 1337,
-      ...dto
-    })
-    expect(mockCharacterService.updateOne).toBeCalledWith(1337, dto)
+
+    const result = await controller.getMany(query, req)
+
+    expect(mockCharacterService.getMany).toBeCalledWith(
+      {
+        order: ORDER.DESC,
+        otherQuery: 'name=Morty&status=Alive',
+        endpoint: 'characters',
+        page: 1,
+        skip: 0,
+        take: 70
+      },
+      {
+        name: 'Morty',
+        status: 'Dead'
+      }
+    )
+    expect(result.results).toBeInstanceOf(Array)
+    expect(result.info).toBeInstanceOf(Object)
   })
 
-  it('should remove a character', async () => {
+  it('[GET ONE] - should return a character with id: 255', async () => {
+    const id = 255
+    mockCharacterService.getOne = jest.fn().mockResolvedValue({ id, name: 'Morty-test' })
+
+    const result = await controller.getOne(id)
+
+    expect(mockCharacterService.getOne).toHaveBeenCalledWith(id)
+    expect(result).toHaveProperty('id', 255)
+  })
+
+  it('[UPDATE] - should return updated character with id: 1337', async () => {
+    const id = 1337
+    const updateCharacterDto: UpdateCharacterDto = {
+      name: 'Update character name'
+    }
+
+    const result = await controller.updateOne(id, updateCharacterDto)
+
+    expect(mockCharacterService.updateOne).toBeCalledWith(id, updateCharacterDto)
+    expect(result).toStrictEqual({ id: 1337, name: 'Update character name' })
+  })
+
+  it('[REMOVE] - should return a removed character with id: 5', async () => {
     const id = 5
+
     const result = await controller.removeOne(id)
-    expect(result).toEqual({ id: 5 })
+
     expect(mockCharacterService.removeOne).toHaveBeenCalledWith(id)
+    expect(result).toHaveProperty('id', 5)
   })
 })

@@ -2,27 +2,17 @@ import { Test, TestingModule } from '@nestjs/testing'
 
 import { EpisodeController } from '@app/controllers/main'
 import { EpisodeService } from '@app/services/main'
+import { mockCreateEpisodeDto, mockEpisodeService } from '../../utils/mock/main/episode.mock'
+import { QueryEpisodeDto } from '@app/dto/main'
+import { ORDER } from '@common/constants'
 
 jest.mock('@common/decorators', () => ({
   ...jest.requireActual('@common/decorators'),
   ApiEntitiesOperation: () => jest.fn()
 }))
 
-describe('EpisodeController', () => {
+describe('[Episode] Controller', () => {
   let controller: EpisodeController
-  let counter = 0
-
-  const mockRolesGuard = {}
-  const mockEpisodeService = {
-    createOne: jest.fn(dto => ({ id: ++counter, ...dto, createdAt: new Date() })),
-    getMany: jest.fn(async (pagination, dto) => [
-      { name: dto.name, episode: dto.episode },
-      { name: dto.name, episode: dto.episode }
-    ]),
-    getOne: jest.fn(async id => ({ id, name: 'test' })),
-    updateOne: jest.fn(async (id, dto) => ({ id, ...dto })),
-    removeOne: jest.fn(async id => ({ id, name: 'test' }))
-  }
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
       controllers: [EpisodeController],
@@ -36,58 +26,58 @@ describe('EpisodeController', () => {
     expect(controller).toBeDefined()
   })
 
-  it('should create a new episode', async () => {
-    const createDto: any = { name: 'test', episode: 'episode' }
+  it('should return a promise', async () => {
+    const id = 255
 
-    const result = await controller.createOne(createDto)
-
-    expect(mockEpisodeService.createOne).toHaveBeenCalledWith({ name: 'test', episode: 'episode' })
-    expect(result).toStrictEqual({ id: expect.any(Number), ...createDto, createdAt: expect.any(Date) })
+    const result = controller.getOne(id)
+    expect(mockEpisodeService.getOne).toHaveBeenCalledWith(id)
+    expect(result).toBeInstanceOf(Promise)
   })
 
-  it('should get all the episodes', async () => {
-    const query: any = {
-      name: 'test',
-      episode: 'episode',
-      skip: null
-    }
+  it('[CREATE] - should return a created episode', async () => {
+    const result = await controller.createOne(mockCreateEpisodeDto)
+
+    expect(mockEpisodeService.createOne).toHaveBeenCalledWith(mockCreateEpisodeDto)
+    expect(result).toStrictEqual({ id: expect.any(Number), ...mockCreateEpisodeDto, createdAt: expect.any(Date) })
+  })
+
+  it('[GET MANY] - should return page info and results [array of episodes]', async () => {
+    const query = new QueryEpisodeDto()
+    query.name = 'Fucking Episode'
+    query.order = ORDER.DESC
+    query.page = 25
+    query.episode = 'EPFUCK03123'
     const req: any = {
-      originalUrl: 'episodes?name=test'
+      originalUrl: 'episodes?name=Fucking+Episode'
     }
     const result = await controller.getMany(query, req)
     expect(mockEpisodeService.getMany).toHaveBeenCalledWith(
       {
-        otherQuery: 'name=test',
+        order: ORDER.DESC,
+        otherQuery: 'name=Fucking+Episode',
+        page: 25,
         endpoint: 'episodes',
-        skip: null
+        take: 20,
+        skip: 480 // (page-1) * take
       },
       {
-        name: 'test',
-        episode: 'episode'
+        name: 'Fucking Episode',
+        episode: 'EPFUCK03123'
       }
     )
-    expect(result).toStrictEqual([
-      {
-        name: 'test',
-        episode: 'episode'
-      },
-      {
-        name: 'test',
-        episode: 'episode'
-      }
-    ])
+    expect(result.results).toBeInstanceOf(Array)
+    expect(result.info).toBeInstanceOf(Object)
   })
 
-  it('should get one episode with specified id', async () => {
+  it('[GET ONE] - should return episode width id: 1337', async () => {
     const id = 1337
     const result = await controller.getOne(id)
 
     expect(mockEpisodeService.getOne).toHaveBeenCalledWith(id)
-
-    expect(result).toStrictEqual({ id: 1337, name: 'test' })
+    expect(result).toHaveProperty('id', 1337)
   })
 
-  it('should update the episode with specified id', async () => {
+  it('[UPDATE] - should remove updated episode with id: 228', async () => {
     const id = 228
     const updDto = { name: 'nigga' }
     const result = await controller.updateOne(id, updDto)
@@ -96,7 +86,7 @@ describe('EpisodeController', () => {
     expect(result).toStrictEqual({ id, ...updDto })
   })
 
-  it('should remove the episode with specified id', async () => {
+  it('[REMOVE] - should return a removed episode with id: 1333', async () => {
     const id = 1333
 
     const result = await controller.removeOne(id)

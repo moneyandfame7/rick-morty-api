@@ -26,7 +26,7 @@ export class LocationService implements BaseService<Location, CreateLocationDto,
       throw this.locationsException.alreadyExists(exists.name)
     }
 
-    const location = this.locationRepository.create(createLocationDto)
+    const location = await this.locationRepository.create(createLocationDto)
     return this.locationRepository.save(location)
   }
 

@@ -30,6 +30,7 @@ export class CharacterService implements BaseService<Character, CreateCharacterD
       status: createCharacterDto.status,
       species: createCharacterDto.species
     })
+    
     if (exists) {
       throw this.charactersException.alreadyExists()
     }
