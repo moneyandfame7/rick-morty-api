@@ -23,12 +23,12 @@ export class CharacterController {
 
   @ApiEntitiesOperation(CHARACTER_OPERATION.CREATE)
   @UseInterceptors(FileInterceptor('image', { storage: memoryStorage() }))
-  public async createOne(@Body() character: CreateCharacterDto, @UploadedFile() file: Express.Multer.File): Promise<Character> {
+  public createOne(@Body() character: CreateCharacterDto, @UploadedFile() file: Express.Multer.File): Promise<Character> {
     return this.characterService.createOne(character, file)
   }
 
   @ApiEntitiesOperation(CHARACTER_OPERATION.GET_MANY)
-  public async getMany(@Query(new ValidationPipe({ transform: true })) query: QueryCharacterDto, @Req() req: Request): Promise<Presenter<Character>> {
+  public getMany(@Query(new ValidationPipe({ transform: true })) query: QueryCharacterDto, @Req() req: Request): Promise<Presenter<Character>> {
     const queryPaginationDto: QueryPaginationDto = {
       take: query.take,
       page: query.page,
@@ -53,17 +53,17 @@ export class CharacterController {
   }
 
   @ApiEntitiesOperation(CHARACTER_OPERATION.GET_ONE)
-  public async getOne(@Param('id', ParseIntPipe) id: number): Promise<Character> {
+  public getOne(@Param('id', ParseIntPipe) id: number): Promise<Character> {
     return this.characterService.getOne(id)
   }
 
   @ApiEntitiesOperation(CHARACTER_OPERATION.UPDATE)
-  public async updateOne(@Param('id', ParseIntPipe) id: number, @Body() updateCharacterDto: UpdateCharacterDto): Promise<Character> {
+  public updateOne(@Param('id', ParseIntPipe) id: number, @Body() updateCharacterDto: UpdateCharacterDto): Promise<Character> {
     return this.characterService.updateOne(id, updateCharacterDto)
   }
 
   @ApiEntitiesOperation(CHARACTER_OPERATION.REMOVE)
-  public async removeOne(@Param('id', ParseIntPipe) id: number): Promise<Character> {
+  public removeOne(@Param('id', ParseIntPipe) id: number): Promise<Character> {
     return this.characterService.removeOne(id)
   }
 }
