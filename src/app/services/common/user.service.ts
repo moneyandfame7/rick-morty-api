@@ -97,8 +97,10 @@ export class UserService {
   }
 
   public async changePhoto(id: string, file: Express.Multer.File): Promise<User> {
-    if (!file) throw new BadRequestException('You must provide a photo')
-    const fileBuffer = await sharp(file.buffer).resize({ height: 128, width: 128, fit: 'cover' }).toBuffer()
+    if (!file) {
+      throw new BadRequestException('You must provide a photo')
+    }
+    const fileBuffer = await sharp(file.buffer).resize({ height: 500, width: 500, fit: 'cover' }).toBuffer()
     const [, type] = file.mimetype.split('/')
     const params: PutObjectCommandInput = {
       Bucket: this.s3Service.bucketName,
