@@ -41,16 +41,10 @@ export class AuthorizationService {
       verify_link
     }
     const user = await this.userService.createOne(info)
+
     await this.mailService.sendVerifyMail(user.email, verify_link)
 
     return this.buildUserInfoAndTokens(user)
-    // return {
-    //   message: 'User is redirected to Welcome page',
-    //   body: {
-    //     user,
-    //     tokens
-    //   }
-    // }
   }
 
   public async welcomePage(token: string, details: UserDetailsDto): Promise<AuthorizationTokens> {

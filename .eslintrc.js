@@ -44,6 +44,7 @@ module.exports = {
     '@typescript-eslint/restrict-template-expressions': 'off',
     '@typescript-eslint/naming-convention': 'off',
     '@typescript-eslint/indent': 'off',
+    '@typescript-eslint/no-inferrable-types': 'off',
     '@typescript-eslint/no-unused-expressions': 'off',
     '@typescript-eslint/no-unused-vars': 'warn',
     '@typescript-eslint/explicit-member-accessibility': 'error',

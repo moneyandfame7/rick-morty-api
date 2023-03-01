@@ -30,14 +30,14 @@ export class CharacterService implements BaseService<Character, CreateCharacterD
       status: createCharacterDto.status,
       species: createCharacterDto.species
     })
-    
+
     if (exists) {
       throw this.charactersException.alreadyExists()
     }
     if (!file) {
       throw this.charactersException.emptyFile()
     }
-    const fileBuffer = await sharp(file.buffer).resize({ height: 300, width: 300, fit: 'cover' }).toBuffer()
+    const fileBuffer = await sharp(file.buffer).resize({ height: 500, width: 500, fit: 'cover' }).toBuffer()
 
     const characterAttributes: CreateCharacterDto = {
       id: (await this.getCount()) + 1,
@@ -48,7 +48,6 @@ export class CharacterService implements BaseService<Character, CreateCharacterD
       species: createCharacterDto.species
     }
     const [, type] = file.mimetype.split('/')
-
     const params: PutObjectCommandInput = {
       Bucket: this.s3Service.bucketName,
       Key: `characters/${characterAttributes.id}.${type}`,
