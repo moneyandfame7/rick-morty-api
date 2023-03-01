@@ -52,7 +52,7 @@ describe('[Location] Service', () => {
     it('should successfully create the location', async () => {
       const result = await service.createOne(mockCreateLocationDto)
 
-      expect(result).toEqual({
+      expect(result).toStrictEqual({
         id: expect.any(Number),
         ...mockCreateLocationDto,
         createdAt: expect.any(Date)
@@ -201,6 +201,6 @@ describe('[Location] Service', () => {
   it('should return count of locations', async () => {
     const result = await service.getCount()
 
-    expect(result).toEqual(MOCK_LOCATION_COUNT)
+    expect(result).toStrictEqual(MOCK_LOCATION_COUNT)
   })
 })

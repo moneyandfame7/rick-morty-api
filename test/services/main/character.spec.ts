@@ -70,6 +70,7 @@ describe('[Character] Service', () => {
       const result = await service.createOne(mockCreateCharacterDto, mockExpressFile)
       const [, type] = mockExpressFile.mimetype.split('/')
 
+      // todo: можливо визивати тут mockCharacterService.getCount?? check character service
       const charAttributes: CreateCharacterDto = {
         id: MOCK_CHARACTER_COUNT + 1,
         name: mockCreateCharacterDto.name,
@@ -125,7 +126,7 @@ describe('[Character] Service', () => {
 
       const result = await service.getMany(queryPaginationDto, queryCharacterDto)
 
-      expect(result).toEqual({
+      expect(result).toStrictEqual({
         results: [{ id: expect.any(Number), name: 'rick' }],
         info: {
           page: 1,
@@ -164,7 +165,7 @@ describe('[Character] Service', () => {
       const result = await service.getOne(id)
       expect(result).toBeDefined()
 
-      expect(result).toEqual({
+      expect(result).toStrictEqual({
         id,
         name: 'test'
       })
@@ -179,6 +180,7 @@ describe('[Character] Service', () => {
     }
     it('should throws an error if the character is not found', async () => {
       let result: any
+      mockCharacterRepository.getOne = jest.fn().mockResolvedValue(null)
       try {
         result = await service.updateOne(id, dto)
       } catch (e) {
@@ -195,7 +197,7 @@ describe('[Character] Service', () => {
       result = await service.updateOne(id, dto)
 
       expect(mockCharacterRepository.getOne).toBeCalledWith(5)
-      expect(result).toEqual({ id, ...dto })
+      expect(result).toStrictEqual({ id, ...dto })
     })
   })
 
@@ -204,6 +206,7 @@ describe('[Character] Service', () => {
 
     it('should throws an error if the character not found', async () => {
       let result: any
+      mockCharacterRepository.getOne = jest.fn().mockResolvedValue(null)
       try {
         result = await service.removeOne(id)
       } catch (e) {
@@ -215,7 +218,10 @@ describe('[Character] Service', () => {
     })
 
     it('should successfully remove the character', async () => {
-      mockCharacterRepository.getOne = jest.fn(id => ({ id, name: 'test' }))
+      mockCharacterRepository.getOne = jest.fn(id => ({
+        id,
+        name: 'test'
+      }))
 
       const result = await service.removeOne(id)
       expect(mockCharacterRepository.getOne).toHaveBeenCalledWith(id)

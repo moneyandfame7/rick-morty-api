@@ -50,6 +50,8 @@ describe('[Episode] Service', () => {
     })
 
     it('should successfully create the episode', async () => {
+      mockEpisodeRepository.findOneBy = jest.fn().mockResolvedValue(null)
+
       const result = await service.createOne(mockCreateEpisodeDto)
       expect(result).toStrictEqual({
         id: expect.any(Number),
@@ -95,7 +97,7 @@ describe('[Episode] Service', () => {
         count: 1
       }))
       const result = await service.getMany(queryPaginationDto, queryEpisodeDto)
-      expect(result).toEqual({
+      expect(result).toStrictEqual({
         info: {
           page: 25,
           endpoint: 'episodes',
@@ -116,6 +118,7 @@ describe('[Episode] Service', () => {
 
     it('should throws an error if the episode is not found', async () => {
       let result: any
+      mockEpisodeRepository.getOne = jest.fn().mockResolvedValue(null)
 
       try {
         result = await service.getOne(id)
@@ -145,7 +148,8 @@ describe('[Episode] Service', () => {
       name: 'update test'
     }
     it('should throws an error if the episode is not found', async () => {
-      mockEpisodeRepository.getOne = jest.fn()
+      mockEpisodeRepository.getOne = jest.fn().mockReturnValue(null)
+
       let result
       try {
         result = await service.updateOne(id, dto)
@@ -158,7 +162,7 @@ describe('[Episode] Service', () => {
     })
 
     it('should successfully update the episode', async () => {
-      mockEpisodeRepository.getOne = jest.fn().mockReturnValue({ id, name: 'test' })
+      mockEpisodeRepository.getOne = jest.fn().mockResolvedValue({ id, name: 'test' })
 
       const result = await service.updateOne(id, dto)
       expect(mockEpisodeRepository.getOne).toHaveBeenCalledWith(id)
@@ -200,6 +204,6 @@ describe('[Episode] Service', () => {
   it('should return count of episodes', async () => {
     const result = await service.getCount()
 
-    expect(result).toEqual(MOCK_EPISODE_COUNT)
+    expect(result).toStrictEqual(MOCK_EPISODE_COUNT)
   })
 })

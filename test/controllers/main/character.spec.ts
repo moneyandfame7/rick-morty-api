@@ -42,7 +42,7 @@ describe('[Character] Controller', () => {
   })
 
   it('[CREATE] - should return a created character', async () => {
-    expect(await controller.createOne(mockCreateCharacterDto, mockExpressFile)).toEqual({
+    expect(await controller.createOne(mockCreateCharacterDto, mockExpressFile)).toStrictEqual({
       id: expect.any(Number),
       ...mockCreateCharacterDto,
       createdAt: expect.any(Date)
