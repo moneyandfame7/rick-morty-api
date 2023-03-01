@@ -36,8 +36,8 @@ export class EpisodeService implements BaseService<Episode, CreateEpisodeDto, Up
     if (!count || !episodes) {
       throw this.episodesException.manyNotFound()
     }
-
     const buildPaginationInfo = this.paginationService.buildPaginationInfo({ queryPaginationDto, count })
+
     return this.paginationService.wrapEntityWithPaginationInfo(episodes, buildPaginationInfo)
   }
 

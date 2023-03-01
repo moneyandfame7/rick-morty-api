@@ -29,7 +29,7 @@ export class Character {
   public gender: string
 
   @ApiProperty({ example: 'Genetic experiment', description: 'The type or subspecies of the character.' })
-  @Column()
+  @Column({ nullable: true })
   public type: string
 
   @ApiProperty({ description: 'Link to character`s photo.' })
