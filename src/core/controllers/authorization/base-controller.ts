@@ -11,7 +11,7 @@ export class BaseAuthorizationController {
   public readonly REFRESH_TOKEN_COOKIE: string
   public readonly ACCESS_TOKEN_COOKIE: string
   public readonly REFRESH_TOKEN_EXPIRE_COOKIE: number = 30 * 24 * 60 * 60 * 1000 // 30 days
-  public readonly ACCESS_TOKEN_EXPIRE_COOKIE: number = 60000 /*30 * 60 * 1000*/ // 30 minutes
+  public readonly ACCESS_TOKEN_EXPIRE_COOKIE: number = 30 * 60 * 1000 // 30 minutes
   protected constructor(
     protected readonly config: EnvironmentConfigService,
     protected readonly authService: AuthorizationService,
