@@ -5,9 +5,7 @@ import { EnvironmentConfigService } from '@app/services/common'
 
 import { TokenRepository } from '@infrastructure/repositories/common'
 import { Token, User } from '@infrastructure/entities/common'
-
-import type { GeneratedTokens } from '@core/models/common'
-import type { JwtPayload, TempJwtPayload } from '@core/models/authorization'
+import type { AuthResponse, JwtPayload, TempJwtPayload } from '@core/models/authorization'
 
 @Injectable()
 export class TokenService {
@@ -19,14 +17,16 @@ export class TokenService {
     this.REFRESH_SECRET = this.config.getJwtRefreshSecret()
   }
 
-  public generateTokens(user: User): GeneratedTokens {
-    const payload = {
+  public generateTokens(user: User): AuthResponse {
+    const payload: JwtPayload = {
       id: user.id,
       email: user.email,
       username: user.username,
       banned: user.banned,
+      auth_type: user.auth_type,
       role: user.role,
       country: user.country,
+      photo: user.photo,
       mail_subscribe: user.mail_subscribe
     }
     const access_token = this.jwtService.sign(payload, {
@@ -39,6 +39,7 @@ export class TokenService {
     })
 
     return {
+      user: payload,
       access_token,
       refresh_token
     }

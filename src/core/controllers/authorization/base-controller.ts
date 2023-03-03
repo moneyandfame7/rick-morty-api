@@ -3,7 +3,7 @@ import type { Request, Response } from 'express'
 import { AuthorizationService } from '@app/services/authorization'
 import { EnvironmentConfigService, TokenService, UserService } from '@app/services/common'
 
-import type { AuthorizationTokens } from '@core/models/authorization'
+import type { AuthResponse } from '@core/models/authorization'
 import type { GeneratedTokens, UserBeforeAuthentication } from '@core/models/common'
 
 export class BaseAuthorizationController {
@@ -11,7 +11,7 @@ export class BaseAuthorizationController {
   public readonly REFRESH_TOKEN_COOKIE: string
   public readonly ACCESS_TOKEN_COOKIE: string
   public readonly REFRESH_TOKEN_EXPIRE_COOKIE: number = 30 * 24 * 60 * 60 * 1000 // 30 days
-  public readonly ACCESS_TOKEN_EXPIRE_COOKIE: number = 30 * 60 * 1000 // 30 minutes
+  public readonly ACCESS_TOKEN_EXPIRE_COOKIE: number = 60000 /*30 * 60 * 1000*/ // 30 minutes
   protected constructor(
     protected readonly config: EnvironmentConfigService,
     protected readonly authService: AuthorizationService,
@@ -46,26 +46,22 @@ export class BaseAuthorizationController {
     res.clearCookie(this.ACCESS_TOKEN_COOKIE)
   }
 
-  public async socialLogin(user: UserBeforeAuthentication): Promise<AuthorizationTokens> {
+  public async socialLogin(user: UserBeforeAuthentication): Promise<AuthResponse> {
     const existUser = await this.userService.getOneByAuthType(user.email, user.auth_type)
 
     if (existUser) {
       return this.authService.buildUserInfoAndTokens(existUser)
-      // const ifPassedWelcomePage = existUser.country || existUser.username || existUser.mail_subscribe
-      // return {
-      //   message: ifPassedWelcomePage ? 'User is finished registration' : 'User is redirected to welcome page',
-      //   user: existUser,
-      //   tokens
-      // }
     }
 
     const info: UserBeforeAuthentication = {
       email: user.email,
+      photo: user.photo,
       username: user.username,
       auth_type: user.auth_type,
       is_verified: true
     }
     const createdUser = await this.userService.createOne(info)
+
     return this.authService.buildUserInfoAndTokens(createdUser)
   }
 }

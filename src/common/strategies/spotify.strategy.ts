@@ -1,5 +1,5 @@
 import { PassportStrategy } from '@nestjs/passport'
-import { Injectable, UnauthorizedException } from '@nestjs/common'
+import { Injectable, InternalServerErrorException } from '@nestjs/common'
 import { type Profile, Strategy, type VerifyCallback } from 'passport-spotify'
 
 import { EnvironmentConfigService } from '@app/services/common'
@@ -19,7 +19,7 @@ export class SpotifyStrategy extends PassportStrategy(Strategy, 'spotify') {
 
   public async validate(accessToken: string, refreshToken: string, profile: Profile, done: VerifyCallback): Promise<void> {
     if (!profile.emails) {
-      throw new UnauthorizedException('An error has occurred. Try another authorization method.')
+      throw new InternalServerErrorException('An error has occurred. Try another authorization method.')
     }
     const userInfo: UserBeforeAuthentication = {
       username: profile.displayName,

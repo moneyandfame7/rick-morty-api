@@ -7,15 +7,15 @@ export class AuthorizationException {
   public constructor(private readonly apiErrorService: ApiErrorService) {}
 
   public incorrectEmail(): HttpException {
-    return this.apiErrorService.throwErrorResponse('email', 'Incorrect email', HttpStatus.UNAUTHORIZED)
+    return this.apiErrorService.throwErrorResponse('email', 'Incorrect email', HttpStatus.BAD_REQUEST)
   }
 
   public incorrectPassword(): HttpException {
-    return this.apiErrorService.throwErrorResponse('password', `Incorrect password`, HttpStatus.UNAUTHORIZED)
+    return this.apiErrorService.throwErrorResponse('password', `Incorrect password`, HttpStatus.BAD_REQUEST)
   }
 
   public alreadyUsedEmail(email: string): HttpException {
-    return this.apiErrorService.throwErrorResponse('email', `Email "${email}  is already in use`, HttpStatus.UNAUTHORIZED)
+    return this.apiErrorService.throwErrorResponse('email', `Email "${email}  is already in use`, HttpStatus.BAD_REQUEST)
   }
 
   public incorrectVerificationLink(): HttpException {

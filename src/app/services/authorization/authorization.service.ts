@@ -10,6 +10,7 @@ import { Token, User } from '@infrastructure/entities/common'
 
 import type { UserBeforeAuthentication } from '@core/models/common'
 import type { AuthorizationTokens, JwtPayload } from '@core/models/authorization'
+import { AuthResponse } from '@core/models/authorization'
 
 import { AuthorizationException } from '@common/exceptions/authorization'
 import { UserException } from '@common/exceptions/common'
@@ -26,7 +27,7 @@ export class AuthorizationService {
     private readonly userException: UserException
   ) {}
 
-  public async signup(dto: AuthorizationDto): Promise<AuthorizationTokens> {
+  public async signup(dto: AuthorizationDto): Promise<AuthResponse> {
     const exists = await this.userService.getOneByAuthType(dto.email, AUTHORIZATION_PROVIDER.JWT)
     if (exists) {
       throw this.authorizationException.alreadyUsedEmail(exists.email)
@@ -47,35 +48,17 @@ export class AuthorizationService {
     return this.buildUserInfoAndTokens(user)
   }
 
-  public async welcomePage(token: string, details: UserDetailsDto): Promise<AuthorizationTokens> {
+  public async welcomePage(token: string, details: UserDetailsDto): Promise<AuthResponse> {
     const welcomePageUser = this.tokenService.validateAccessToken(token)
 
     const user = await this.userService.updateOne(welcomePageUser.id, details)
     return this.buildUserInfoAndTokens(user)
-    // return {
-    //   message: 'User is redirected to Home page',
-    //   body: {
-    //     user,
-    //     tokens
-    //   }
-    // }
   }
 
-  public async login(userDto: AuthorizationDto): Promise<AuthorizationTokens> {
+  public async login(userDto: AuthorizationDto): Promise<AuthResponse> {
     const user = await this.validateUser(userDto)
-    return this.buildUserInfoAndTokens(user)
 
-    // if (!(user.username || user.country || user.mail_subscribe)) {
-    //   return {
-    //     message: 'User is redirected to Welcome page',
-    //     body: {
-    //       user,
-    //       tokens
-    //     }
-    //   }
-    // }
-    //
-    // return { message: 'User is redirected to Home page', body: { user, tokens } }
+    return this.buildUserInfoAndTokens(user)
   }
 
   public logout(refreshToken: string): Promise<Token> {
@@ -86,7 +69,7 @@ export class AuthorizationService {
     return this.tokenService.validateAccessToken(tokens.access_token)
   }
 
-  public async refresh(refreshToken: string): Promise<AuthorizationTokens> {
+  public async refresh(refreshToken: string): Promise<AuthResponse> {
     if (!refreshToken) {
       throw new UnauthorizedException()
     }
@@ -97,11 +80,10 @@ export class AuthorizationService {
       throw new UnauthorizedException()
     }
     const user = await this.userService.getOneById(userData.id)
-
     return this.buildUserInfoAndTokens(user)
   }
 
-  public async verify(link: string): Promise<AuthorizationTokens> {
+  public async verify(link: string): Promise<AuthResponse> {
     const user = await this.userService.getOneByVerifyLink(link)
 
     if (!user) {
@@ -111,6 +93,7 @@ export class AuthorizationService {
       throw this.authorizationException.alreadyVerified()
     }
     const updated = await this.userService.updateOne(user.id, { is_verified: true })
+
     return this.buildUserInfoAndTokens(updated)
   }
 
@@ -131,7 +114,7 @@ export class AuthorizationService {
     return link
   }
 
-  public async reset(id: string, token: string, dto: ResetPasswordDto): Promise<AuthorizationTokens> {
+  public async reset(id: string, token: string, dto: ResetPasswordDto): Promise<AuthResponse> {
     const user = await this.userService.getOneById(id)
 
     if (!user) {
@@ -147,13 +130,14 @@ export class AuthorizationService {
     }
     const hashedPassword = await this.hashPassword(dto.password)
     const updated = await this.userService.updateOne(id, { password: hashedPassword })
+
     return this.buildUserInfoAndTokens(updated)
   }
 
-  public async buildUserInfoAndTokens(user: User): Promise<AuthorizationTokens> {
-    const tokens = await this.tokenService.generateTokens(user)
-    await this.tokenService.saveToken(user.id, tokens.refresh_token)
-    return tokens
+  public async buildUserInfoAndTokens(user: User): Promise<AuthResponse> {
+    const data = this.tokenService.generateTokens(user)
+    await this.tokenService.saveToken(user.id, data.refresh_token)
+    return data
   }
 
   private async validateUser(userDto: AuthorizationDto): Promise<User> {

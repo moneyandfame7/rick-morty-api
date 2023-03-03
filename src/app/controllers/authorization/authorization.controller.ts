@@ -10,7 +10,7 @@ import { AuthorizationDto } from '@app/dto/authorization'
 import { Token } from '@infrastructure/entities/common'
 
 import { BaseAuthorizationController } from '@core/controllers/authorization'
-import type { AuthorizationTokens, JwtPayload } from '@core/models/authorization'
+import type { AuthResponse, JwtPayload } from '@core/models/authorization'
 
 import { JwtAuthGuard } from '@common/guards/authorization'
 
@@ -27,29 +27,18 @@ export class AuthorizationController extends BaseAuthorizationController {
   }
 
   @Post('/signup')
-  public async signup(@Body() dto: AuthorizationDto, @Req() req: Request, @Res({ passthrough: true }) res: Response): Promise<AuthorizationTokens> {
-    const { access_token, refresh_token } = this.getCookies(req)
-    if (access_token && refresh_token) {
-      return {
-        access_token,
-        refresh_token
-      }
-    }
-    const tokens = await this.authService.signup(dto)
-    this.setCookies(res, tokens.refresh_token, tokens.access_token)
-    return tokens
+  public async signup(@Body() dto: AuthorizationDto, @Req() req: Request, @Res({ passthrough: true }) res: Response): Promise<AuthResponse> {
+    const data = await this.authService.signup(dto)
+    this.setCookies(res, data.refresh_token, data.access_token)
+    return data
   }
 
   @Post('/login')
-  public async login(@Body() dto: AuthorizationDto, @Req() req: Request, @Res({ passthrough: true }) res: Response): Promise<AuthorizationTokens> {
-    const { access_token, refresh_token } = this.getCookies(req)
-    if (access_token && refresh_token) {
-      return { access_token, refresh_token }
-    }
-    const tokens = await this.authService.login(dto)
-    this.setCookies(res, tokens.refresh_token, tokens.access_token)
+  public async login(@Body() dto: AuthorizationDto, @Req() req: Request, @Res({ passthrough: true }) res: Response): Promise<AuthResponse> {
+    const data = await this.authService.login(dto)
+    this.setCookies(res, data.refresh_token, data.access_token)
 
-    return tokens
+    return data
   }
 
   @Post('/logout')
@@ -65,24 +54,25 @@ export class AuthorizationController extends BaseAuthorizationController {
   }
 
   @Get('/refresh')
-  public async refresh(@Req() req: Request, @Res({ passthrough: true }) res: Response): Promise<AuthorizationTokens> {
+  public async refresh(@Req() req: Request, @Res({ passthrough: true }) res: Response): Promise<AuthResponse> {
     const { refresh_token } = this.getCookies(req)
-    const tokens = await this.authService.refresh(refresh_token)
-    this.setCookies(res, tokens.refresh_token, tokens.access_token)
-    return tokens
+    const data = await this.authService.refresh(refresh_token)
+    this.setCookies(res, data.refresh_token, data.access_token)
+    return data
   }
 
   @Post('/verify/:link')
-  public async verify(@Param('link') link: string, @Res({ passthrough: true }) res: Response): Promise<AuthorizationTokens> {
-    const tokens = await this.authService.verify(link)
-    this.setCookies(res, tokens.refresh_token, tokens.access_token)
-    return tokens
+  public async verify(@Param('link') link: string, @Res({ passthrough: true }) res: Response): Promise<AuthResponse> {
+    const data = await this.authService.verify(link)
+    this.setCookies(res, data.refresh_token, data.access_token)
+    return data
   }
 
-  @Get('/status')
+  @Get('/profile')
   @UseGuards(JwtAuthGuard)
   public status(@Req() req: Request): JwtPayload {
     const tokens = this.getCookies(req)
+    console.log(tokens)
     return this.authService.status(tokens)
   }
 
@@ -102,16 +92,11 @@ export class AuthorizationController extends BaseAuthorizationController {
   }
 
   @Post('/reset/:id/:token')
-  public async reset(
-    @Param('id') id: string,
-    @Param('token') token: string,
-    @Body() dto: ResetPasswordDto,
-    @Res({ passthrough: true }) res: Response
-  ): Promise<AuthorizationTokens> {
-    const tokens = await this.authService.reset(id, token, dto)
+  public async reset(@Param('id') id: string, @Param('token') token: string, @Body() dto: ResetPasswordDto, @Res({ passthrough: true }) res: Response): Promise<AuthResponse> {
+    const data = await this.authService.reset(id, token, dto)
 
-    this.setCookies(res, tokens.refresh_token, tokens.access_token)
+    this.setCookies(res, data.refresh_token, data.access_token)
 
-    return tokens
+    return data
   }
 }

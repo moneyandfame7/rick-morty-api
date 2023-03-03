@@ -1,5 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger'
-import { IsEmail, MinLength } from 'class-validator'
+import { IsEmail, MaxLength, MinLength } from 'class-validator'
 import { Type } from 'class-transformer'
 
 export class AuthorizationDto {
@@ -12,6 +12,7 @@ export class AuthorizationDto {
     description: 'The password of the user.'
   })
   @MinLength(8)
+  @MaxLength(20)
   @Type(() => String)
   public readonly password: string
 }

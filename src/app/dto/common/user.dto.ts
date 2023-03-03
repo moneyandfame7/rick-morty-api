@@ -6,8 +6,8 @@ import { AUTHORIZATION_PROVIDER, ROLES } from '@common/constants'
 
 export class CreateUserDto {
   @ApiProperty({ example: 'User_228', description: 'The username of the user.' })
-  @MinLength(2)
-  @MaxLength(20)
+  @MinLength(8)
+  @MaxLength(32)
   @Type(() => String)
   public readonly username?: string
 
@@ -19,8 +19,8 @@ export class CreateUserDto {
     example: '$2b$05$oSq9tOJGxOvmDpj7KLaJP.t0BGI6ic4OrOSCf/493ZsG9z/JoC3ki',
     description: 'The hashed password of the user.'
   })
-  @MinLength(3)
-  @MaxLength(32)
+  @MinLength(8)
+  @MaxLength(20)
   @Type(() => String)
   public readonly password?: string
 
@@ -68,20 +68,20 @@ export class EmailDto {
 }
 
 export class ResetPasswordDto {
-  @MinLength(3)
-  @MaxLength(32)
+  @MinLength(8)
+  @MaxLength(20)
   @Type(() => String)
   public readonly password: string
 
-  @MinLength(3)
-  @MaxLength(32)
+  @MinLength(8)
+  @MaxLength(20)
   @Type(() => String)
   public readonly confirmPassword: string
 }
 
 export class UserDetailsDto {
   @MinLength(2)
-  @MaxLength(20)
+  @MaxLength(32)
   @Type(() => String)
   @IsNotEmpty()
   public username: string
