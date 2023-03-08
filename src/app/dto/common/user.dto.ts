@@ -1,5 +1,5 @@
 import { ApiProperty, PartialType } from '@nestjs/swagger'
-import { IsBoolean, IsEmail, IsEnum, IsNotEmpty, IsOptional, IsString, IsUUID, MaxLength, MinLength } from 'class-validator'
+import { IsBoolean, IsEmail, IsEnum, IsNotEmpty, IsOptional, IsString, IsUUID, Length, MaxLength, MinLength } from 'class-validator'
 import { Type } from 'class-transformer'
 
 import { AUTHORIZATION_PROVIDER, ROLES } from '@common/constants'
@@ -41,6 +41,7 @@ export class CreateUserDto {
   public readonly mail_subscribe?: boolean
 
   @IsString()
+  @Length(2, 2)
   public readonly country?: string
 }
 

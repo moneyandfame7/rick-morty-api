@@ -27,7 +27,8 @@ export class TokenService {
       role: user.role,
       country: user.country,
       photo: user.photo,
-      mail_subscribe: user.mail_subscribe
+      mail_subscribe: user.mail_subscribe,
+      is_verified: user.is_verified
     }
     const access_token = this.jwtService.sign(payload, {
       secret: this.ACCESS_SECRET,

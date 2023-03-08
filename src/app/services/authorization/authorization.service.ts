@@ -3,7 +3,7 @@ import * as bcrypt from 'bcrypt'
 import { v4 as uuid } from 'uuid'
 
 import { EnvironmentConfigService, MailService, TokenService, UserService } from '@app/services/common'
-import { AuthorizationDto } from '@app/dto/authorization'
+import { LoginDto, SignupDto} from '@app/dto/authorization'
 import { ResetPasswordDto, UserDetailsDto } from '@app/dto/common'
 
 import { Token, User } from '@infrastructure/entities/common'
@@ -27,7 +27,7 @@ export class AuthorizationService {
     private readonly userException: UserException
   ) {}
 
-  public async signup(dto: AuthorizationDto): Promise<AuthResponse> {
+  public async signup(dto: SignupDto): Promise<AuthResponse> {
     const exists = await this.userService.getOneByAuthType(dto.email, AUTHORIZATION_PROVIDER.JWT)
     if (exists) {
       throw this.authorizationException.alreadyUsedEmail(exists.email)
@@ -42,7 +42,6 @@ export class AuthorizationService {
       verify_link
     }
     const user = await this.userService.createOne(info)
-
     await this.mailService.sendVerifyMail(user.email, verify_link)
 
     return this.buildUserInfoAndTokens(user)
@@ -55,7 +54,7 @@ export class AuthorizationService {
     return this.buildUserInfoAndTokens(user)
   }
 
-  public async login(userDto: AuthorizationDto): Promise<AuthResponse> {
+  public async login(userDto: LoginDto): Promise<AuthResponse> {
     const user = await this.validateUser(userDto)
 
     return this.buildUserInfoAndTokens(user)
@@ -95,6 +94,19 @@ export class AuthorizationService {
     const updated = await this.userService.updateOne(user.id, { is_verified: true })
 
     return this.buildUserInfoAndTokens(updated)
+  }
+
+  public async resendVerification(user: JwtPayload): Promise<void> {
+    const foundedUser = await this.userService.getOneById(user.id)
+
+    if (!foundedUser) {
+      throw this.authorizationException.incorrectVerificationLink()
+    }
+
+    if (foundedUser.is_verified) {
+      throw this.authorizationException.alreadyVerified()
+    }
+    await this.mailService.sendVerifyMail(foundedUser.email, foundedUser.verify_link)
   }
 
   public async forgot(email: string): Promise<string> {
@@ -140,7 +152,7 @@ export class AuthorizationService {
     return data
   }
 
-  private async validateUser(userDto: AuthorizationDto): Promise<User> {
+  private async validateUser(userDto: LoginDto): Promise<User> {
     const user = await this.userService.getOneByAuthType(userDto.email, AUTHORIZATION_PROVIDER.JWT)
     if (!user) {
       throw this.authorizationException.incorrectEmail()

@@ -4,9 +4,9 @@ import type { Response } from 'express'
 import { AuthorizationService } from '@app/services/authorization'
 import { EnvironmentConfigService, TokenService, UserService } from '@app/services/common'
 
-import type { UserBeforeAuthentication } from '@core/models/common'
-import type { AuthResponse } from '@core/models/authorization'
 import { BaseAuthorizationController } from '@core/controllers/authorization'
+import type { AuthResponse } from '@core/models/authorization'
+import type { UserBeforeAuthentication } from '@core/models/common'
 
 import { GetUser } from '@common/decorators'
 import { DiscordAuthGuard } from '@common/guards/authorization'

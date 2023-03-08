@@ -21,6 +21,7 @@ export interface JwtPayload {
   readonly country: string | null
   readonly photo: string | null
   readonly mail_subscribe: boolean | null
+  readonly is_verified: boolean
 }
 
 export interface TempJwtPayload {
