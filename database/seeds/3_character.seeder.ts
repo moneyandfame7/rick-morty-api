@@ -22,7 +22,7 @@ export class CharacterSeeder implements Seeder {
           name: character.name,
           gender: character.gender,
           status: character.status,
-          image: `${process.env.S3BUCKET_URL}/${character.id}.jpeg`,
+          image: `${process.env.S3BUCKET_URL}/characters/${character.id}.jpeg`,
           species: character.species,
           // @ts-expect-error тому шо мені впадлу возитись
           location: responseLocation[getIdFromUrl(character.location.url) - 1],

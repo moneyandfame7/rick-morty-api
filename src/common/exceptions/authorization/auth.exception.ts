@@ -1,21 +1,23 @@
 import { type HttpException, HttpStatus, Injectable } from '@nestjs/common'
 
 import { ApiErrorService } from '@app/services/common'
+import { HttpCode } from '@common/constants'
 
 @Injectable()
 export class AuthorizationException {
   public constructor(private readonly apiErrorService: ApiErrorService) {}
 
   public incorrectEmail(): HttpException {
-    return this.apiErrorService.throwErrorResponse('Incorrect email.', HttpStatus.BAD_REQUEST)
+    // return this.apiErrorService.throwErrorResponse('Incorrect email.', HttpStatus.BAD_REQUEST)
+    return this.apiErrorService.throwDemo(HttpCode.EMAIL_NOT_FOUND, 'Couldn’t find your account', HttpStatus.BAD_REQUEST)
   }
 
   public incorrectPassword(): HttpException {
-    return this.apiErrorService.throwErrorResponse(`Incorrect password.`, HttpStatus.BAD_REQUEST)
+    return this.apiErrorService.throwDemo(HttpCode.INCORRECT_PASSWORD, `Incorrect password.`, HttpStatus.BAD_REQUEST)
   }
 
-  public alreadyUsedEmail(email: string): HttpException {
-    return this.apiErrorService.throwErrorResponse(`Email ${email} is already in use.`, HttpStatus.BAD_REQUEST)
+  public alreadyUsedEmail(): HttpException {
+    return this.apiErrorService.throwDemo(HttpCode.EMAIL_ALREADY_USED, `That email is taken. Try another.`, HttpStatus.BAD_REQUEST)
   }
 
   public incorrectVerificationLink(): HttpException {
