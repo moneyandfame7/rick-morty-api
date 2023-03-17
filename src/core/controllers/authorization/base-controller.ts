@@ -30,13 +30,13 @@ export class BaseAuthorizationController {
 
       // sameSite: 'none'
       /*  TODO: зробити так, якщо це production, то vercel, якщо develop */
-      domain: 'rick-morty-git-feature-antd-design-moneyandfame7.vercel.app'
+      domain: 'rick-morty-api-nest-production.up.railway.app'
     })
     res.cookie(this.ACCESS_TOKEN_COOKIE, access_token, {
       maxAge: this.ACCESS_TOKEN_EXPIRE_COOKIE,
       secure: true,
       // sameSite: 'none'
-      domain: 'rick-morty-git-feature-antd-design-moneyandfame7.vercel.app'
+      domain: 'rick-morty-api-nest-production.up.railway.app'
     })
   }
 
