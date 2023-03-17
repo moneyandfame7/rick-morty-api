@@ -8,7 +8,7 @@ import { AppModule } from '@app/app.module'
 import { CustomValidationPipe } from '@common/pipes'
 
 async function bootstrap(): Promise<void> {
-  const PORT = process.env.PORT ?? 3000
+  const PORT = process.env.PORT ?? 3001
   const app = await NestFactory.create(AppModule, {
     cors: { origin: process.env.CLIENT_URL, credentials: true }
   })

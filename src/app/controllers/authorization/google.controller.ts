@@ -6,7 +6,7 @@ import { AuthorizationService } from '@app/services/authorization'
 
 import { BaseAuthorizationController } from '@core/controllers/authorization'
 import type { UserBeforeAuthentication } from '@core/models/common'
-import type { AuthorizationTokens } from '@core/models/authorization'
+import type { AuthResponse } from '@core/models/authorization'
 
 import { GetUser } from '@common/decorators'
 import { GoogleAuthGuard } from '@common/guards/authorization'
@@ -30,9 +30,9 @@ export class GoogleController extends BaseAuthorizationController {
 
   @Get('/redirect')
   @UseGuards(GoogleAuthGuard)
-  public async redirect(@GetUser() user: UserBeforeAuthentication, @Res({ passthrough: true }) res: Response): Promise<AuthorizationTokens> {
-    const tokens = await this.socialLogin(user)
-    this.setCookies(res, tokens.refresh_token, tokens.access_token)
-    return tokens
+  public async redirect(@GetUser() user: UserBeforeAuthentication, @Res({ passthrough: true }) res: Response): Promise<AuthResponse> {
+    const data = await this.socialLogin(user)
+    this.setCookies(res, data.refresh_token, data.access_token)
+    return data
   }
 }

@@ -4,9 +4,9 @@ import type { Response } from 'express'
 import { AuthorizationService } from '@app/services/authorization'
 import { EnvironmentConfigService, TokenService, UserService } from '@app/services/common'
 
-import type { UserBeforeAuthentication } from '@core/models/common'
-import type { AuthorizationTokens } from '@core/models/authorization'
 import { BaseAuthorizationController } from '@core/controllers/authorization'
+import type { AuthResponse } from '@core/models/authorization'
+import type { UserBeforeAuthentication } from '@core/models/common'
 
 import { GetUser } from '@common/decorators'
 import { DiscordAuthGuard } from '@common/guards/authorization'
@@ -30,9 +30,9 @@ export class DiscordController extends BaseAuthorizationController {
 
   @Get('/redirect')
   @UseGuards(DiscordAuthGuard)
-  public async redirect(@GetUser() user: UserBeforeAuthentication, @Res({ passthrough: true }) res: Response): Promise<AuthorizationTokens> {
-    const tokens = await this.socialLogin(user)
-    this.setCookies(res, tokens.refresh_token, tokens.access_token)
-    return tokens
+  public async redirect(@GetUser() user: UserBeforeAuthentication, @Res({ passthrough: true }) res: Response): Promise<AuthResponse> {
+    const data = await this.socialLogin(user)
+    this.setCookies(res, data.refresh_token, data.access_token)
+    return data
   }
 }

@@ -29,18 +29,26 @@ export class MailService {
   }
 
   public async sendVerifyMail(email: string, link: string): Promise<void> {
+    const clientLink = `${this.config.getClientUrl()}/account/verify/${link}`
+
     await this.transporter.sendMail({
       from: this.user,
       to: email,
-      subject: 'Verify your email',
+      subject: `${email}, please verify your account`,
       text: '',
       html: `
         <div >
-             <h1>Hi!</h1>
-            <p style="font-size:18px">Please confirm that you signed up using the email address ${email} by clicking the link below.</p>
-             <a href="${link}" target="_blank">
-             ${link}
-             </a>
+        <h1>${email}</h1>
+            <p style="font-size:18px">
+              We just need to verify your email address before you can access Rick&MortyApi
+            </p>
+
+            <p style="font-size:18px">
+              Verify your email address <a href="${clientLink}" target="_blank"></a>
+            </p>
+            <p style="font-size:18px>
+              <b>Thanks! – The Rick&MortyApi</b>
+            </p>
         </div>
         `
     })

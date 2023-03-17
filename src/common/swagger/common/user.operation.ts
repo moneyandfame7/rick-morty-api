@@ -63,7 +63,7 @@ export const USER_OPERATION: UserOperation = {
     guard: UseGuards(JwtAuthGuard, RolesGuard)
   },
   BAN: {
-    summary: ' ban a user',
+    summary: 'ban a user',
     status: HttpStatus.OK,
     type: User,
     method: HttpMethod.POST('/ban'),
@@ -74,7 +74,7 @@ export const USER_OPERATION: UserOperation = {
     summary: 'change user image',
     status: HttpStatus.OK,
     type: User,
-    method: HttpMethod.POST(':id/photo'),
+    method: HttpMethod.POST('/photo'),
     guard: UseGuards(JwtAuthGuard)
   }
 }

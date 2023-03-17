@@ -22,7 +22,7 @@ export class User {
   public password: string
 
   @Column({ nullable: true })
-  public photo?: string
+  public photo: string
 
   @ApiProperty({ example: 'admin', description: 'The role of the user' })
   @ManyToOne(() => Role, role => role.value)

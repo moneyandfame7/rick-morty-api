@@ -1,4 +1,4 @@
-import { Injectable, UnauthorizedException } from '@nestjs/common'
+import { Injectable, InternalServerErrorException } from '@nestjs/common'
 import { PassportStrategy } from '@nestjs/passport'
 import { Profile, Strategy } from 'passport-github2'
 
@@ -19,7 +19,7 @@ export class GithubStrategy extends PassportStrategy(Strategy, 'github') {
 
   public validate(accessToken: string, refreshToken: string, profile: Profile): UserBeforeAuthentication {
     if (!profile.emails) {
-      throw new UnauthorizedException('An error has occurred. Try another authorization method.')
+      throw new InternalServerErrorException('An error has occurred. Try another authorization method.')
     }
     return {
       username: profile.username || profile.displayName,

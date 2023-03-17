@@ -82,11 +82,10 @@ export class UserController {
     return this.userService.ban(banUserDto)
   }
 
-  @Post(':id/photo')
+  @Post('/photo')
   @ApiEntitiesOperation(USER_OPERATION.CHANGE_IMAGE)
   @UseInterceptors(FileInterceptor('photo', { storage: memoryStorage() }))
-  public async changeImage(@Req() req: Request, @UploadedFile() file: Express.Multer.File): Promise<User> {
-    const id = (req.user as User).id
-    return this.userService.changePhoto(id, file)
+  public async changeImage(@GetUser() user: JwtPayload, @UploadedFile() file: Express.Multer.File): Promise<User> {
+    return this.userService.changePhoto(user.id, file)
   }
 }

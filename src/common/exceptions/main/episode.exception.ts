@@ -7,15 +7,15 @@ export class EpisodeException {
   public constructor(private readonly apiErrorService: ApiErrorService) {}
 
   public manyNotFound(): HttpException {
-    return this.apiErrorService.throwErrorResponse('episode', 'Episodes not found', HttpStatus.NOT_FOUND)
+    return this.apiErrorService.throwErrorResponse('Episodes not found', HttpStatus.NOT_FOUND)
   }
 
   public withIdNotFound(id: number): HttpException {
-    return this.apiErrorService.throwErrorResponse('episode', `Episode with ${id} not found`, HttpStatus.NOT_FOUND)
+    return this.apiErrorService.throwErrorResponse(`Episode with ${id} not found`, HttpStatus.NOT_FOUND)
   }
 
   public alreadyExists(name: string): HttpException {
-    return this.apiErrorService.throwErrorResponse('episode', `Episode with name ${name} already exists`, HttpStatus.CONFLICT)
+    return this.apiErrorService.throwErrorResponse(`Episode with name ${name} already exists`, HttpStatus.CONFLICT)
   }
 
   //

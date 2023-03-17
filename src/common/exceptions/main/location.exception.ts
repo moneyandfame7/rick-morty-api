@@ -7,15 +7,15 @@ export class LocationException {
   public constructor(private readonly apiErrorService: ApiErrorService) {}
 
   public manyNotFound(): HttpException {
-    return this.apiErrorService.throwErrorResponse('location', 'Locations not found', HttpStatus.NOT_FOUND)
+    return this.apiErrorService.throwErrorResponse('Locations not found', HttpStatus.NOT_FOUND)
   }
 
   public withIdNotFound(id: number): HttpException {
-    return this.apiErrorService.throwErrorResponse('location', `Location with ${id} not found`, HttpStatus.NOT_FOUND)
+    return this.apiErrorService.throwErrorResponse(`Location with ${id} not found`, HttpStatus.NOT_FOUND)
   }
 
   public alreadyExists(name: string): HttpException {
-    return this.apiErrorService.throwErrorResponse('location', `Location with name ${name} already exists`, HttpStatus.CONFLICT)
+    return this.apiErrorService.throwErrorResponse(`Location with name ${name} already exists`, HttpStatus.CONFLICT)
   }
 
   //

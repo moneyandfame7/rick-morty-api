@@ -2,11 +2,15 @@ import { HttpException, HttpStatus, Injectable } from '@nestjs/common'
 
 @Injectable()
 export class ApiErrorService {
-  public throwErrorResponse(key: string, error: string, status: HttpStatus): HttpException {
+  public throwErrorResponse(error: string, status: HttpStatus): HttpException {
+    return new HttpException(error, status)
+  }
+
+  public throwDemo(code: string, message: string, status: HttpStatus): HttpException {
     const errorResponse = {
-      errors: {}
+      code,
+      message
     }
-    errorResponse.errors[key] = error
     return new HttpException(errorResponse, status)
   }
 }
