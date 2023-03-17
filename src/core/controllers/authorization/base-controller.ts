@@ -25,12 +25,18 @@ export class BaseAuthorizationController {
 
   public setCookies(res: Response, refresh_token: string, access_token: string): void {
     res.cookie(this.REFRESH_TOKEN_COOKIE, refresh_token, {
-      httpOnly: true,
-      maxAge: this.REFRESH_TOKEN_EXPIRE_COOKIE
+      maxAge: this.REFRESH_TOKEN_EXPIRE_COOKIE,
+      secure: true,
+
+      // sameSite: 'none'
+      /*  TODO: зробити так, якщо це production, то vercel, якщо develop */
+      domain: 'rick-morty-git-feature-antd-design-moneyandfame7.vercel.app'
     })
     res.cookie(this.ACCESS_TOKEN_COOKIE, access_token, {
-      httpOnly: true,
-      maxAge: this.ACCESS_TOKEN_EXPIRE_COOKIE
+      maxAge: this.ACCESS_TOKEN_EXPIRE_COOKIE,
+      secure: true,
+      // sameSite: 'none'
+      domain: 'rick-morty-git-feature-antd-design-moneyandfame7.vercel.app'
     })
   }
 

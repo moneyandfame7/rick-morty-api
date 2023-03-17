@@ -10,7 +10,7 @@ import { CustomValidationPipe } from '@common/pipes'
 async function bootstrap(): Promise<void> {
   const PORT = process.env.PORT ?? 3001
   const app = await NestFactory.create(AppModule, {
-    cors: { origin: process.env.CLIENT_URL, credentials: true }
+    cors: { origin: 'https://rick-morty-git-feature-antd-design-moneyandfame7.vercel.app', credentials: true }
   })
   app.useGlobalPipes(new CustomValidationPipe())
   app.use(cookieParser())
