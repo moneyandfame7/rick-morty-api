@@ -36,7 +36,7 @@ export class BaseAuthorizationController {
       maxAge: this.ACCESS_TOKEN_EXPIRE_COOKIE,
       secure: true,
       // sameSite: 'none'
-      domain: 'rick-morty-git-feature-antd-design-moneyandfame7.vercel.app'
+      domain: 'rick-morty-api-nest-production.up.railway.app'
     })
   }
 
