@@ -27,16 +27,16 @@ export class BaseAuthorizationController {
     res.cookie(this.REFRESH_TOKEN_COOKIE, refresh_token, {
       maxAge: this.REFRESH_TOKEN_EXPIRE_COOKIE,
       secure: true,
-      sameSite: 'none',
+      sameSite: 'none'
       /*  TODO: зробити так, якщо це production, то vercel, якщо develop */
-      domain: '.up.railway.app'
+      // domain: '.up.railway.app'
     })
     res.cookie(this.ACCESS_TOKEN_COOKIE, access_token, {
       maxAge: this.ACCESS_TOKEN_EXPIRE_COOKIE,
       secure: true,
 
-      sameSite: 'none',
-      domain: '.up.railway.app'
+      sameSite: 'none'
+      // domain: '.up.railway.app'
     })
   }
 

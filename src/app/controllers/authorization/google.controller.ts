@@ -1,4 +1,4 @@
-import { Controller, Get, Res, UseGuards } from '@nestjs/common'
+import { Controller, Get,  Redirect, Res, UseGuards } from '@nestjs/common'
 import type { Response } from 'express'
 
 import { EnvironmentConfigService, TokenService, UserService } from '@app/services/common'
@@ -29,10 +29,13 @@ export class GoogleController extends BaseAuthorizationController {
   public async login(): Promise<void> {}
 
   @Get('/redirect')
+  @Redirect()
   @UseGuards(GoogleAuthGuard)
-  public async redirect(@GetUser() user: UserBeforeAuthentication, @Res({ passthrough: true }) res: Response): Promise<AuthResponse> {
+  public async redirect(@GetUser() user: UserBeforeAuthentication, @Res({ passthrough: true }) res: Response): Promise<{ url: string }> {
     const data = await this.socialLogin(user)
     this.setCookies(res, data.refresh_token, data.access_token)
-    return data
+    return {
+      url: `http://localhost:3000/social?token=${data.access_token}`
+    }
   }
 }
