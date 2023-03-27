@@ -1,11 +1,11 @@
-import {Body, Controller, Get, Param, ParseIntPipe, Query, Req, ValidationPipe} from '@nestjs/common'
+import {Body, Controller, Param, ParseIntPipe, Query, Req, ValidationPipe} from '@nestjs/common'
 import {ApiTags} from '@nestjs/swagger'
 import type {Request} from 'express'
 import * as _ from 'lodash'
 
 import {EpisodeService} from '@app/services/main'
 
-import {CreateEpisodeDto,  FieldsEpisodeDto, QueryEpisodeDto, UpdateEpisodeDto} from '@app/dto/main'
+import {CreateEpisodeDto, FieldsEpisodeDto, QueryEpisodeDto, UpdateEpisodeDto} from '@app/dto/main'
 import {QueryPaginationDto} from '@app/dto/common'
 
 import type {Presenter} from '@core/services/common'
@@ -26,13 +26,12 @@ export class EpisodeController {
         return this.episodeService.createOne(createEpisodeDto)
     }
 
-    @Get('/names')
+    @ApiEntitiesOperation(EPISODE_OPERATION.GET_NAMES)
     public getNameList(): Promise<string[]> {
         return this.episodeService.getNameList()
     }
 
-
-    @Get('/unique')
+    @ApiEntitiesOperation(EPISODE_OPERATION.GET_BY_FIELDS)
     public getUniqueByFields(@Body() dto: FieldsEpisodeDto): Promise<{ [field: string]: string[] }> {
         return this.episodeService.getUniqueByFields(dto.fields)
     }

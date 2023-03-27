@@ -1,6 +1,6 @@
 import {
     Body,
-    Controller, Get,
+    Controller,
     Param,
     ParseIntPipe,
     Query,
@@ -38,12 +38,12 @@ export class CharacterController {
         return this.characterService.createOne(character, file)
     }
 
-    @Get('/names')
+    @ApiEntitiesOperation(CHARACTER_OPERATION.GET_NAMES)
     public getNameList(): Promise<string[]> {
         return this.characterService.getNameList()
     }
 
-    @Get('/unique')
+    @ApiEntitiesOperation(CHARACTER_OPERATION.GET_BY_FIELDS)
     public getUniqueByFields(@Body() dto: FieldsCharacterDto): Promise<{ [field: string]: string[] }> {
         return this.characterService.getUniqueByFields(dto.fields)
     }

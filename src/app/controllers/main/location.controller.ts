@@ -1,4 +1,4 @@
-import {Body, Controller, Get, Param, ParseIntPipe, Query, Req, ValidationPipe} from '@nestjs/common'
+import {Body, Controller, Param, ParseIntPipe, Query, Req, ValidationPipe} from '@nestjs/common'
 import {ApiTags} from '@nestjs/swagger'
 import type {Request} from 'express'
 import * as _ from 'lodash'
@@ -16,7 +16,7 @@ import type {Presenter} from '@core/services/common'
 
 import {Location} from '@infrastructure/entities/main'
 
-import {LOCATION_OPERATION} from '@common/swagger/main'
+import {EPISODE_OPERATION, LOCATION_OPERATION} from '@common/swagger/main'
 import {ApiEntitiesOperation} from '@common/decorators'
 
 @Controller('/api/locations')
@@ -30,12 +30,12 @@ export class LocationController {
         return this.locationService.createOne(createLocationDto)
     }
 
-    @Get('/names')
+    @ApiEntitiesOperation(EPISODE_OPERATION.GET_NAMES)
     public getNameList(): Promise<string[]> {
         return this.locationService.getNameList()
     }
 
-    @Get('/unique')
+    @ApiEntitiesOperation(EPISODE_OPERATION.GET_BY_FIELDS)
     public getUniqueByFields(@Body() dto: FieldsLocationDto): Promise<{ [field: string]: string[] }> {
         return this.locationService.getUniqueByFields(dto.fields)
     }

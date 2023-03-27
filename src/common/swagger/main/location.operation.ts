@@ -31,6 +31,13 @@ export const LOCATION_OPERATION: MainEntitiesOperations = {
         method: HttpMethod.GET('/names'),
         guard: UseGuards(JwtAuthGuard)
     },
+    GET_BY_FIELDS: {
+        summary: 'get list of unique values by field',
+        status: HttpStatus.OK,
+        type: [String],
+        method: HttpMethod.GET('/unique'),
+        guard: UseGuards(JwtAuthGuard)
+    },
     GET_ONE: {
         summary: 'get one location with specified id',
         status: HttpStatus.OK,
