@@ -19,6 +19,7 @@ export interface BaseOperations {
 
 interface OtherOperations {
     GET_NAMES: BaseOperationOptions
+    GET_BY_FIELDS: BaseOperationOptions
 }
 
 export type MainEntitiesOperations = BaseOperations & OtherOperations
