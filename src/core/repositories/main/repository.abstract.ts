@@ -42,7 +42,7 @@ export abstract class MainRepositoryAbstract<Entity extends ObjectLiteral, Query
     }
 
     public async getByField(field: string): Promise<string[]> {
-        const entities = await this.builder.select(`DISTINCT "${field}"`).execute()
+        const entities = await this.builder.select(`DISTINCT "${field}"`).addOrderBy(field, 'ASC').execute()
         return entities.map(entity => entity[field])
     }
 }

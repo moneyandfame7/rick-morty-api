@@ -1,13 +1,15 @@
-import {IsArray, IsDate, IsEnum,  IsNotEmpty, IsNumber, IsObject, IsOptional, IsString} from 'class-validator'
+import {IsArray, IsDate, IsEnum, IsIn, IsNotEmpty, IsNumber, IsObject, IsOptional, IsString} from 'class-validator'
 import {ApiProperty} from '@nestjs/swagger'
 import {PartialType} from '@nestjs/mapped-types'
 
 import {CreateLocationDto} from '@app/dto/main'
 import {QueryPaginationDto} from '@app/dto/common'
 
-import {Character, Episode} from '@infrastructure/entities/main'
+import {Episode} from '@infrastructure/entities/main'
 
 import {CHARACTER_GENDER, CHARACTER_STATUS} from '@common/constants'
+import {charactersProperties} from "@common/constants/entities-properties";
+
 
 export class CreateCharacterDto {
     @IsNumber()
@@ -134,7 +136,8 @@ export class QueryCharacterDto extends QueryPaginationDto {
 
 export class FieldsCharacterDto {
     @IsArray()
-    public fields: Array<keyof Character>
+    @IsIn(charactersProperties, {each: true})
+    public fields: string[]
 
 }
 

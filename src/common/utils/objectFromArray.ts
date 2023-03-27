@@ -2,7 +2,7 @@
 receives an array of keys and returns an object with a key array of values
 */
 
-export const objectFromArray = (fields: string[], values: never[]): { [p: string]: string[] } => {
+export const objectFromArray = (fields: string[], values: string[][]): { [p: string]: string[] } => {
     const object = fields.map((field) => {
         return {[field]: ['']};
     }).reduce((acc, field) => {

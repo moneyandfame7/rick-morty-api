@@ -1,9 +1,9 @@
 import {ApiProperty} from '@nestjs/swagger'
 import {PartialType} from '@nestjs/mapped-types'
-import {IsArray, IsNotEmpty, IsOptional, IsString} from 'class-validator'
+import {IsArray, IsIn, IsNotEmpty, IsOptional, IsString} from 'class-validator'
 
 import {QueryPaginationDto} from '@app/dto/common'
-import {Location} from "@infrastructure/entities/main";
+import {locationProperties} from "@common/constants/entities-properties";
 
 export class CreateLocationDto {
     @ApiProperty({example: 'Earth (C-137)', description: 'The name of the location.'})
@@ -43,7 +43,8 @@ export class QueryLocationDto extends QueryPaginationDto {
 
 export class FieldsLocationDto {
     @IsArray()
-    public fields: Array<keyof Location>
+    @IsIn(locationProperties, {each: true})
+    public fields: string[]
 }
 
 export class UpdateLocationDto extends PartialType(CreateLocationDto) {

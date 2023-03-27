@@ -1,9 +1,9 @@
 import {PartialType} from '@nestjs/mapped-types'
 import {ApiProperty} from '@nestjs/swagger'
-import {IsArray, IsNotEmpty, IsOptional, IsString} from 'class-validator'
+import {IsArray, IsIn, IsNotEmpty, IsOptional, IsString} from 'class-validator'
 
 import {QueryPaginationDto} from '@app/dto/common'
-import {Episode} from "@infrastructure/entities/main";
+import {episodeProperties} from "@common/constants/entities-properties";
 
 export class CreateEpisodeDto {
     @ApiProperty({example: 'Pilot', description: 'The name of the episode.'})
@@ -51,9 +51,11 @@ export class QueryEpisodeDto extends QueryPaginationDto {
     public character_name?: string
 }
 
+
 export class FieldsEpisodeDto {
     @IsArray()
-    public fields: Array<keyof Episode>
+    @IsIn(episodeProperties, {each: true})
+    public fields: string[]
 }
 
 export class UpdateEpisodeDto extends PartialType(CreateEpisodeDto) {
