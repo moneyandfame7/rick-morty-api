@@ -1,53 +1,60 @@
-import { PartialType } from '@nestjs/mapped-types'
-import { ApiProperty } from '@nestjs/swagger'
-import { IsNotEmpty, IsOptional, IsString } from 'class-validator'
+import {PartialType} from '@nestjs/mapped-types'
+import {ApiProperty} from '@nestjs/swagger'
+import {IsArray, IsNotEmpty, IsOptional, IsString} from 'class-validator'
 
-import { QueryPaginationDto } from '@app/dto/common'
+import {QueryPaginationDto} from '@app/dto/common'
+import {Episode} from "@infrastructure/entities/main";
 
 export class CreateEpisodeDto {
-  @ApiProperty({ example: 'Pilot', description: 'The name of the episode.' })
-  @IsString()
-  @IsNotEmpty()
-  public name: string
+    @ApiProperty({example: 'Pilot', description: 'The name of the episode.'})
+    @IsString()
+    @IsNotEmpty()
+    public name: string
 
-  @ApiProperty({ example: 'S01E01', description: 'The code of the episode.' })
-  @IsString()
-  @IsNotEmpty()
-  public episode: string
+    @ApiProperty({example: 'S01E01', description: 'The code of the episode.'})
+    @IsString()
+    @IsNotEmpty()
+    public episode: string
 
-  @ApiProperty({ example: 'December, 2, 2013', description: 'The air date of the episode.' })
-  @IsString()
-  @IsNotEmpty()
-  public airDate: string
+    @ApiProperty({example: 'December, 2, 2013', description: 'The air date of the episode.'})
+    @IsString()
+    @IsNotEmpty()
+    public airDate: string
 
-  @ApiProperty({
-    example: [1, 2, 3, 4, 5, 7, 10],
-    description: 'List of characters who have been seen in the episode.'
-  })
-  public characters?: number[]
+    @ApiProperty({
+        example: [1, 2, 3, 4, 5, 7, 10],
+        description: 'List of characters who have been seen in the episode.'
+    })
+    public characters?: number[]
 
-  public createdAt?: Date
+    public createdAt?: Date
 }
 
 export class QueryEpisodeDto extends QueryPaginationDto {
-  @ApiProperty({ example: 1, description: 'The id of the episode.' })
-  @IsOptional()
-  public id?: string
+    @ApiProperty({example: 1, description: 'The id of the episode.'})
+    @IsOptional()
+    public id?: string
 
-  @ApiProperty({ example: 'Pilot', description: 'The name of the episode.' })
-  @IsOptional()
-  @IsString()
-  public name?: string
+    @ApiProperty({example: 'Pilot', description: 'The name of the episode.'})
+    @IsOptional()
+    @IsString()
+    public name?: string
 
-  @ApiProperty({ example: 'S01E01', description: 'The code of the episode.' })
-  @IsOptional()
-  @IsString()
-  public episode?: string
+    @ApiProperty({example: 'S01E01', description: 'The code of the episode.'})
+    @IsOptional()
+    @IsString()
+    public episode?: string
 
-  @ApiProperty({ example: 'S01E01', description: 'The name of the character who was present in the episode' })
-  @IsOptional()
-  @IsString()
-  public character_name?: string
+    @ApiProperty({example: 'S01E01', description: 'The name of the character who was present in the episode'})
+    @IsOptional()
+    @IsString()
+    public character_name?: string
 }
 
-export class UpdateEpisodeDto extends PartialType(CreateEpisodeDto) {}
+export class FieldsEpisodeDto {
+    @IsArray()
+    public fields: Array<keyof Episode>
+}
+
+export class UpdateEpisodeDto extends PartialType(CreateEpisodeDto) {
+}
