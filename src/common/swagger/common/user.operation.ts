@@ -8,13 +8,13 @@ import { JwtAuthGuard } from '@common/guards/authorization'
 import { RolesGuard } from '@common/guards/common'
 import { BaseOperationOptions, BaseOperations } from '@common/swagger/interface'
 
-interface IUserOperation {
+interface OtherOperations {
   ADD_ROLE: BaseOperationOptions
   BAN: BaseOperationOptions
   CHANGE_IMAGE: BaseOperationOptions
 }
 
-type UserOperation = IUserOperation & BaseOperations
+type UserOperation = OtherOperations & BaseOperations
 export const USER_OPERATION: UserOperation = {
   CREATE: {
     summary: 'create and save a new user to collection',

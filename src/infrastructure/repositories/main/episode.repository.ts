@@ -40,6 +40,7 @@ export class EpisodeRepository extends MainRepositoryAbstract<Episode, QueryEpis
     return created.raw[0]
   }
 
+
   public async getMany(pageOptionsDto: QueryPaginationDto, queryCharacterDto: QueryEpisodeDto): Promise<GetManyEpisodes> {
     const queryBuilder = this.builder.skip(pageOptionsDto.skip).take(pageOptionsDto.take).addOrderBy('episode.id', pageOptionsDto.order)
 
