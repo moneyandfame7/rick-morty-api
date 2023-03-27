@@ -31,7 +31,6 @@ export class AuthorizationController extends BaseAuthorizationController {
   public async signup(@Body() dto: SignupDto, @Req() req: Request, @Res({ passthrough: true }) res: Response): Promise<AuthResponse> {
     const data = await this.authService.signup(dto)
     this.setCookies(res, data.refresh_token, data.access_token)
-    console.log(dto, new Date().getTime())
 
     return data
   }
@@ -40,7 +39,6 @@ export class AuthorizationController extends BaseAuthorizationController {
   public async login(@Body() dto: LoginDto, @Req() req: Request, @Res({ passthrough: true }) res: Response): Promise<AuthResponse> {
     const data = await this.authService.login(dto)
     this.setCookies(res, data.refresh_token, data.access_token)
-    console.log(dto, new Date().getTime())
 
     return data
   }
@@ -83,7 +81,6 @@ export class AuthorizationController extends BaseAuthorizationController {
   @UseGuards(JwtAuthGuard)
   public async welcomePage(@Body() details: UserDetailsDto, @Req() req: Request, @Res({ passthrough: true }) res: Response): Promise<AuthResponse> {
     const { access_token } = this.getCookies(req)
-    console.log(details)
 
     const data = await this.authService.welcomePage(access_token, details)
     this.setCookies(res, data.refresh_token, data.access_token)
@@ -93,8 +90,6 @@ export class AuthorizationController extends BaseAuthorizationController {
   @Post('/resend-verification')
   @UseGuards(JwtAuthGuard)
   public async resendVerification(@GetUser() user: JwtPayload): Promise<void> {
-    console.log(user)
-
     await this.authService.resendVerification(user)
   }
 

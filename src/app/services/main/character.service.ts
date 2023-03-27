@@ -62,7 +62,6 @@ export class CharacterService implements BaseService<Character, CreateCharacterD
 
   public async getMany(queryPaginationDto: QueryPaginationDto, queryCharacterDto: QueryCharacterDto): Promise<Presenter<Character>> {
     const { characters, count } = await this.characterRepository.getMany(queryPaginationDto, queryCharacterDto)
-    console.log(queryPaginationDto)
 
     if (!count || !characters) {
       throw this.charactersException.manyNotFound()
