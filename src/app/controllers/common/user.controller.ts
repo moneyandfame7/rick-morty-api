@@ -1,8 +1,8 @@
-import { Body, Controller, ForbiddenException, InternalServerErrorException, Param, Post, Req, Res, UploadedFile, UseInterceptors } from '@nestjs/common'
+import { Body, Controller, ForbiddenException, InternalServerErrorException, Param, Post,  Res, UploadedFile, UseInterceptors } from '@nestjs/common'
 import { ApiTags } from '@nestjs/swagger'
 import { FileInterceptor } from '@nestjs/platform-express'
 import { memoryStorage } from 'multer'
-import type { Request, Response } from 'express'
+import type {  Response } from 'express'
 
 import { EnvironmentConfigService, TokenService, UserService } from '@app/services/common'
 import { AddRoleDto, BanUserDto, CreateUserDto, UpdateUserDto } from '@app/dto/common'
@@ -52,7 +52,7 @@ export class UserController {
     const isAdmin = user.role.value === 'admin'
 
     if (!exist) {
-      throw this.userException.withIdNotFound(id)
+      throw this.userException.withIdNotFound()
     }
 
     if (user.id === id) {

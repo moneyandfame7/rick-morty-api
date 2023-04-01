@@ -31,8 +31,8 @@ export class LocationController {
     }
 
     @ApiEntitiesOperation(EPISODE_OPERATION.GET_NAMES)
-    public getNameList(): Promise<string[]> {
-        return this.locationService.getNameList()
+    public getNameList(@Body('name') name: string): Promise<string[]> {
+        return this.locationService.getNameList(name)
     }
 
     @ApiEntitiesOperation(EPISODE_OPERATION.GET_BY_FIELDS)

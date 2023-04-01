@@ -32,8 +32,8 @@ export class EpisodeService implements BaseService<Episode, CreateEpisodeDto, Up
         return this.episodeRepository.save(episode)
     }
 
-    public getNameList(): Promise<string[]> {
-        return this.episodeRepository.getNameList()
+    public getNameList(name:string): Promise<string[]> {
+        return this.episodeRepository.getNameList(name)
     }
 
     public async getUniqueByFields(fields: string[]): Promise<{ [field: string]: string[] }> {

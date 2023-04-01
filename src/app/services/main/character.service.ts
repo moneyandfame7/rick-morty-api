@@ -63,8 +63,8 @@ export class CharacterService implements BaseService<Character, CreateCharacterD
         return this.characterRepository.save(character)
     }
 
-    public getNameList(): Promise<string[]> {
-        return this.characterRepository.getNameList()
+    public async getNameList(name: string): Promise<string[]> {
+       return this.characterRepository.getNameList(name)
     }
 
     public async getUniqueByFields(fields: string[]): Promise<{ [field: string]: string[] }> {

@@ -1,5 +1,5 @@
 import {ApiProperty} from '@nestjs/swagger'
-import {IsEmail, MaxLength, MinLength} from 'class-validator'
+import { IsEmail, MaxLength, MinLength} from 'class-validator'
 import {Type} from 'class-transformer'
 
 export class SignupDto {
@@ -23,4 +23,9 @@ export class LoginDto {
 
     @Type(() => String)
     public readonly password: string;
+}
+
+export class ForgotDto {
+    @IsEmail()
+    public readonly email: string
 }

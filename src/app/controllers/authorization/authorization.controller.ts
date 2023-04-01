@@ -1,11 +1,11 @@
-import {Body, Controller, Get, Param, Post, Req, Res, UnauthorizedException, UseGuards} from '@nestjs/common'
+import {Body, Controller, Get, Param, Post, Query, Req, Res, UnauthorizedException, UseGuards} from '@nestjs/common'
 import {ApiTags} from '@nestjs/swagger'
 import type {Request, Response} from 'express'
 
 import {AuthorizationService} from '@app/services/authorization'
 import {EnvironmentConfigService, TokenService, UserService} from '@app/services/common'
-import {EmailDto, ResetPasswordDto, UserDetailsDto} from '@app/dto/common'
-import {LoginDto, SignupDto} from '@app/dto/authorization'
+import {ResetPasswordDto, UserDetailsDto} from '@app/dto/common'
+import {ForgotDto, LoginDto, SignupDto} from '@app/dto/authorization'
 
 import {Token} from '@infrastructure/entities/common'
 
@@ -59,6 +59,7 @@ export class AuthorizationController extends BaseAuthorizationController {
     public async refresh(@Req() req: Request, @Res({passthrough: true}) res: Response): Promise<AuthResponse> {
         const {refresh_token} = this.getCookies(req)
         const data = await this.authService.refresh(refresh_token)
+
         res.cookie(this.ACCESS_TOKEN_COOKIE, data.access_token, {
             maxAge: this.ACCESS_TOKEN_EXPIRE_COOKIE,
             secure: true,
@@ -97,12 +98,12 @@ export class AuthorizationController extends BaseAuthorizationController {
     }
 
     @Post('/forgot')
-    public async forgot(@Body() dto: EmailDto): Promise<string> {
-        return this.authService.forgot(dto.email)
+    public async forgot(@Body() dto: ForgotDto): Promise<void> {
+        await this.authService.forgot(dto.email)
     }
 
-    @Post('/reset/:id/:token')
-    public async reset(@Param('id') id: string, @Param('token') token: string, @Body() dto: ResetPasswordDto, @Res({passthrough: true}) res: Response): Promise<AuthResponse> {
+    @Post('/reset')
+    public async reset(@Query('id') id: string, @Query('token') token: string, @Body() dto: ResetPasswordDto, @Res({passthrough: true}) res: Response): Promise<AuthResponse> {
         const data = await this.authService.reset(id, token, dto)
 
         this.setCookies(res, data.refresh_token, data.access_token)

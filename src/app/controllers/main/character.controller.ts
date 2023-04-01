@@ -39,8 +39,8 @@ export class CharacterController {
     }
 
     @ApiEntitiesOperation(CHARACTER_OPERATION.GET_NAMES)
-    public getNameList(): Promise<string[]> {
-        return this.characterService.getNameList()
+    public getNameList(@Body('name') name: string): Promise<string[]> {
+        return this.characterService.getNameList(name)
     }
 
     @ApiEntitiesOperation(CHARACTER_OPERATION.GET_BY_FIELDS)

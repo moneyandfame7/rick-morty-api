@@ -36,9 +36,12 @@ export abstract class MainRepositoryAbstract<Entity extends ObjectLiteral, Query
         return queryBuilder.getCount()
     }
 
-    public async getNameList(): Promise<string[]> {
-        const entities = await this.builder.select('name').getRawMany<Entity>()
-        return entities.map(entitity => entitity.name)
+    public async getNameList(name: string): Promise<string[]> {
+        const queryBuilder = this.builder
+        this.buildQueries(queryBuilder, {name} as QueryEntityDto)
+
+        const entities = await queryBuilder.select('DISTINCT name').getRawMany<Entity>()
+        return entities.map(entity => entity.name)
     }
 
     public async getByField(field: string): Promise<string[]> {

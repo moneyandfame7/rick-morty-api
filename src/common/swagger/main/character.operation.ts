@@ -29,7 +29,7 @@ export const CHARACTER_OPERATION: MainEntitiesOperations = {
         summary: 'get list of names',
         status: HttpStatus.OK,
         type: [String],
-        method: HttpMethod.GET('/names'),
+        method: HttpMethod.POST('/names'),
         guard: UseGuards(JwtAuthGuard)
     },
     GET_BY_FIELDS: {

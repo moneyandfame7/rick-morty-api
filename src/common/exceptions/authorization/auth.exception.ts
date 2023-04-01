@@ -9,7 +9,6 @@ export class AuthorizationException {
     }
 
     public incorrectEmail(): HttpException {
-        // return this.apiErrorService.throwErrorResponse('Incorrect email.', HttpStatus.BAD_REQUEST)
         return this.apiErrorService.throwDemo(HttpStatus.BAD_REQUEST, HttpStack.EMAIL_NOT_FOUND, "Couldn’t find your account");
     }
 
@@ -30,10 +29,18 @@ export class AuthorizationException {
     }
 
     public passwordIsEqualToOld(): HttpException {
-        return this.apiErrorService.throwErrorResponse("Password is equal to old password", HttpStatus.BAD_REQUEST);
+        return this.apiErrorService.throwDemo(HttpStatus.BAD_REQUEST, HttpStack.PASSWORD_IS_EQUAL_OLD, `Password is equal to old password`);
     }
 
     public passwordDontMatch(): HttpException {
         return this.apiErrorService.throwErrorResponse("Passwords don't match", HttpStatus.BAD_REQUEST);
+    }
+
+    public tokenExpired(): HttpException {
+        return this.apiErrorService.throwDemo(HttpStatus.BAD_REQUEST, HttpStack.TOKEN_EXPIRED, 'The time to reset the password has expired. Please try again')
+    }
+
+    public invalidToken(): HttpException {
+        return this.apiErrorService.throwDemo(HttpStatus.BAD_REQUEST, HttpStack.INVALID_TOKEN, 'Invalid token')
     }
 }

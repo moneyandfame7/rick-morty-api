@@ -32,8 +32,8 @@ export class LocationService implements BaseService<Location, CreateLocationDto,
         return this.locationRepository.save(location)
     }
 
-    public getNameList(): Promise<string[]> {
-        return this.locationRepository.getNameList()
+    public getNameList(name:string): Promise<string[]> {
+        return this.locationRepository.getNameList(name)
     }
 
     public async getUniqueByFields(fields: string[]): Promise<{ [field: string]: string[] }> {
