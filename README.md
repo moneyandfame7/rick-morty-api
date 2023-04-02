@@ -24,6 +24,6 @@ This API uses OAuth 2.0 and JWT used access and refresh token
 
 ## Acknowledgments
 
-- This API was built using the [Rick and Morty API](https://kamilmysliwiec.com) as the data source.
+- This API was built using the [Rick and Morty API](https://rickandmortyapi.com) as the data source.
 - Special thanks to the creators of the Rick and Morty API for providing such a fun and interesting data source to work
   with.
