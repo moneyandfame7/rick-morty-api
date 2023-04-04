@@ -31,14 +31,15 @@ export class BaseAuthorizationController {
       secure: true,
       sameSite: 'none',
       /* process.env.COOKIE_DOMAN ?? undefined */
+      /* if production, set domain, else localhost or undefined? */
       domain: '.vercel.app'
     })
     res.cookie(this.ACCESS_TOKEN_COOKIE, access_token, {
       maxAge: this.ACCESS_TOKEN_EXPIRE_COOKIE,
-      secure: false,
+      secure: true,
 
-      sameSite: 'lax',
-      domain: '.up.railway.app'
+      sameSite: 'none',
+      domain: '.vercel.app'
     })
   }
 
