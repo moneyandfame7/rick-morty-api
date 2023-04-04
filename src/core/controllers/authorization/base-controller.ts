@@ -28,10 +28,10 @@ export class BaseAuthorizationController {
   public setCookies(res: Response, refresh_token: string, access_token: string): void {
     res.cookie(this.REFRESH_TOKEN_COOKIE, refresh_token, {
       maxAge: this.REFRESH_TOKEN_EXPIRE_COOKIE,
-      secure: false,
-      sameSite: 'lax',
+      secure: true,
+      sameSite: 'none',
       /* process.env.COOKIE_DOMAN ?? undefined */
-      domain: '.up.railway.app'
+      domain: '.vercel.app'
     })
     res.cookie(this.ACCESS_TOKEN_COOKIE, access_token, {
       maxAge: this.ACCESS_TOKEN_EXPIRE_COOKIE,
