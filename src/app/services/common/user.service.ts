@@ -46,7 +46,7 @@ export class UserService {
     const user = await this.userRepository.getOneById(id)
 
     if (!user) {
-      throw this.userException.withIdNotFound(id)
+      throw this.userException.withIdNotFound()
     }
 
     return user
@@ -77,7 +77,7 @@ export class UserService {
     const user = await this.userRepository.getOneById(id)
 
     if (!user) {
-      throw this.userException.withIdNotFound(id)
+      throw this.userException.withIdNotFound()
     }
 
     return this.userRepository.updateOne(id, updateUserDto)
@@ -119,7 +119,7 @@ export class UserService {
     const user = await this.userRepository.getOneById(id)
 
     if (!user) {
-      throw this.userException.withIdNotFound(id)
+      throw this.userException.withIdNotFound()
     }
 
     await this.tokenService.removeByUserId(user.id)
@@ -140,7 +140,7 @@ export class UserService {
   public async ban(dto: BanUserDto): Promise<User> {
     const user = await this.userRepository.getOneById(dto.userId)
     if (!user) {
-      throw this.userException.withIdNotFound(dto.userId)
+      throw this.userException.withIdNotFound()
     }
 
     return this.userRepository.ban(dto.userId, dto.banReason)

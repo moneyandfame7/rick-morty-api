@@ -10,10 +10,11 @@ import { CustomValidationPipe } from '@common/pipes'
 async function bootstrap(): Promise<void> {
   const PORT = process.env.PORT ?? 3001
   const app = await NestFactory.create(AppModule, {
-    cors: { origin: 'https://rick-morty-git-develop-moneyandfame7.vercel.app', credentials: true }
+    cors: { origin: process.env.CLIENT_URL, credentials: true }
   })
   app.useGlobalPipes(new CustomValidationPipe())
   app.use(cookieParser())
+
   const config = new DocumentBuilder()
     .addBearerAuth()
     .setTitle('The Rick & Morty API')

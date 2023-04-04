@@ -1,180 +1,187 @@
-import { Injectable, InternalServerErrorException } from '@nestjs/common'
-import { ConfigService } from '@nestjs/config'
+import {Injectable, InternalServerErrorException} from "@nestjs/common";
+import {ConfigService} from "@nestjs/config";
 
-import type { AuthorizationConfig, DatabaseConfig, S3BucketConfig } from '@core/config'
+import type {AuthorizationConfig, DatabaseConfig, S3BucketConfig} from "@core/config";
 
 @Injectable()
 export class EnvironmentConfigService implements AuthorizationConfig, S3BucketConfig, DatabaseConfig {
-  public constructor(private readonly configService: ConfigService) {}
-
-  private getStringEnv(env: string): string {
-    const value = this.configService.get<string>(env)
-    if (!value) {
-      throw new InternalServerErrorException('Environment variable not specified')
+    public constructor(private readonly configService: ConfigService) {
     }
-    return value
-  }
 
-  private getNumberEnv(env: string): number {
-    const value = this.configService.get<number>(env)
-    if (!value) {
-      throw new InternalServerErrorException('Environment variable not specified')
+    private getStringEnv(env: string): string {
+        const value = this.configService.get<string>(env);
+        if (!value) {
+            throw new InternalServerErrorException("Environment variable not specified");
+        }
+        return value;
     }
-    return value
-  }
 
-  /**
-   * Common configurations
-   **/
-  public getBaseUrl(): string {
-    return this.getStringEnv('BASE_URL')
-  }
+    private getNumberEnv(env: string): number {
+        const value = this.configService.get<number>(env);
+        if (!value) {
+            throw new InternalServerErrorException("Environment variable not specified");
+        }
+        return value;
+    }
 
-  public getClientUrl(): string {
-    return this.getStringEnv('CLIENT_URL')
-  }
+    /**
+     * Common configurations
+     **/
+    public getBaseUrl(): string {
+        return this.getStringEnv("BASE_URL");
+    }
 
-  /**
-   * Mailer credentials
-   **/
-  public getMailerHost(): string {
-    return this.getStringEnv('MAILER_HOST')
-  }
+    public getClientUrl(): string {
+        return this.getStringEnv("CLIENT_URL");
+    }
 
-  public getMailerPort(): number {
-    return this.getNumberEnv('MAILER_PORT')
-  }
+    public getClientSuccessRedirect(): string {
+        return this.getClientUrl() + "/login/success";
+    }
 
-  public getMailerUser(): string {
-    return this.getStringEnv('MAILER_USER')
-  }
+    /**
+     * Mailer credentials
+     **/
+    public getMailerHost(): string {
+        return this.getStringEnv("MAILER_HOST");
+    }
 
-  public getMailerPassword(): string {
-    return this.getStringEnv('MAILER_PASSWORD')
-  }
+    public getMailerPort(): number {
+        return this.getNumberEnv("MAILER_PORT");
+    }
 
-  /**
-   * Database credentials
-   **/
-  public getDatabaseHost(): string {
-    return this.getStringEnv('DB_HOST')
-  }
+    public getMailerUser(): string {
+        return this.getStringEnv("MAILER_USER");
+    }
 
-  public getDatabaseName(): string {
-    return this.getStringEnv('DB_NAME')
-  }
+    public getMailerPassword(): string {
+        return this.getStringEnv("MAILER_PASSWORD");
+    }
 
-  public getDatabasePassword(): string {
-    return this.getStringEnv('DB_PASSWORD')
-  }
+    /**
+     * Database credentials
+     **/
+    public getDatabaseHost(): string {
+        return this.getStringEnv("DB_HOST");
+    }
 
-  public getDatabasePort(): number {
-    return this.getNumberEnv('DB_PORT')
-  }
+    public getDatabaseName(): string {
+        return this.getStringEnv("DB_NAME");
+    }
 
-  public getDatabaseUsername(): string {
-    return this.getStringEnv('DB_USERNAME')
-  }
+    public getDatabasePassword(): string {
+        return this.getStringEnv("DB_PASSWORD");
+    }
 
-  /**
-   * S3Bucket credentials
-   **/
-  public getS3BucketAccessKey(): string {
-    return this.getStringEnv('S3BUCKET_ACCESS_KEY')
-  }
+    public getDatabasePort(): number {
+        return this.getNumberEnv("DB_PORT");
+    }
 
-  public getS3BucketAccessSecret(): string {
-    return this.getStringEnv('S3BUCKET_ACCESS_SECRET')
-  }
+    public getDatabaseUsername(): string {
+        return this.getStringEnv("DB_USERNAME");
+    }
 
-  public getS3BucketName(): string {
-    return this.getStringEnv('S3BUCKET_NAME')
-  }
+    /**
+     * S3Bucket credentials
+     **/
+    public getS3BucketAccessKey(): string {
+        return this.getStringEnv("S3BUCKET_ACCESS_KEY");
+    }
 
-  public getS3BucketRegion(): string {
-    return this.getStringEnv('S3BUCKET_REGION')
-  }
+    public getS3BucketAccessSecret(): string {
+        return this.getStringEnv("S3BUCKET_ACCESS_SECRET");
+    }
 
-  public getS3BucketUrl(): string {
-    return this.getStringEnv('S3BUCKET_URL')
-  }
+    public getS3BucketName(): string {
+        return this.getStringEnv("S3BUCKET_NAME");
+    }
 
-  /**
-   * JWT credentials
-   **/
-  public getJwtAccessCookie(): string {
-    return this.getStringEnv('JWT_ACCESS_COOKIE')
-  }
+    public getS3BucketRegion(): string {
+        return this.getStringEnv("S3BUCKET_REGION");
+    }
 
-  public getJwtAccessSecret(): string {
-    return this.getStringEnv('JWT_ACCESS_SECRET')
-  }
+    public getS3BucketUrl(): string {
+        return this.getStringEnv("S3BUCKET_URL");
+    }
 
-  public getJwtRefreshCookie(): string {
-    return this.getStringEnv('JWT_REFRESH_COOKIE')
-  }
+    /**
+     * JWT credentials
+     **/
+    public getJwtAccessCookie(): string {
+        return this.getStringEnv("JWT_ACCESS_COOKIE");
+    }
 
-  public getJwtRefreshSecret(): string {
-    return this.getStringEnv('JWT_REFRESH_SECRET')
-  }
+    public getJwtAccessSecret(): string {
+        return this.getStringEnv("JWT_ACCESS_SECRET");
+    }
 
-  /**
-   * Google credentials
-   **/
-  public getGoogleCallbackUrl(): string {
-    return this.getStringEnv('GOOGLE_CALLBACK_URL')
-  }
+    public getJwtRefreshCookie(): string {
+        return this.getStringEnv("JWT_REFRESH_COOKIE");
+    }
 
-  public getGoogleClientId(): string {
-    return this.getStringEnv('GOOGLE_CLIENT_ID')
-  }
+    public getJwtRefreshSecret(): string {
+        return this.getStringEnv("JWT_REFRESH_SECRET");
+    }
 
-  public getGoogleClientSecret(): string {
-    return this.getStringEnv('GOOGLE_CLIENT_SECRET')
-  }
+    /**
+     * Google credentials
+     **/
+    public getGoogleCallbackUrl(): string {
+        return this.getBaseUrl() + "/auth/google/redirect";
+    }
 
-  /**
-   * Discord credentials
-   **/
-  public getDiscordCallbackUrl(): string {
-    return this.getStringEnv('DISCORD_CALLBACK_URL')
-  }
+    public getGoogleClientId(): string {
+        return this.getStringEnv("GOOGLE_CLIENT_ID");
+    }
 
-  public getDiscordClientId(): string {
-    return this.getStringEnv('DISCORD_CLIENT_ID')
-  }
+    public getGoogleClientSecret(): string {
+        return this.getStringEnv("GOOGLE_CLIENT_SECRET");
+    }
 
-  public getDiscordClientSecret(): string {
-    return this.getStringEnv('DISCORD_CLIENT_SECRET')
-  }
+    /**
+     * Discord credentials
+     **/
+    public getDiscordCallbackUrl(): string {
+        return this.getBaseUrl() + "/auth/discord/redirect";
+    }
 
-  /**
-   * GitHub credentials
-   **/
-  public getGithubCallbackUrl(): string {
-    return this.getStringEnv('GITHUB_CALLBACK_URL')
-  }
+    public getDiscordClientId(): string {
+        return this.getStringEnv("DISCORD_CLIENT_ID");
+    }
 
-  public getGithubClientId(): string {
-    return this.getStringEnv('GITHUB_CLIENT_ID')
-  }
+    public getDiscordClientSecret(): string {
+        return this.getStringEnv("DISCORD_CLIENT_SECRET");
+    }
 
-  public getGithubClientSecret(): string {
-    return this.getStringEnv('GITHUB_CLIENT_SECRET')
-  }
+    /**
+     * GitHub credentials
+     **/
+    public getGithubCallbackUrl(): string {
+        return this.getBaseUrl() + "/auth/github/redirect";
+    }
 
-  /**
-   * Spotify credentials
-   **/
-  public getSpotifyCallbackUrl(): string {
-    return this.getStringEnv('SPOTIFY_CALLBACK_URL')
-  }
+    public getGithubClientId(): string {
+        return this.getStringEnv("GITHUB_CLIENT_ID");
+    }
 
-  public getSpotifyClientId(): string {
-    return this.getStringEnv('SPOTIFY_CLIENT_ID')
-  }
+    public getGithubClientSecret(): string {
+        return this.getStringEnv("GITHUB_CLIENT_SECRET");
+    }
 
-  public getSpotifyClientSecret(): string {
-    return this.getStringEnv('SPOTIFY_CLIENT_SECRET')
-  }
+    /**
+     * Spotify credentials
+     **/
+    public getSpotifyCallbackUrl(): string {
+        return this.getBaseUrl() + "/auth/spotify/redirect";
+    }
+
+    public getSpotifyClientId(): string {
+        return this.getStringEnv("SPOTIFY_CLIENT_ID");
+    }
+
+    public getSpotifyClientSecret(): string {
+        return this.getStringEnv("SPOTIFY_CLIENT_SECRET");
+    }
+
+
 }

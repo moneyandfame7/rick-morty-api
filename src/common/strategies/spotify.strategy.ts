@@ -12,7 +12,7 @@ export class SpotifyStrategy extends PassportStrategy(Strategy, 'spotify') {
     super({
       clientID: config.getSpotifyClientId(),
       clientSecret: config.getSpotifyClientSecret(),
-      callbackURL: config.getSpotifyCallbackUrl(),
+      callbackURL: config.getBaseUrl() + "/auth/spotify/redirect",
       scope: ['user-read-email', 'user-read-private', 'ugc-image-upload']
     })
   }

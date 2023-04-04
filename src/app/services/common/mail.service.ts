@@ -38,16 +38,16 @@ export class MailService {
       text: '',
       html: `
         <div >
-        <h1>${email}</h1>
+        <h1>Hi, ${email}!</h1>
             <p style="font-size:18px">
-              We just need to verify your email address before you can access Rick&MortyApi
+              We just need to verify your email address before you can access Rickmorty API
             </p>
 
             <p style="font-size:18px">
-              Verify your email address <a href="${clientLink}" target="_blank"></a>
+              Verify your email address by click <a href="${clientLink}">here</a>
             </p>
-            <p style="font-size:18px>
-              <b>Thanks! – The Rick&MortyApi</b>
+            <p style="font-size:18px">
+              <b>Thanks! – Rickmorty API</b>
             </p>
         </div>
         `
@@ -63,8 +63,8 @@ export class MailService {
         <div >
              <h1>Hi!</h1>
              <p style="font-size:18px">Someone (hopefully you) has requested a password reset for your Rick&MortyAPI account. Follow the link below to set a new password:</p>
-             <a href="${link}" target="_blank">
-             ${link}
+             <a href="${link}">
+             Click here
              </a>
         </div>
         `

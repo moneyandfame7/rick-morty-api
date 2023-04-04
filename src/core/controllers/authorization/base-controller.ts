@@ -3,10 +3,11 @@ import type { Request, Response } from 'express'
 import { AuthorizationService } from '@app/services/authorization'
 import { EnvironmentConfigService, TokenService, UserService } from '@app/services/common'
 
-import type { AuthResponse } from '@core/models/authorization'
 import type { GeneratedTokens, UserBeforeAuthentication } from '@core/models/common'
+import { AuthResponse } from '@core/models/authorization'
 
 export class BaseAuthorizationController {
+  public readonly SUCCESS_CLIENT_REDIRECT: string
   public readonly CLIENT_URL: string
   public readonly REFRESH_TOKEN_COOKIE: string
   public readonly ACCESS_TOKEN_COOKIE: string
@@ -21,22 +22,23 @@ export class BaseAuthorizationController {
     this.REFRESH_TOKEN_COOKIE = this.config.getJwtRefreshCookie()
     this.ACCESS_TOKEN_COOKIE = this.config.getJwtAccessCookie()
     this.CLIENT_URL = this.config.getClientUrl()
+    this.SUCCESS_CLIENT_REDIRECT = this.config.getClientSuccessRedirect()
   }
 
   public setCookies(res: Response, refresh_token: string, access_token: string): void {
     res.cookie(this.REFRESH_TOKEN_COOKIE, refresh_token, {
       maxAge: this.REFRESH_TOKEN_EXPIRE_COOKIE,
-      secure: true,
-      sameSite: 'none',
+      secure: false,
+      sameSite: 'lax'
       /*  TODO: зробити так, якщо це production, то vercel, якщо develop */
-      domain: '.up.railway.app'
+      // domain: '.up.railway.app'
     })
     res.cookie(this.ACCESS_TOKEN_COOKIE, access_token, {
       maxAge: this.ACCESS_TOKEN_EXPIRE_COOKIE,
-      secure: true,
+      secure: false,
 
-      sameSite: 'none',
-      domain: '.up.railway.app'
+      sameSite: 'lax'
+      // domain: '.up.railway.app'
     })
   }
 

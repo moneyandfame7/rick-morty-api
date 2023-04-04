@@ -1,97 +1,109 @@
-import { ApiProperty, PartialType } from '@nestjs/swagger'
-import { IsBoolean, IsEmail, IsEnum, IsNotEmpty, IsOptional, IsString, IsUUID, Length, MaxLength, MinLength } from 'class-validator'
-import { Type } from 'class-transformer'
+import {ApiProperty, PartialType} from '@nestjs/swagger'
+import {
+    IsBoolean,
+    IsEmail,
+    IsEnum,
+    IsNotEmpty,
+    IsOptional,
+    IsString,
+    IsUUID,
+    Length,
+    MaxLength,
+    MinLength
+} from 'class-validator'
+import {Type} from 'class-transformer'
 
-import { AUTHORIZATION_PROVIDER, ROLES } from '@common/constants'
+import {AUTHORIZATION_PROVIDER, ROLES} from '@common/constants'
 
 export class CreateUserDto {
-  @ApiProperty({ example: 'User_228', description: 'The username of the user.' })
-  @MinLength(8)
-  @MaxLength(32)
-  @Type(() => String)
-  public readonly username?: string
+    @ApiProperty({example: 'User_228', description: 'The username of the user.'})
+    @MinLength(8)
+    @MaxLength(32)
+    @Type(() => String)
+    public readonly username?: string
 
-  @ApiProperty({ example: 'user@gmail.com', description: 'The email of the user.' })
-  @IsEmail()
-  public readonly email: string
+    @ApiProperty({example: 'user@gmail.com', description: 'The email of the user.'})
+    @IsEmail()
+    public readonly email: string
 
-  @ApiProperty({
-    example: '$2b$05$oSq9tOJGxOvmDpj7KLaJP.t0BGI6ic4OrOSCf/493ZsG9z/JoC3ki',
-    description: 'The hashed password of the user.'
-  })
-  @MinLength(8)
-  @MaxLength(20)
-  @Type(() => String)
-  public readonly password?: string
+    @ApiProperty({
+        example: '$2b$05$oSq9tOJGxOvmDpj7KLaJP.t0BGI6ic4OrOSCf/493ZsG9z/JoC3ki',
+        description: 'The hashed password of the user.'
+    })
+    @MinLength(8)
+    @MaxLength(20)
+    @Type(() => String)
+    public readonly password?: string
 
-  @IsEnum(AUTHORIZATION_PROVIDER)
-  public readonly auth_type: string
+    @IsEnum(AUTHORIZATION_PROVIDER)
+    public readonly auth_type: string
 
-  @IsOptional()
-  public readonly photo?: string
+    @IsOptional()
+    public readonly photo?: string
 
-  @IsUUID()
-  @IsOptional()
-  public readonly verify_link?: string
+    @IsUUID()
+    @IsOptional()
+    public readonly verify_link?: string
 
-  @IsBoolean()
-  public readonly is_verified?: boolean = false
+    @IsBoolean()
+    public readonly is_verified?: boolean = false
 
-  @IsBoolean()
-  public readonly mail_subscribe?: boolean
+    @IsBoolean()
+    public readonly mail_subscribe?: boolean
 
-  @IsString()
-  @Length(2, 2)
-  public readonly country?: string
+    @IsString()
+    @Length(2, 2)
+    public readonly country?: string
 }
 
-export class UpdateUserDto extends PartialType(CreateUserDto) {}
+export class UpdateUserDto extends PartialType(CreateUserDto) {
+}
 
 export class AddRoleDto {
-  @IsEnum(ROLES)
-  public readonly value: ROLES
+    @IsEnum(ROLES)
+    public readonly value: ROLES
 
-  @IsUUID()
-  public readonly userId: string
+    @IsUUID()
+    public readonly userId: string
 }
 
 export class BanUserDto {
-  @IsUUID()
-  public readonly userId: string
+    @IsUUID()
+    public readonly userId: string
 
-  @IsNotEmpty()
-  public readonly banReason: string
+    @IsNotEmpty()
+    public readonly banReason: string
 }
 
 export class EmailDto {
-  @IsEmail()
-  public email: string
+    @IsEmail()
+    public email: string
 }
 
 export class ResetPasswordDto {
-  @MinLength(8)
-  @MaxLength(20)
-  @Type(() => String)
-  public readonly password: string
+    @MinLength(8)
+    @MaxLength(20)
+    @Type(() => String)
+    public readonly password: string
 
-  @MinLength(8)
-  @MaxLength(20)
-  @Type(() => String)
-  public readonly confirmPassword: string
+    @MinLength(8)
+    @MaxLength(20)
+    @Type(() => String)
+    public readonly confirmPassword: string
 }
 
 export class UserDetailsDto {
-  @MinLength(2)
-  @MaxLength(32)
-  @Type(() => String)
-  @IsNotEmpty()
-  public username: string
+    @MinLength(2)
+    @MaxLength(32)
+    @Type(() => String)
+    @IsNotEmpty()
+    public username: string
 
-  @IsBoolean()
-  @Type(() => Boolean)
-  public mail_subscribe: boolean
+    @IsBoolean()
+    @Type(() => Boolean)
+    public mail_subscribe: boolean
 
-  @IsNotEmpty()
-  @IsString()
-  public country: string
+    @IsNotEmpty()
+    @IsString()
+    public country: string
 }
