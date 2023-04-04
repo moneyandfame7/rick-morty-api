@@ -1,4 +1,4 @@
-import {Body, Controller, Param, ParseIntPipe, Query, Req, ValidationPipe} from '@nestjs/common'
+import {Body, Controller, Get, Param, ParseIntPipe, Query, Req, ValidationPipe} from '@nestjs/common'
 import {ApiTags} from '@nestjs/swagger'
 import type {Request} from 'express'
 import * as _ from 'lodash'
@@ -30,12 +30,18 @@ export class LocationController {
         return this.locationService.createOne(createLocationDto)
     }
 
-    @ApiEntitiesOperation(EPISODE_OPERATION.GET_NAMES)
+    @ApiEntitiesOperation(LOCATION_OPERATION.GET_NAMES)
     public getNameList(@Body('name') name: string): Promise<string[]> {
         return this.locationService.getNameList(name)
     }
 
-    @ApiEntitiesOperation(EPISODE_OPERATION.GET_BY_FIELDS)
+    /*@Get('/count')*/
+    @ApiEntitiesOperation(LOCATION_OPERATION.GET_COUNT)
+    public async getCount(): Promise<number> {
+        return this.locationService.getCount()
+    }
+
+    @ApiEntitiesOperation(LOCATION_OPERATION.GET_BY_FIELDS)
     public getUniqueByFields(@Body() dto: FieldsLocationDto): Promise<{ [field: string]: string[] }> {
         return this.locationService.getUniqueByFields(dto.fields)
     }
@@ -67,6 +73,10 @@ export class LocationController {
     public async getOne(@Param('id', ParseIntPipe) id: number): Promise<Location> {
         return this.locationService.getOne(id)
     }
+
+    /*@ApiEntitiesOperation(LOCATION_OPERATION.GET_COUNT)*/
+
+
 
     @ApiEntitiesOperation(LOCATION_OPERATION.UPDATE)
     public async updateOne(@Param('id', ParseIntPipe) id: number, @Body() updateLocationDto: UpdateLocationDto): Promise<Location> {

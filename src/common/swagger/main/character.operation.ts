@@ -23,7 +23,7 @@ export const CHARACTER_OPERATION: MainEntitiesOperations = {
         status: HttpStatus.OK,
         type: [Character],
         method: HttpMethod.GET(''),
-        guard: UseGuards(JwtAuthGuard)
+        guard: UseGuards()
     },
     GET_NAMES: {
         summary: 'get list of names',
@@ -45,6 +45,13 @@ export const CHARACTER_OPERATION: MainEntitiesOperations = {
         type: Character,
         method: HttpMethod.GET(':id'),
         guard: UseGuards(JwtAuthGuard)
+    },
+    GET_COUNT: {
+        summary: 'get count of characters',
+        status: HttpStatus.OK,
+        type: Number,
+        method: HttpMethod.GET('/count'),
+        guard: UseGuards()
     },
     UPDATE: {
         summary: 'update one character with specified id',

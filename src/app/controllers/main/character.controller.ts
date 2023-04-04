@@ -38,6 +38,11 @@ export class CharacterController {
         return this.characterService.createOne(character, file)
     }
 
+    @ApiEntitiesOperation(CHARACTER_OPERATION.GET_COUNT)
+    public getCount(): Promise<number> {
+        return this.characterService.getCount()
+    }
+
     @ApiEntitiesOperation(CHARACTER_OPERATION.GET_NAMES)
     public getNameList(@Body('name') name: string): Promise<string[]> {
         return this.characterService.getNameList(name)
@@ -77,6 +82,8 @@ export class CharacterController {
     public getOne(@Param('id', ParseIntPipe) id: number): Promise<Character> {
         return this.characterService.getOne(id)
     }
+
+
 
     @ApiEntitiesOperation(CHARACTER_OPERATION.UPDATE)
     public updateOne(@Param('id', ParseIntPipe) id: number, @Body() updateCharacterDto: UpdateCharacterDto): Promise<Character> {

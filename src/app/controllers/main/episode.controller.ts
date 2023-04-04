@@ -26,6 +26,11 @@ export class EpisodeController {
         return this.episodeService.createOne(createEpisodeDto)
     }
 
+    @ApiEntitiesOperation(EPISODE_OPERATION.GET_COUNT)
+    public async getCount(): Promise<number> {
+        return this.episodeService.getCount()
+    }
+
     @ApiEntitiesOperation(EPISODE_OPERATION.GET_NAMES)
     public getNameList(@Body('name') name: string): Promise<string[]> {
         return this.episodeService.getNameList(name)

@@ -1,12 +1,12 @@
 import {BadRequestException, Injectable} from '@nestjs/common'
 import {JwtService} from '@nestjs/jwt'
+import {TokenExpiredError} from "jsonwebtoken";
 
 import {EnvironmentConfigService} from '@app/services/common'
 
 import {TokenRepository} from '@infrastructure/repositories/common'
 import {Token, User} from '@infrastructure/entities/common'
 import type {AuthResponse, JwtPayload, TempJwtPayload} from '@core/models/authorization'
-import { TokenExpiredError} from "jsonwebtoken";
 import {AuthorizationException} from "@common/exceptions/authorization";
 
 @Injectable()

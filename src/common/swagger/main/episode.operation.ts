@@ -45,6 +45,13 @@ export const EPISODE_OPERATION: MainEntitiesOperations = {
         method: HttpMethod.GET(':id'),
         guard: UseGuards(JwtAuthGuard)
     },
+    GET_COUNT: {
+        summary: 'get count of episodes',
+        status: HttpStatus.OK,
+        type: Number,
+        method: HttpMethod.GET('/count'),
+        guard: UseGuards()
+    },
     UPDATE: {
         summary: 'update one episode with specified id',
         status: HttpStatus.OK,

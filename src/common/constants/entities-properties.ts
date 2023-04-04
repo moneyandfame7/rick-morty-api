@@ -3,6 +3,7 @@ export const charactersProperties = [
     'type',
     'species',
     'gender',
+    'image'
 ]
 
 export const episodeProperties = [

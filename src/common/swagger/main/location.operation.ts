@@ -45,6 +45,13 @@ export const LOCATION_OPERATION: MainEntitiesOperations = {
         method: HttpMethod.GET(':id'),
         guard: UseGuards(JwtAuthGuard)
     },
+    GET_COUNT: {
+        summary: 'get count of locations',
+        status: HttpStatus.OK,
+        type: Number,
+        method: HttpMethod.GET('/count'),
+        guard: UseGuards()
+    },
     UPDATE: {
         summary: 'update one location with specified id',
         status: HttpStatus.OK,
