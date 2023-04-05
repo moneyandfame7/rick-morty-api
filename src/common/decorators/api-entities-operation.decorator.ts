@@ -1,7 +1,7 @@
 import { applyDecorators } from '@nestjs/common'
 import { ApiOperation, ApiResponse } from '@nestjs/swagger'
 
-import { BaseOperationOptions } from '@common/swagger'
+import { BaseOperationOptions } from '@common/operations'
 
 // eslint-disable-next-line
 export const ApiEntitiesOperation = ({ guard, role, method, summary, status, type }: BaseOperationOptions): any => {

@@ -6,7 +6,7 @@ import { CreateRoleDto } from '@app/dto/common'
 
 import { Role } from '@infrastructure/entities/common'
 
-import { ROLE_OPERATION } from '@common/swagger/common'
+import { ROLE_OPERATION } from '@common/operations/common'
 import { ApiEntitiesOperation } from '@common/decorators'
 
 @Controller('api/roles')

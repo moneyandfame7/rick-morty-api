@@ -6,6 +6,15 @@ export interface AuthResponse {
   readonly user: JwtPayload
 }
 
+export interface RefreshTokenResponse {
+  readonly access_token: string
+  readonly user: JwtPayload
+}
+
+export interface RedirectType {
+  url: string
+}
+
 export interface AuthorizationTokens {
   readonly refresh_token: string
   readonly access_token: string

@@ -32,7 +32,7 @@ export class AuthorizationException {
         return this.apiErrorService.throwDemo(HttpStatus.BAD_REQUEST, HttpStack.PASSWORD_IS_EQUAL_OLD, `Password is equal to old password`);
     }
 
-    public passwordDontMatch(): HttpException {
+    public passwordsDontMatch(): HttpException {
         return this.apiErrorService.throwErrorResponse("Passwords don't match", HttpStatus.BAD_REQUEST);
     }
 

@@ -1,4 +1,4 @@
-import { BaseOperations } from '@common/swagger/interface'
+import { BaseOperations } from '@common/operations/type'
 import { HttpStatus, UseGuards } from '@nestjs/common'
 
 import { Role } from '@infrastructure/entities/common'
@@ -8,7 +8,9 @@ import { Roles } from '@common/decorators'
 import { JwtAuthGuard } from '@common/guards/authorization'
 import { RolesGuard } from '@common/guards/common'
 
-export const ROLE_OPERATION: Omit<BaseOperations, 'REMOVE' | 'UPDATE'> = {
+type RoleOperations = Omit<BaseOperations, 'REMOVE' | 'UPDATE'>
+
+export const ROLE_OPERATION: RoleOperations = {
   CREATE: {
     summary: 'create and save a new role to collection',
     status: HttpStatus.CREATED,
