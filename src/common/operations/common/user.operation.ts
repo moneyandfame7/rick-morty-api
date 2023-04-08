@@ -2,11 +2,11 @@ import { HttpStatus, UseGuards } from '@nestjs/common'
 
 import { User } from '@infrastructure/entities/common'
 
-import { HttpMethod, ROLES } from '@common/constants'
-import { Roles } from '@common/decorators'
+import { HttpMethod } from '@common/constants'
 import { JwtAuthGuard } from '@common/guards/authorization'
 import { RolesGuard } from '@common/guards/common'
 import { BaseOperationOptions, BaseOperations } from '@common/operations/type'
+import { getPrivelegedRoles } from '@common/utils'
 
 interface UserOtherOperations {
   ADD_ROLE: BaseOperationOptions
@@ -23,7 +23,7 @@ export const USER_OPERATION: UserOperations = {
     status: HttpStatus.CREATED,
     type: User,
     method: HttpMethod.POST(''),
-    role: Roles(ROLES.ADMIN),
+    role: getPrivelegedRoles(),
     guard: UseGuards(JwtAuthGuard, RolesGuard)
   },
   GET_MANY: {
@@ -52,7 +52,7 @@ export const USER_OPERATION: UserOperations = {
     status: HttpStatus.OK,
     type: User,
     method: HttpMethod.PATCH(':id'),
-    role: Roles(ROLES.ADMIN),
+    /* role: getPrivelegedRoles(), */
     guard: UseGuards(JwtAuthGuard, RolesGuard)
   },
   REMOVE: {
@@ -60,7 +60,7 @@ export const USER_OPERATION: UserOperations = {
     status: HttpStatus.OK,
     type: User,
     method: HttpMethod.DELETE(':id'),
-    role: Roles(ROLES.ADMIN, ROLES.USER),
+    role: getPrivelegedRoles(),
     guard: UseGuards(JwtAuthGuard, RolesGuard)
   },
   ADD_ROLE: {
@@ -68,7 +68,7 @@ export const USER_OPERATION: UserOperations = {
     status: HttpStatus.OK,
     type: User,
     method: HttpMethod.POST('/role'),
-    role: Roles(ROLES.ADMIN),
+    role: getPrivelegedRoles(),
     guard: UseGuards(JwtAuthGuard, RolesGuard)
   },
   BAN: {
@@ -76,7 +76,7 @@ export const USER_OPERATION: UserOperations = {
     status: HttpStatus.OK,
     type: User,
     method: HttpMethod.POST('/ban'),
-    role: Roles(ROLES.ADMIN),
+    role: getPrivelegedRoles(),
     guard: UseGuards(JwtAuthGuard, RolesGuard)
   },
   CHANGE_IMAGE: {

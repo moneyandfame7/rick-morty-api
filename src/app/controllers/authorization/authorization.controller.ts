@@ -4,8 +4,8 @@ import type { Request, Response } from 'express'
 
 import { AuthorizationService } from '@app/services/authorization'
 import { EnvironmentConfigService, TokenService, UserService } from '@app/services/common'
-import { ResetPasswordDto, UserDetailsDto } from '@app/dto/common'
-import { ForgotDto, LoginDto, SignupDto } from '@app/dto/authorization'
+import { ResetPasswordDto, UserDetailsDto } from '@infrastructure/dto/common'
+import { ForgotDto, LoginDto, SignupDto } from '@infrastructure/dto/authorization'
 
 import { Token } from '@infrastructure/entities/common'
 

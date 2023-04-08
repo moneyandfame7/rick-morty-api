@@ -3,8 +3,8 @@ import * as sharp from 'sharp'
 import type { PutObjectCommandInput } from '@aws-sdk/client-s3'
 
 import { PaginationService, S3Service } from '@app/services/common'
-import { QueryPaginationDto } from '@app/dto/common'
-import { CreateCharacterDto, QueryCharacterDto, UpdateCharacterDto } from '@app/dto/main'
+import { QueryPaginationDto } from '@infrastructure/dto/common'
+import { CreateCharacterDto, QueryCharacterDto, UpdateCharacterDto } from '@infrastructure/dto/main'
 
 import { Character } from '@infrastructure/entities/main'
 import { CharacterRepository } from '@infrastructure/repositories/main'

@@ -1,15 +1,17 @@
-import { BadRequestException, Injectable } from '@nestjs/common'
+import { BadRequestException, ForbiddenException, Injectable } from '@nestjs/common'
 import * as sharp from 'sharp'
 import type { PutObjectCommandInput } from '@aws-sdk/client-s3'
 
 import { RolesService, S3Service, TokenService } from '@app/services/common'
-import { AddRoleDto, BanUserDto, CreateUserDto, UpdateUserDto } from '@app/dto/common'
+import { AddRoleDto, BanUserDto, CreateUserDto, UpdateUserDto } from '@infrastructure/dto/common'
 
 import { UserRepository } from '@infrastructure/repositories/common'
 import { User } from '@infrastructure/entities/common'
 
 import { UserException } from '@common/exceptions/common'
-import { AUTHORIZATION_PROVIDER } from '@common/constants'
+import { AUTHORIZATION_PROVIDER, RolesEnum } from '@common/constants'
+import { JwtPayload } from '@core/models/authorization'
+import { hasPermission } from '@common/utils'
 
 @Injectable()
 export class UserService {
@@ -80,7 +82,10 @@ export class UserService {
       throw this.userException.withIdNotFound()
     }
 
-    return this.userRepository.updateOne(id, updateUserDto)
+    return this.userRepository.save({
+      ...user,
+      ...updateUserDto
+    })
   }
 
   public async changeUsername(id: string, username: string): Promise<User> {
@@ -137,13 +142,18 @@ export class UserService {
     throw new BadRequestException('Role or user not found.')
   }
 
-  public async ban(dto: BanUserDto): Promise<User> {
+  public async ban(dto: BanUserDto, initiator: JwtPayload): Promise<User> {
     const user = await this.userRepository.getOneById(dto.userId)
+    const isPrivelegedRole = hasPermission(initiator.role.value)
     if (!user) {
       throw this.userException.withIdNotFound()
     }
-
-    return this.userRepository.ban(dto.userId, dto.banReason)
+    if (user.id === initiator.id) {
+      return this.userRepository.ban(dto.userId, dto.banReason)
+    } else if (isPrivelegedRole && user.role.value !== RolesEnum.OWNER) {
+      return this.userRepository.ban(dto.userId)
+    }
+    throw new ForbiddenException()
   }
 
   public async emailExists(email: string): Promise<boolean> {

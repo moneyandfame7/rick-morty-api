@@ -3,7 +3,7 @@ import type { Seeder } from 'typeorm-extension'
 
 import type { LocationResponse } from '../interfaces'
 
-import { CreateLocationDto } from '@app/dto/main'
+import { CreateLocationDto } from '@infrastructure/dto/main'
 
 import { Location } from '@infrastructure/entities/main'
 

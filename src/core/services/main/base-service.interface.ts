@@ -1,4 +1,4 @@
-import { QueryPaginationDto } from '@app/dto/common'
+import { QueryPaginationDto } from '@infrastructure/dto/common'
 import type { Presenter } from '@core/services/common'
 
 export interface BaseService<Entity, CreateEntityDto, UpdateEntityDto, QueryEntityDto> {

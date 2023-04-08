@@ -1,8 +1,8 @@
 import { DataSource, SelectQueryBuilder } from 'typeorm'
 import { Injectable } from '@nestjs/common'
 
-import type { CreateEpisodeDto, QueryEpisodeDto, UpdateEpisodeDto } from '@app/dto/main'
-import type { QueryPaginationDto } from '@app/dto/common'
+import type { CreateEpisodeDto, QueryEpisodeDto, UpdateEpisodeDto } from '@infrastructure/dto/main'
+import type { QueryPaginationDto } from '@infrastructure/dto/common'
 
 import type { GetManyEpisodes } from '@core/models/main'
 import { MainRepositoryAbstract } from '@core/repositories/main'
@@ -39,7 +39,6 @@ export class EpisodeRepository extends MainRepositoryAbstract<Episode, QueryEpis
 
     return created.raw[0]
   }
-
 
   public async getMany(pageOptionsDto: QueryPaginationDto, queryCharacterDto: QueryEpisodeDto): Promise<GetManyEpisodes> {
     const queryBuilder = this.builder.skip(pageOptionsDto.skip).take(pageOptionsDto.take).addOrderBy('episode.id', pageOptionsDto.order)

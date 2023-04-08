@@ -1,10 +1,10 @@
 import { PartialType } from '@nestjs/swagger'
 import { IsEnum } from 'class-validator'
 
-import { ROLES } from '@common/constants'
+import { RolesEnum } from '@common/constants'
 
 export class CreateRoleDto {
-  @IsEnum(ROLES)
+  @IsEnum(RolesEnum)
   public readonly value: string
 }
 

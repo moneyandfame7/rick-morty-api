@@ -3,8 +3,8 @@ import * as bcrypt from 'bcrypt'
 import { v4 as uuid } from 'uuid'
 
 import { EnvironmentConfigService, MailService, TokenService, UserService } from '@app/services/common'
-import { LoginDto, SignupDto } from '@app/dto/authorization'
-import { ResetPasswordDto, UserDetailsDto } from '@app/dto/common'
+import { LoginDto, SignupDto } from '@infrastructure/dto/authorization'
+import { ResetPasswordDto, UserDetailsDto } from '@infrastructure/dto/common'
 
 import { Token, User } from '@infrastructure/entities/common'
 
@@ -51,6 +51,7 @@ export class AuthorizationService {
     const welcomePageUser = this.tokenService.validateAccessToken(token)
 
     const user = await this.userService.updateOne(welcomePageUser.id, details)
+
     return this.buildUserInfoAndTokens(user)
   }
 

@@ -1,12 +1,11 @@
 import { BaseOperations } from '@common/operations/type'
 import { HttpStatus, UseGuards } from '@nestjs/common'
 
-import { Role } from '@infrastructure/entities/common'
-
-import { HttpMethod, ROLES } from '@common/constants'
-import { Roles } from '@common/decorators'
+import { HttpMethod, RolesEnum } from '@common/constants'
 import { JwtAuthGuard } from '@common/guards/authorization'
 import { RolesGuard } from '@common/guards/common'
+import { Role } from '@infrastructure/entities/common'
+import { Roles } from '@common/decorators'
 
 type RoleOperations = Omit<BaseOperations, 'REMOVE' | 'UPDATE'>
 
@@ -16,7 +15,7 @@ export const ROLE_OPERATION: RoleOperations = {
     status: HttpStatus.CREATED,
     type: Role,
     method: HttpMethod.POST(''),
-    role: Roles(ROLES.ADMIN),
+    role: Roles(RolesEnum.ADMIN, RolesEnum.USER),
     guard: UseGuards(JwtAuthGuard, RolesGuard)
   },
   GET_MANY: {

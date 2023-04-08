@@ -1,6 +1,6 @@
 import { ConflictException, NotFoundException } from '@nestjs/common'
 import { Episode } from '@infrastructure/entities/main'
-import { CreateEpisodeDto } from '@app/dto/main'
+import { CreateEpisodeDto } from '@infrastructure/dto/main'
 
 export const MOCK_EPISODE_COUNT = 63
 
