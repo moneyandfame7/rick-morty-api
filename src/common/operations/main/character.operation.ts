@@ -3,10 +3,11 @@ import { HttpStatus, UseGuards } from '@nestjs/common'
 import { Character } from '@infrastructure/entities/main'
 
 import { BaseOperationOptions, MainEntitiesOperations } from '@common/operations'
-import { HttpMethod, ROLES } from '@common/constants'
+import { HttpMethod, RolesEnum } from '@common/constants'
 import { Roles } from '@common/decorators'
 import { JwtAuthGuard } from '@common/guards/authorization'
 import { RolesGuard } from '@common/guards/common'
+import { getPrivelegedRoles } from '@common/utils/getPrivelegedRoles'
 
 interface CharacterOtherOperations {
   GET_IMAGES: BaseOperationOptions
@@ -18,7 +19,7 @@ export const CHARACTER_OPERATION: CharacterOperations = {
     status: HttpStatus.CREATED,
     type: Character,
     method: HttpMethod.POST(''),
-    role: Roles(ROLES.ADMIN),
+    role: getPrivelegedRoles(),
     guard: UseGuards(JwtAuthGuard, RolesGuard)
   },
   GET_MANY: {
@@ -68,7 +69,7 @@ export const CHARACTER_OPERATION: CharacterOperations = {
     status: HttpStatus.OK,
     type: Character,
     method: HttpMethod.PATCH(':id'),
-    role: Roles(ROLES.ADMIN),
+    role: getPrivelegedRoles(),
     guard: UseGuards(JwtAuthGuard, RolesGuard)
   },
   REMOVE: {
@@ -76,7 +77,7 @@ export const CHARACTER_OPERATION: CharacterOperations = {
     status: HttpStatus.OK,
     type: Character,
     method: HttpMethod.DELETE(':id'),
-    role: Roles(ROLES.ADMIN),
+    role: getPrivelegedRoles(),
     guard: UseGuards(JwtAuthGuard, RolesGuard)
   }
 }

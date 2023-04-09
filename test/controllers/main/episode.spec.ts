@@ -3,7 +3,7 @@ import { Test, TestingModule } from '@nestjs/testing'
 import { EpisodeController } from '@app/controllers/main'
 import { EpisodeService } from '@app/services/main'
 import { mockCreateEpisodeDto, mockEpisodeService } from '../../utils/mock/main/episode.mock'
-import { QueryEpisodeDto } from '@app/dto/main'
+import { QueryEpisodeDto } from '@infrastructure/dto/main'
 import { ORDER } from '@common/constants'
 
 jest.mock('@common/decorators', () => ({

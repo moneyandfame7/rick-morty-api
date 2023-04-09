@@ -3,10 +3,11 @@ import { HttpStatus, UseGuards } from '@nestjs/common'
 import { Episode } from '@infrastructure/entities/main'
 
 import { MainEntitiesOperations } from '@common/operations'
-import { HttpMethod, ROLES } from '@common/constants'
+import { HttpMethod } from '@common/constants'
 import { Roles } from '@common/decorators'
 import { JwtAuthGuard } from '@common/guards/authorization'
 import { RolesGuard } from '@common/guards/common'
+import { getPrivelegedRoles } from '@common/utils/getPrivelegedRoles'
 
 export const EPISODE_OPERATION: MainEntitiesOperations = {
   CREATE: {
@@ -14,7 +15,7 @@ export const EPISODE_OPERATION: MainEntitiesOperations = {
     status: HttpStatus.CREATED,
     type: Episode,
     method: HttpMethod.POST(''),
-    role: Roles(ROLES.ADMIN),
+    role: getPrivelegedRoles(),
     guard: UseGuards(JwtAuthGuard, RolesGuard)
   },
   GET_MANY: {
@@ -57,7 +58,7 @@ export const EPISODE_OPERATION: MainEntitiesOperations = {
     status: HttpStatus.OK,
     type: Episode,
     method: HttpMethod.PATCH(':id'),
-    role: Roles(ROLES.ADMIN),
+    role: getPrivelegedRoles(),
     guard: UseGuards(JwtAuthGuard, RolesGuard)
   },
   REMOVE: {
@@ -65,7 +66,7 @@ export const EPISODE_OPERATION: MainEntitiesOperations = {
     status: HttpStatus.OK,
     type: Episode,
     method: HttpMethod.DELETE(':id'),
-    role: Roles(ROLES.ADMIN),
+    role: getPrivelegedRoles(),
     guard: UseGuards(JwtAuthGuard, RolesGuard)
   }
 }

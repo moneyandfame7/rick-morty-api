@@ -1,8 +1,8 @@
 import { DataSource, type SelectQueryBuilder } from 'typeorm'
 import { Injectable } from '@nestjs/common'
 
-import { CreateCharacterDto, QueryCharacterDto, UpdateCharacterDto } from '@app/dto/main'
-import { QueryPaginationDto } from '@app/dto/common'
+import { CreateCharacterDto, QueryCharacterDto, UpdateCharacterDto } from '@infrastructure/dto/main'
+import { QueryPaginationDto } from '@infrastructure/dto/common'
 
 import { MainRepositoryAbstract } from '@core/repositories/main'
 import type { GetManyCharacters } from '@core/models/main'

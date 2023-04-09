@@ -1,7 +1,7 @@
 import { DataSource, Repository, SelectQueryBuilder } from 'typeorm'
 import { Injectable } from '@nestjs/common'
 
-import { CreateUserDto, UpdateUserDto } from '@app/dto/common'
+import { CreateUserDto, UpdateUserDto } from '@infrastructure/dto/common'
 
 import { User } from '@infrastructure/entities/common'
 
@@ -15,8 +15,8 @@ export class UserRepository extends Repository<User> {
     return this.createQueryBuilder('user')
   }
 
-  private buildRelations(builder: SelectQueryBuilder<User>): void {
-    builder.leftJoinAndSelect('user.role', 'role')
+  private get builderWithRelations(): SelectQueryBuilder<User> {
+    return this.createQueryBuilder('user').leftJoinAndSelect('user.role', 'role')
   }
 
   public async createOne(createUserDto: CreateUserDto): Promise<User> {
@@ -27,30 +27,28 @@ export class UserRepository extends Repository<User> {
   }
 
   public async getOneById(id: User['id']): Promise<User | null> {
-    const queryBuilder = this.builder
-    this.buildRelations(queryBuilder)
+    const queryBuilder = this.builderWithRelations
 
     return queryBuilder.where('user.id = :id', { id }).getOne()
   }
 
   public async getMany(): Promise<User[]> {
-    const queryBuilder = this.builder
-    this.buildRelations(queryBuilder)
+    const queryBuilder = this.builderWithRelations
 
     return queryBuilder.getMany()
   }
 
   public async updateOne(id: User['id'], updateUserDto: UpdateUserDto): Promise<User> {
-    const queryBuilder = this.builder
-    this.buildRelations(queryBuilder)
+    const queryBuilder = this.builderWithRelations
+
     const updated = await queryBuilder.update(User).set(updateUserDto).where('id = :id', { id }).returning('*').execute()
 
+    console.log(updated.raw[0])
     return updated.raw[0]
   }
 
   public async removeOne(id: User['id']): Promise<User> {
-    const queryBuilder = this.builder
-    this.buildRelations(queryBuilder)
+    const queryBuilder = this.builderWithRelations
 
     const removed = await queryBuilder.delete().from(User).where('id = :id', { id }).returning('*').execute()
 
@@ -58,35 +56,31 @@ export class UserRepository extends Repository<User> {
   }
 
   public async getOneByUsername(username: string): Promise<User | null> {
-    const queryBuilder = this.builder
-    this.buildRelations(queryBuilder)
+    const queryBuilder = this.builderWithRelations
 
     return queryBuilder.where('username = :username', { username }).getOne()
   }
 
   public async getOneByVerifyLink(verify_link: string): Promise<User | null> {
-    const queryBuilder = this.builder
-    this.buildRelations(queryBuilder)
+    const queryBuilder = this.builderWithRelations
 
     return queryBuilder.where('verify_link = :verify_link', { verify_link }).getOne()
   }
 
   public async getOneByEmail(email: string): Promise<User | null> {
-    const queryBuilder = this.builder
-    this.buildRelations(queryBuilder)
+    const queryBuilder = this.builderWithRelations
 
     return queryBuilder.where('email = :email', { email }).getOne()
   }
 
   public async getOneByAuthType(email: string, auth_type: string): Promise<User | null> {
-    const queryBuilder = this.builder
-    this.buildRelations(queryBuilder)
+    const queryBuilder = this.builderWithRelations
+
     return queryBuilder.where('email = :email', { email }).andWhere('auth_type = :auth_type', { auth_type }).getOne()
   }
 
-  public async ban(id: string, ban_reason: string): Promise<User> {
-    const queryBuilder = this.builder
-    this.buildRelations(queryBuilder)
+  public async ban(id: string, ban_reason?: string): Promise<User> {
+    const queryBuilder = this.builderWithRelations
 
     const banned = await queryBuilder
       .update(User)

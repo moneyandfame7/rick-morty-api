@@ -1,5 +1,5 @@
 import { ConflictException, NotFoundException, UnprocessableEntityException } from '@nestjs/common'
-import { CreateCharacterDto } from '@app/dto/main'
+import { CreateCharacterDto } from '@infrastructure/dto/main'
 import { Character, Location } from '@infrastructure/entities/main'
 
 export const MOCK_CHARACTER_COUNT = 783

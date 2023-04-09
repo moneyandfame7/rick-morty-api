@@ -3,7 +3,7 @@ import type { Seeder } from 'typeorm-extension'
 
 import type { EpisodeResponse } from '../interfaces'
 
-import { CreateEpisodeDto } from '@app/dto/main/episode.dto'
+import { CreateEpisodeDto } from '@infrastructure/dto/main/episode.dto'
 
 import { Episode } from '@infrastructure/entities/main/episode.entity'
 

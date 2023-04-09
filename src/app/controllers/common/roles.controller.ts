@@ -2,7 +2,7 @@ import { Body, Controller, Param } from '@nestjs/common'
 import { ApiTags } from '@nestjs/swagger'
 
 import { RolesService } from '@app/services/common'
-import { CreateRoleDto } from '@app/dto/common'
+import { CreateRoleDto } from '@infrastructure/dto/common'
 
 import { Role } from '@infrastructure/entities/common'
 

@@ -4,8 +4,8 @@ import type { Request } from 'express'
 import * as _ from 'lodash'
 
 import { LocationService } from '@app/services/main'
-import { CreateLocationDto, FieldsLocationDto, QueryLocationDto, UpdateLocationDto } from '@app/dto/main'
-import { QueryPaginationDto } from '@app/dto/common'
+import { CreateLocationDto, FieldsLocationDto, QueryLocationDto, UpdateLocationDto } from '@infrastructure/dto/main'
+import { QueryPaginationDto } from '@infrastructure/dto/common'
 
 import type { Presenter } from '@core/services/common'
 

@@ -4,8 +4,8 @@ import { Test, TestingModule } from '@nestjs/testing'
 
 import { CharacterService } from '@app/services/main'
 import { PaginationService, S3Service } from '@app/services/common'
-import { QueryPaginationDto } from '@app/dto/common'
-import { CreateCharacterDto, UpdateCharacterDto } from '@app/dto/main'
+import { QueryPaginationDto } from '@infrastructure/dto/common'
+import { CreateCharacterDto, UpdateCharacterDto } from '@infrastructure/dto/main'
 
 import { CharacterRepository } from '@infrastructure/repositories/main'
 

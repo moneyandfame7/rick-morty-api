@@ -3,7 +3,7 @@ import { ConflictException, NotFoundException } from '@nestjs/common'
 
 import { EpisodeService } from '@app/services/main'
 import { PaginationService } from '@app/services/common'
-import { QueryPaginationDto } from '@app/dto/common'
+import { QueryPaginationDto } from '@infrastructure/dto/common'
 
 import { EpisodeRepository } from '@infrastructure/repositories/main'
 
@@ -12,7 +12,7 @@ import { ORDER } from '@common/constants'
 
 import { MOCK_EPISODE_COUNT, mockCreateEpisodeDto, mockEpisodeException, mockEpisodeRepository, mockExistEpisode } from '../../utils/mock/main/episode.mock'
 import { mockPaginationService } from '../../utils/mock/common'
-import { UpdateEpisodeDto } from '@app/dto/main'
+import { UpdateEpisodeDto } from '@infrastructure/dto/main'
 
 describe('[Episode] Service', () => {
   let service: EpisodeService

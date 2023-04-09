@@ -6,8 +6,8 @@ import * as _ from 'lodash'
 import { memoryStorage } from 'multer'
 
 import { CharacterService } from '@app/services/main'
-import { CreateCharacterDto, FieldsCharacterDto, QueryCharacterDto, UpdateCharacterDto } from '@app/dto/main'
-import { QueryPaginationDto } from '@app/dto/common'
+import { CreateCharacterDto, FieldsCharacterDto, QueryCharacterDto, UpdateCharacterDto } from '@infrastructure/dto/main'
+import { QueryPaginationDto } from '@infrastructure/dto/common'
 
 import type { Presenter } from '@core/services/common'
 

@@ -5,7 +5,7 @@ import { memoryStorage } from 'multer'
 import type { Response } from 'express'
 
 import { EnvironmentConfigService, TokenService, UserService } from '@app/services/common'
-import { AddRoleDto, BanUserDto, CreateUserDto, UpdateUserDto } from '@app/dto/common'
+import { AddRoleDto, BanUserDto, CreateUserDto, UpdateUserDto } from '@infrastructure/dto/common'
 
 import { User } from '@infrastructure/entities/common'
 
@@ -14,6 +14,8 @@ import { ApiEntitiesOperation, GetUser } from '@common/decorators'
 import { JwtPayload } from '@core/models/authorization'
 import { AuthorizationService } from '@app/services/authorization'
 import { UserException } from '@common/exceptions/common'
+import { hasPermission } from '@common/utils'
+import { RolesEnum } from '@common/constants'
 
 @Controller('api/users')
 @ApiTags('users')
@@ -47,14 +49,14 @@ export class UserController {
   }
 
   @ApiEntitiesOperation(USER_OPERATION.UPDATE)
-  public async updateOne(@Param('id') id: string, @Body() updateUserDto: UpdateUserDto): Promise<User> {
+  public async updateOne(@Param('id') id: string, @Body() updateUserDto: UpdateUserDto, @GetUser() initiator: JwtPayload): Promise<User> {
     return this.userService.updateOne(id, updateUserDto)
   }
 
   @ApiEntitiesOperation(USER_OPERATION.REMOVE)
   public async removeOne(@Param('id') id: string, @GetUser() user: JwtPayload, @Res({ passthrough: true }) res: Response): Promise<User> {
     const exist = await this.userService.getOneById(id)
-    const isAdmin = user.role.value === 'admin'
+    const isPrivelegedRole = hasPermission(user.role.value)
 
     if (!exist) {
       throw this.userException.withIdNotFound()
@@ -63,14 +65,14 @@ export class UserController {
     if (user.id === id) {
       const token = await this.tokenService.getOneByUserId(id)
       if (!token) {
-        throw new InternalServerErrorException('token aboboaosdoasd')
+        throw new InternalServerErrorException('token not founded in db')
       }
       res.clearCookie(this.config.getJwtRefreshCookie())
       res.clearCookie(this.config.getJwtAccessCookie())
       await this.authorizationService.logout(token.refresh_token)
       return this.userService.removeOne(id)
     }
-    if (isAdmin) {
+    if (isPrivelegedRole && exist.role.value !== RolesEnum.OWNER) {
       return this.userService.removeOne(id)
     }
 
@@ -83,8 +85,8 @@ export class UserController {
   }
 
   @ApiEntitiesOperation(USER_OPERATION.BAN)
-  public async ban(@Body() banUserDto: BanUserDto): Promise<User> {
-    return this.userService.ban(banUserDto)
+  public async ban(@Body() banUserDto: BanUserDto, @GetUser() initiator: JwtPayload): Promise<User> {
+    return this.userService.ban(banUserDto, initiator)
   }
 
   @Post('/photo')

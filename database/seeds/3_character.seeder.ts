@@ -3,7 +3,7 @@ import type { Seeder } from 'typeorm-extension'
 
 import type { CharacterResponse, LocationResponse } from '../interfaces'
 
-import { CreateCharacterDto } from '@app/dto/main'
+import { CreateCharacterDto } from '@infrastructure/dto/main'
 
 import { Character } from '@infrastructure/entities/main'
 
