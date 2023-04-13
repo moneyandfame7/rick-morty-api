@@ -12,6 +12,7 @@ import { UserException } from '@common/exceptions/common'
 import { AUTHORIZATION_PROVIDER, RolesEnum } from '@common/constants'
 import { JwtPayload } from '@core/models/authorization'
 import { hasPermission } from '@common/utils'
+import { RecentUsers, UserStatistics } from '@common/types/user'
 
 @Injectable()
 export class UserService {
@@ -42,6 +43,14 @@ export class UserService {
     }
 
     return users
+  }
+
+  public async getStatistics(): Promise<UserStatistics> {
+    return this.userRepository.getStatistics()
+  }
+
+  public async getRecent(): Promise<RecentUsers[]> {
+    return this.userRepository.getRecent()
   }
 
   public async getOneById(id: string): Promise<User> {

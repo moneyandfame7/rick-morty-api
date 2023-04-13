@@ -1,4 +1,4 @@
-import { Body, Controller, ForbiddenException, InternalServerErrorException, Param, Post, Res, UploadedFile, UseInterceptors } from '@nestjs/common'
+import { Body, Controller, ForbiddenException, InternalServerErrorException, Param, Post, Query, Res, UploadedFile, UseInterceptors } from '@nestjs/common'
 import { ApiTags } from '@nestjs/swagger'
 import { FileInterceptor } from '@nestjs/platform-express'
 import { memoryStorage } from 'multer'
@@ -16,6 +16,7 @@ import { AuthorizationService } from '@app/services/authorization'
 import { UserException } from '@common/exceptions/common'
 import { hasPermission } from '@common/utils'
 import { RolesEnum } from '@common/constants'
+import { RecentUsers, UserStatistics } from '@common/types/user'
 
 @Controller('api/users')
 @ApiTags('users')
@@ -36,6 +37,16 @@ export class UserController {
   @ApiEntitiesOperation(USER_OPERATION.GET_COUNT)
   public async getCount(): Promise<number> {
     return this.userService.getCount()
+  }
+
+  @ApiEntitiesOperation(USER_OPERATION.GET_STATISTICS)
+  public async getStatistics(): Promise<UserStatistics> {
+    return this.userService.getStatistics()
+  }
+
+  @ApiEntitiesOperation(USER_OPERATION.GET_RECENT)
+  public async getRecent(): Promise<RecentUsers[]> {
+    return this.userService.getRecent()
   }
 
   @ApiEntitiesOperation(USER_OPERATION.GET_MANY)
