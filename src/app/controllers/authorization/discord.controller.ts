@@ -31,11 +31,10 @@ export class DiscordController extends BaseAuthorizationController {
   @Get('/redirect')
   @Redirect()
   @UseGuards(DiscordAuthGuard)
-  public async redirect(@GetUser() user: UserBeforeAuthentication, @Res({ passthrough: true }) res: Response): Promise<RedirectType> {
+  public async redirect(@GetUser() user: UserBeforeAuthentication): Promise<RedirectType> {
     const data = await this.socialLogin(user)
-    this.setCookies(res, data.refresh_token, data.access_token)
     return {
-      url: this.SUCCESS_CLIENT_REDIRECT
+      url: `${this.SUCCESS_CLIENT_REDIRECT}?refresh=${data.refresh_token}&access=${data.access_token}`
     }
   }
 }
