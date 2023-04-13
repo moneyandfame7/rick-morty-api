@@ -19,24 +19,12 @@
     "forceConsistentCasingInFileNames": false,
     "noFallthroughCasesInSwitch": false,
     "paths": {
-      "@app/*": [
-        "src/app/*"
-      ],
-      "@common/*": [
-        "src/common/*"
-      ],
-      "@config/*": [
-        "src/config/*"
-      ],
-      "@core/*": [
-        "src/core/*"
-      ],
-      "@infrastructure/*": [
-        "src/infrastructure/*"
-      ],
-      "@modules/*": [
-        "src/modules/*"
-      ]
+      "@app/*": ["src/app/*"],
+      "@common/*": ["src/common/*"],
+      "@config/*": ["src/config/*"],
+      "@core/*": ["src/core/*"],
+      "@infrastructure/*": ["src/infrastructure/*"],
+      "@modules/*": ["src/modules/*"]
     }
   }
 }
