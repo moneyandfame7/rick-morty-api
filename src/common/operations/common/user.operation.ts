@@ -13,6 +13,8 @@ interface UserOtherOperations {
   BAN: BaseOperationOptions
   CHANGE_IMAGE: BaseOperationOptions
   GET_COUNT: BaseOperationOptions
+  GET_STATISTICS: BaseOperationOptions
+  GET_RECENT: BaseOperationOptions
 }
 
 type UserOperations = UserOtherOperations & BaseOperations
@@ -46,6 +48,22 @@ export const USER_OPERATION: UserOperations = {
     type: Number,
     method: HttpMethod.GET('/count'),
     guard: UseGuards()
+  },
+  GET_STATISTICS: {
+    summary: 'get statistics of users',
+    status: HttpStatus.OK,
+    type: [User],
+    method: HttpMethod.GET('/statistics'),
+    role: getPrivelegedRoles(),
+    guard: UseGuards(JwtAuthGuard, RolesGuard)
+  },
+  GET_RECENT: {
+    summary: 'get recent users',
+    status: HttpStatus.OK,
+    type: [User],
+    method: HttpMethod.GET('/recent'),
+    role: getPrivelegedRoles(),
+    guard: UseGuards(JwtAuthGuard, RolesGuard)
   },
   UPDATE: {
     summary: 'update one user with specified id',

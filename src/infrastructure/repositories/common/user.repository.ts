@@ -4,6 +4,7 @@ import { Injectable } from '@nestjs/common'
 import { CreateUserDto, UpdateUserDto } from '@infrastructure/dto/common'
 
 import { User } from '@infrastructure/entities/common'
+import { RecentUsers, UserStatistics } from '@common/types/user'
 
 @Injectable()
 export class UserRepository extends Repository<User> {
@@ -36,6 +37,33 @@ export class UserRepository extends Repository<User> {
     const queryBuilder = this.builderWithRelations
 
     return queryBuilder.getMany()
+  }
+
+  public async getRecent(): Promise<RecentUsers[]> {
+    const queryBuilder = this.builderWithRelations
+    const data = await queryBuilder.take(15).select(['role', 'user.username', 'user.created_at', 'user.photo', 'user.id', 'user.country']).getMany()
+    return data.map(user => ({
+      username: user.username,
+      country: user.country,
+      id: user.id,
+      created_at: user.created_at,
+      role: user.role.value,
+      photo: user.photo
+    }))
+  }
+
+  public async getStatistics(): Promise<UserStatistics> {
+    const queryBuilder = this.builderWithRelations
+
+    const authStats = await queryBuilder.select('auth_type, COUNT(user.id)', 'count').groupBy('auth_type').getRawMany()
+    const userCount = await queryBuilder.getCount()
+    const verifiedStats = await queryBuilder.select('COUNT(*)', 'count').addSelect('is_verified', 'verified').groupBy('is_verified').orderBy('is_verified', 'ASC').getRawMany()
+
+    return {
+      authStats,
+      userCount,
+      verifiedStats
+    }
   }
 
   public async updateOne(id: User['id'], updateUserDto: UpdateUserDto): Promise<User> {

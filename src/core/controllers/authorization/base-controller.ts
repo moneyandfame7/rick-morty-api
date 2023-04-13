@@ -39,7 +39,8 @@ export class BaseAuthorizationController {
     res.cookie(this.ACCESS_TOKEN_COOKIE, access_token, {
       maxAge: this.ACCESS_EXPIRES,
       secure: true,
-      sameSite: 'strict'
+      sameSite: 'strict',
+      path: '/'
     })
   }
 
@@ -47,7 +48,8 @@ export class BaseAuthorizationController {
     res.cookie(this.REFRESH_TOKEN_COOKIE, refresh_token, {
       maxAge: this.REFRESH_EXPIRES,
       secure: true,
-      sameSite: 'strict'
+      sameSite: 'strict',
+      path: '/'
     })
   }
 
