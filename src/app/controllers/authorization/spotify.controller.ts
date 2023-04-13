@@ -31,10 +31,11 @@ export class SpotifyController extends BaseAuthorizationController {
   @Get('/redirect')
   @Redirect()
   @UseGuards(SpotifyAuthGuard)
-  public async redirect(@GetUser() user: UserBeforeAuthentication): Promise<RedirectType> {
+  public async redirect(@GetUser() user: UserBeforeAuthentication, @Res({ passthrough: true }) res: Response): Promise<RedirectType> {
     const data = await this.socialLogin(user)
+    this.setCookies(res, data.refresh_token, data.access_token)
     return {
-      url: `${this.SUCCESS_CLIENT_REDIRECT}?refresh=${data.refresh_token}&access=${data.access_token}`
+      url: this.SUCCESS_CLIENT_REDIRECT
     }
   }
 }
