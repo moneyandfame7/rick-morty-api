@@ -38,18 +38,15 @@ export class BaseAuthorizationController {
   public setAccessToCookie(res: Response, access_token: string): void {
     res.cookie(this.ACCESS_TOKEN_COOKIE, access_token, {
       maxAge: this.ACCESS_EXPIRES,
-      secure: true,
-      sameSite: 'strict',
-      path: '/'
+      secure: false,
+      sameSite: 'none'
     })
   }
 
   public setRefreshToCookie(res: Response, refresh_token: string): void {
     res.cookie(this.REFRESH_TOKEN_COOKIE, refresh_token, {
       maxAge: this.REFRESH_EXPIRES,
-      secure: true,
-      sameSite: 'strict',
-      path: '/'
+      secure: false
     })
   }
 
