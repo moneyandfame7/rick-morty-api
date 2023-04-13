@@ -62,8 +62,7 @@ export class AuthorizationController extends BaseAuthorizationController {
 
     res.cookie(this.ACCESS_TOKEN_COOKIE, data.access_token, {
       maxAge: this.ACCESS_EXPIRES,
-      secure: false,
-      sameSite: 'none'
+      secure: true
     })
 
     return data
