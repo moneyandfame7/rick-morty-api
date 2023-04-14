@@ -41,12 +41,13 @@ export class UserRepository extends Repository<User> {
 
   public async getRecent(): Promise<RecentUsers[]> {
     const queryBuilder = this.builderWithRelations
-    const data = await queryBuilder.take(15).select(['role', 'user.username', 'user.created_at', 'user.photo', 'user.id', 'user.country']).getMany()
+    const data = await queryBuilder.take(15).select(['role', 'user.username', 'user.created_at', 'user.photo', 'user.id', 'user.country', 'user.is_verified']).getMany()
     return data.map(user => ({
       username: user.username,
       country: user.country,
       id: user.id,
       created_at: user.created_at,
+      is_verified: user.is_verified,
       role: user.role.value,
       photo: user.photo
     }))

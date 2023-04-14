@@ -16,6 +16,7 @@ export interface RecentUsers {
   created_at: Date
   username: string
   country: string
+  is_verified: boolean
   role: string
   photo: string
 }
