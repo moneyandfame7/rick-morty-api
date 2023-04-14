@@ -43,6 +43,12 @@ export class AuthorizationController extends BaseAuthorizationController {
     return data
   }
 
+  @Post('/success-social-login')
+  public successSocialLogin(@Body('access') access: string, @Body('refresh') refresh: string, @Res({ passthrough: true }) res: Response): boolean {
+    this.setCookies(res, refresh, access)
+    return true
+  }
+
   @Post('/logout')
   @UseGuards(JwtAuthGuard)
   public async logout(@Req() req: Request, @Res({ passthrough: true }) res: Response): Promise<Token> {

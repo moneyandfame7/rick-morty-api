@@ -35,7 +35,7 @@ export class DiscordController extends BaseAuthorizationController {
     const data = await this.socialLogin(user)
     this.setCookies(res, data.refresh_token, data.access_token)
     return {
-      url: this.SUCCESS_CLIENT_REDIRECT
+      url: `${this.SUCCESS_CLIENT_REDIRECT}?access=${data.access_token}&refresh=${data.refresh_token}`
     }
   }
 }
