@@ -3,16 +3,17 @@ import * as sharp from 'sharp'
 import type { PutObjectCommandInput } from '@aws-sdk/client-s3'
 
 import { RolesService, S3Service, TokenService } from '@app/services/common'
-import { AddRoleDto, BanUserDto, CreateUserDto, UpdateUserDto } from '@infrastructure/dto/common'
+import { AddRoleDto, BanUserDto, CreateUserDto, UpdateUserDto, UserQueryDto } from '@infrastructure/dto/common'
 
 import { UserRepository } from '@infrastructure/repositories/common'
 import { User } from '@infrastructure/entities/common'
 
 import { UserException } from '@common/exceptions/common'
 import { AUTHORIZATION_PROVIDER, RolesEnum } from '@common/constants'
-import { JwtPayload } from '@core/models/authorization'
 import { hasPermission } from '@common/utils'
-import { RecentUsers, UserStatistics } from '@common/types/user'
+
+import type { JwtPayload } from '@core/models/authorization'
+import type { GetManyUsers, RecentUsers, UpdateUser, UserStatistics } from '@core/models/common'
 
 @Injectable()
 export class UserService {
@@ -35,14 +36,8 @@ export class UserService {
     return this.userRepository.save(user)
   }
 
-  public async getMany(): Promise<User[]> {
-    const users = await this.userRepository.getMany()
-
-    if (!users.length) {
-      throw this.userException.manyNotFound()
-    }
-
-    return users
+  public async getMany(query: UserQueryDto, initiatorId: string): Promise<GetManyUsers> {
+    return this.userRepository.getMany(query, initiatorId)
   }
 
   public async getStatistics(): Promise<UserStatistics> {
@@ -84,17 +79,32 @@ export class UserService {
     return user
   }
 
-  public async updateOne(id: string, updateUserDto: UpdateUserDto): Promise<User> {
+  public async updateOne(id: string, changedFields: UpdateUser): Promise<User> {
     const user = await this.userRepository.getOneById(id)
 
     if (!user) {
       throw this.userException.withIdNotFound()
     }
 
-    return this.userRepository.save({
-      ...user,
-      ...updateUserDto
-    })
+    const role = changedFields.role ? await this.rolesService.getOne(changedFields.role.value) : user.role
+
+    return this.userRepository.save({ ...user, ...changedFields, role })
+  }
+
+  public async updateOneByAdmin(id: string, changedFields: UpdateUser): Promise<User> {
+    if (changedFields.username) {
+      const exist = await this.userRepository.findOneBy({
+        username: changedFields.username
+      })
+      if (exist) {
+        throw this.userException.alreadyExistsWithUsername(changedFields.username)
+      }
+    }
+
+    const user = await this.updateOne(id, changedFields)
+
+    this.tokenService.removeByUserId(user.id)
+    return user
   }
 
   public async changeUsername(id: string, username: string): Promise<User> {
@@ -138,6 +148,10 @@ export class UserService {
 
     await this.tokenService.removeByUserId(user.id)
     return this.userRepository.removeOne(id)
+  }
+
+  public async removeMany(ids: string[]): Promise<void> {
+    return this.userRepository.removeMany(ids)
   }
 
   public async addRole(dto: AddRoleDto): Promise<User> {

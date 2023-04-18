@@ -1,10 +1,10 @@
 import { DataSource, Repository, SelectQueryBuilder } from 'typeorm'
 import { Injectable } from '@nestjs/common'
 
-import { CreateUserDto, UpdateUserDto } from '@infrastructure/dto/common'
+import { CreateUserDto, UpdateUserDto, UserQueryDto } from '@infrastructure/dto/common'
 
 import { User } from '@infrastructure/entities/common'
-import { RecentUsers, UserStatistics } from '@common/types/user'
+import type { GetManyUsers, RecentUsers, UpdateUser, UserStatistics } from '@core/models/common'
 
 @Injectable()
 export class UserRepository extends Repository<User> {
@@ -33,10 +33,17 @@ export class UserRepository extends Repository<User> {
     return queryBuilder.where('user.id = :id', { id }).getOne()
   }
 
-  public async getMany(): Promise<User[]> {
+  public async getMany(query: UserQueryDto, id: string): Promise<GetManyUsers> {
     const queryBuilder = this.builderWithRelations
 
-    return queryBuilder.getMany()
+    const [users, count] = await queryBuilder
+      .where('user.id <> :id', { id })
+      .skip(query.page * query.pageSize)
+      .take(query.pageSize)
+      .addOrderBy('user.created_at', 'ASC')
+      .getManyAndCount()
+
+    return { users, count }
   }
 
   public async getRecent(): Promise<RecentUsers[]> {
@@ -67,12 +74,10 @@ export class UserRepository extends Repository<User> {
     }
   }
 
-  public async updateOne(id: User['id'], updateUserDto: UpdateUserDto): Promise<User> {
+  public async updateOne(id: User['id'], updateUserDto: UpdateUser): Promise<User> {
     const queryBuilder = this.builderWithRelations
 
-    const updated = await queryBuilder.update(User).set(updateUserDto).where('id = :id', { id }).returning('*').execute()
-
-    console.log(updated.raw[0])
+    const updated = await queryBuilder.update(User).set(updateUserDto).where('id = :id', { id }).execute()
     return updated.raw[0]
   }
 
@@ -82,6 +87,12 @@ export class UserRepository extends Repository<User> {
     const removed = await queryBuilder.delete().from(User).where('id = :id', { id }).returning('*').execute()
 
     return removed.raw[0]
+  }
+
+  public async removeMany(ids: string[]): Promise<void> {
+    const queryBuilder = this.builderWithRelations
+    const removed = await queryBuilder.delete().from(User).where('id IN (:...ids)', { ids }).execute()
+    console.log(removed)
   }
 
   public async getOneByUsername(username: string): Promise<User | null> {

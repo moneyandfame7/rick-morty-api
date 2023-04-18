@@ -1,12 +1,12 @@
 import { ApiProperty, PartialType } from '@nestjs/swagger'
-import { IsBoolean, IsEmail, IsEnum, IsNotEmpty, IsOptional, IsString, IsUUID, Length, MaxLength, MinLength } from 'class-validator'
+import { IsBoolean, IsEmail, IsEnum, IsInt, IsNotEmpty, IsOptional, IsString, IsUUID, Length, MaxLength, MinLength } from 'class-validator'
 import { Type } from 'class-transformer'
 
 import { AUTHORIZATION_PROVIDER, RolesEnum } from '@common/constants'
 
 export class CreateUserDto {
   @ApiProperty({ example: 'User_228', description: 'The username of the user.' })
-  @MinLength(8)
+  @MinLength(6)
   @MaxLength(32)
   @Type(() => String)
   public readonly username?: string
@@ -53,6 +53,16 @@ export class AddRoleDto {
 
   @IsUUID()
   public readonly userId: string
+}
+
+export class UserQueryDto {
+  @Type(() => Number)
+  @IsInt()
+  public readonly page: number = 1
+
+  @Type(() => Number)
+  @IsInt()
+  public readonly pageSize: number = 20
 }
 
 export class BanUserDto {

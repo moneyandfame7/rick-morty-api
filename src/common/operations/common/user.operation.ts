@@ -15,6 +15,7 @@ interface UserOtherOperations {
   GET_COUNT: BaseOperationOptions
   GET_STATISTICS: BaseOperationOptions
   GET_RECENT: BaseOperationOptions
+  REMOVE_MANY: BaseOperationOptions
 }
 
 type UserOperations = UserOtherOperations & BaseOperations
@@ -34,6 +35,14 @@ export const USER_OPERATION: UserOperations = {
     type: [User],
     method: HttpMethod.GET(''),
     guard: UseGuards(JwtAuthGuard)
+  },
+  REMOVE_MANY: {
+    summary: 'remove many users',
+    status: HttpStatus.OK,
+    type: [User],
+    role: getPrivelegedRoles(),
+    method: HttpMethod.DELETE(''),
+    guard: UseGuards(JwtAuthGuard, RolesGuard)
   },
   GET_ONE: {
     summary: 'get one user with specified id',

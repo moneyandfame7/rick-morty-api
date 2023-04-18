@@ -84,10 +84,9 @@ export class AuthorizationController extends BaseAuthorizationController {
 
   @Post('/welcome')
   @UseGuards(JwtAuthGuard)
-  public async welcomePage(@Body() details: UserDetailsDto, @Req() req: Request, @Res({ passthrough: true }) res: Response): Promise<AuthResponse> {
+  public async welcomePage(@GetUser() user: JwtPayload, @Body() details: UserDetailsDto, @Req() req: Request, @Res({ passthrough: true }) res: Response): Promise<AuthResponse> {
     const { access_token } = this.getCookies(req)
-
-    const data = await this.authService.welcomePage(access_token, details)
+    const data = await this.authService.welcomePage(user, access_token, details)
     this.setCookies(res, data.refresh_token, data.access_token)
     return data
   }

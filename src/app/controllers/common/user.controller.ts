@@ -1,22 +1,23 @@
-import { Body, Controller, ForbiddenException, InternalServerErrorException, Param, Post, Query, Res, UploadedFile, UseInterceptors } from '@nestjs/common'
+import { Body, Controller, ForbiddenException, InternalServerErrorException, Param, Post, Query, Res, UploadedFile, UseInterceptors, ValidationPipe } from '@nestjs/common'
 import { ApiTags } from '@nestjs/swagger'
 import { FileInterceptor } from '@nestjs/platform-express'
 import { memoryStorage } from 'multer'
 import type { Response } from 'express'
 
 import { EnvironmentConfigService, TokenService, UserService } from '@app/services/common'
-import { AddRoleDto, BanUserDto, CreateUserDto, UpdateUserDto } from '@infrastructure/dto/common'
+import { AuthorizationService } from '@app/services/authorization'
 
+import { AddRoleDto, BanUserDto, CreateUserDto, UpdateUserDto, UserQueryDto } from '@infrastructure/dto/common'
 import { User } from '@infrastructure/entities/common'
+
+import type { JwtPayload } from '@core/models/authorization'
+import type { GetManyUsers, RecentUsers, UpdateUser, UserStatistics } from '@core/models/common'
 
 import { USER_OPERATION } from '@common/operations/common'
 import { ApiEntitiesOperation, GetUser } from '@common/decorators'
-import { JwtPayload } from '@core/models/authorization'
-import { AuthorizationService } from '@app/services/authorization'
 import { UserException } from '@common/exceptions/common'
 import { hasPermission } from '@common/utils'
 import { RolesEnum } from '@common/constants'
-import { RecentUsers, UserStatistics } from '@common/types/user'
 
 @Controller('api/users')
 @ApiTags('users')
@@ -50,18 +51,22 @@ export class UserController {
   }
 
   @ApiEntitiesOperation(USER_OPERATION.GET_MANY)
-  public async getMany(): Promise<User[]> {
-    return this.userService.getMany()
+  public async getMany(@GetUser() user: JwtPayload, @Query() dto: UserQueryDto): Promise<GetManyUsers> {
+    return this.userService.getMany(dto, user.id)
   }
 
+  @ApiEntitiesOperation(USER_OPERATION.REMOVE_MANY)
+  public async removeMany(@Body('ids') ids: string[]): Promise<void> {
+    return this.userService.removeMany(ids)
+  }
   @ApiEntitiesOperation(USER_OPERATION.GET_ONE)
   public async getOne(@Param('id') id: string): Promise<User> {
     return this.userService.getOneById(id)
   }
 
   @ApiEntitiesOperation(USER_OPERATION.UPDATE)
-  public async updateOne(@Param('id') id: string, @Body() updateUserDto: UpdateUserDto, @GetUser() initiator: JwtPayload): Promise<User> {
-    return this.userService.updateOne(id, updateUserDto)
+  public async updateOneByAdmin(@Param('id') id: string, @Body() changedFields: UpdateUser): Promise<User> {
+    return this.userService.updateOneByAdmin(id, changedFields)
   }
 
   @ApiEntitiesOperation(USER_OPERATION.REMOVE)

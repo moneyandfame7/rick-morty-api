@@ -47,9 +47,13 @@ export class AuthorizationService {
     return this.buildUserInfoAndTokens(user)
   }
 
-  public async welcomePage(token: string, details: UserDetailsDto): Promise<AuthResponse> {
+  public async welcomePage(initiator: JwtPayload, token: string, details: UserDetailsDto): Promise<AuthResponse> {
     const welcomePageUser = this.tokenService.validateAccessToken(token)
 
+    const exist = await this.userService.getOneByUsername(details.username)
+    if (exist && exist.id !== initiator.id) {
+      throw this.userException.alreadyExistsWithUsername(details.username)
+    }
     const user = await this.userService.updateOne(welcomePageUser.id, details)
 
     return this.buildUserInfoAndTokens(user)
