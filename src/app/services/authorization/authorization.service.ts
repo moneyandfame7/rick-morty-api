@@ -1,5 +1,5 @@
 import { Injectable, UnauthorizedException } from '@nestjs/common'
-import * as bcrypt from 'bcrypt'
+
 import { v4 as uuid } from 'uuid'
 
 import { EnvironmentConfigService, MailService, TokenService, UserService } from '@app/services/common'
@@ -32,7 +32,7 @@ export class AuthorizationService {
     if (exists) {
       throw this.authorizationException.alreadyUsedEmail()
     }
-    const hashedPassword = await this.hashPassword(dto.password)
+    const hashedPassword = await this.userService.hashPassword(dto.password)
     const verify_link = uuid()
     const info: UserBeforeAuthentication = {
       email: dto.email,
@@ -51,6 +51,7 @@ export class AuthorizationService {
     const welcomePageUser = this.tokenService.validateAccessToken(token)
 
     const exist = await this.userService.getOneByUsername(details.username)
+
     if (exist && exist.id !== initiator.id) {
       throw this.userException.alreadyExistsWithUsername(details.username)
     }
@@ -134,7 +135,7 @@ export class AuthorizationService {
     if (!user) {
       throw this.userException.withIdNotFound()
     }
-    const compare = await this.comparePassword(dto.password, user.password)
+    const compare = await this.userService.comparePassword(dto.password, user.password)
     if (compare) {
       throw this.authorizationException.passwordIsEqualToOld()
     }
@@ -144,7 +145,7 @@ export class AuthorizationService {
     if (dto.password !== dto.confirmPassword) {
       throw this.authorizationException.passwordsDontMatch()
     }
-    const hashedPassword = await this.hashPassword(dto.password)
+    const hashedPassword = await this.userService.hashPassword(dto.password)
     const updated = await this.userService.updateOne(id, { password: hashedPassword })
 
     return this.buildUserInfoAndTokens(updated)
@@ -162,19 +163,11 @@ export class AuthorizationService {
       throw this.authorizationException.incorrectEmail()
     }
 
-    const passwordEquals = await this.comparePassword(userDto.password, user.password)
+    const passwordEquals = await this.userService.comparePassword(userDto.password, user.password)
     if (!passwordEquals) {
       throw this.authorizationException.incorrectPassword()
     }
 
     return user
-  }
-
-  private async hashPassword(password: string): Promise<string> {
-    return bcrypt.hash(password, 3)
-  }
-
-  private async comparePassword(password: string, hash: string): Promise<boolean> {
-    return bcrypt.compare(password, hash)
   }
 }

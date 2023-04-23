@@ -92,7 +92,6 @@ export class UserRepository extends Repository<User> {
   public async removeMany(ids: string[]): Promise<void> {
     const queryBuilder = this.builderWithRelations
     const removed = await queryBuilder.delete().from(User).where('id IN (:...ids)', { ids }).execute()
-    console.log(removed)
   }
 
   public async getOneByUsername(username: string): Promise<User | null> {

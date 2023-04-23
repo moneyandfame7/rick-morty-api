@@ -38,7 +38,6 @@ export class CharacterService implements BaseService<Character, CreateCharacterD
     if (!file) {
       throw this.charactersException.emptyFile()
     }
-    const fileBuffer = await sharp(file.buffer).resize({ height: 500, width: 500, fit: 'cover' }).toBuffer()
 
     const characterAttributes: CreateCharacterDto = {
       id: (await this.getCount()) + 1,
@@ -48,15 +47,9 @@ export class CharacterService implements BaseService<Character, CreateCharacterD
       gender: createCharacterDto.gender,
       species: createCharacterDto.species
     }
-    const [, type] = file.mimetype.split('/')
-    const params: PutObjectCommandInput = {
-      Bucket: this.s3Service.bucketName,
-      Key: `characters/${characterAttributes.id}.${type}`,
-      Body: fileBuffer,
-      ContentType: file.mimetype,
-      ACL: 'public-read'
-    }
-    characterAttributes.image = await this.s3Service.upload(params)
+    const characterFileName = `characters/${characterAttributes.id}`
+    characterAttributes.image = await this.s3Service.upload(file, characterFileName)
+
     const character = await this.characterRepository.createOne(characterAttributes)
     return this.characterRepository.save(character)
   }

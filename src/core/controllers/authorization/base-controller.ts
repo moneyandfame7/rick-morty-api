@@ -69,14 +69,13 @@ export class BaseAuthorizationController {
     if (existUser) {
       return this.authService.buildUserInfoAndTokens(existUser)
     }
-
     const info: UserBeforeAuthentication = {
       email: user.email,
       photo: user.photo,
-      username: user.username,
       auth_type: user.auth_type,
       is_verified: true
     }
+
     const createdUser = await this.userService.createOne(info)
 
     return this.authService.buildUserInfoAndTokens(createdUser)

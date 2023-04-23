@@ -1,5 +1,6 @@
 import { Injectable } from '@nestjs/common'
 import { PutObjectCommand, type PutObjectCommandInput, S3Client } from '@aws-sdk/client-s3'
+import * as sharp from 'sharp'
 
 import { EnvironmentConfigService } from '@app/services/common'
 
@@ -21,8 +22,24 @@ export class S3Service {
     this.bucketUrl = config.getS3BucketUrl()
   }
 
-  public async upload(params: PutObjectCommandInput): Promise<string> {
+  private async generateParams(file: Express.Multer.File, name: string): Promise<PutObjectCommandInput> {
+    const [, type] = file.mimetype.split('/')
+    const fileBuffer = await sharp(file.buffer).toBuffer()
+
+    const params: PutObjectCommandInput = {
+      Bucket: this.bucketName,
+      Key: `${name}.${type}`,
+      Body: fileBuffer,
+      ContentType: file.mimetype,
+      ACL: 'public-read'
+    }
+    return params
+  }
+
+  public async upload(file: Express.Multer.File, name: string): Promise<string> {
+    const params = await this.generateParams(file, name)
     const command = new PutObjectCommand(params)
+
     return this.s3.send(command).then(() => `${this.bucketUrl}/${params.Key}`)
   }
 }

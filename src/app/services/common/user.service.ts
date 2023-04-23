@@ -1,9 +1,8 @@
 import { BadRequestException, ForbiddenException, Injectable } from '@nestjs/common'
-import * as sharp from 'sharp'
-import type { PutObjectCommandInput } from '@aws-sdk/client-s3'
+import * as bcrypt from 'bcrypt'
 
 import { RolesService, S3Service, TokenService } from '@app/services/common'
-import { AddRoleDto, BanUserDto, CreateUserDto, UpdateUserDto, UserQueryDto } from '@infrastructure/dto/common'
+import { AddRoleDto, BanUserDto, CreateUserDto, UpdatePasswordDto, UserQueryDto } from '@infrastructure/dto/common'
 
 import { UserRepository } from '@infrastructure/repositories/common'
 import { User } from '@infrastructure/entities/common'
@@ -12,7 +11,7 @@ import { UserException } from '@common/exceptions/common'
 import { AUTHORIZATION_PROVIDER, RolesEnum } from '@common/constants'
 import { hasPermission } from '@common/utils'
 
-import type { JwtPayload } from '@core/models/authorization'
+import type { AuthResponse, JwtPayload } from '@core/models/authorization'
 import type { GetManyUsers, RecentUsers, UpdateUser, UserStatistics } from '@core/models/common'
 
 @Injectable()
@@ -33,6 +32,9 @@ export class UserService {
 
     const user = await this.userRepository.createOne(dto)
     user.role = await this.rolesService.getOne('user')
+    if (user.auth_type !== AUTHORIZATION_PROVIDER.JWT) {
+      user.username = 'Guest' + user.id
+    }
     return this.userRepository.save(user)
   }
 
@@ -91,6 +93,10 @@ export class UserService {
     return this.userRepository.save({ ...user, ...changedFields, role })
   }
 
+  public async editSettings(user: JwtPayload, changedFields: UpdateUser): Promise<User> {
+    return this.updateOne(user.id, changedFields)
+  }
+
   public async updateOneByAdmin(id: string, changedFields: UpdateUser): Promise<User> {
     if (changedFields.username) {
       const exist = await this.userRepository.findOneBy({
@@ -116,6 +122,34 @@ export class UserService {
     return this.updateOne(id, { username })
   }
 
+  public async updatePassword(initiator: JwtPayload, dto: UpdatePasswordDto): Promise<User> {
+    const { oldPassword, newPassword, confirmPassword } = dto
+
+    const user = await this.getOneById(initiator.id)
+    if (!user) {
+      throw new BadRequestException()
+    }
+
+    const oldPasswordIsCorrect = await this.comparePassword(oldPassword, user.password)
+    const confirmIsEqual = newPassword === confirmPassword
+    const newPasswordIsEqualToOld = newPassword === oldPassword
+    if (!oldPasswordIsCorrect) {
+      throw this.userException.incorrectPassword()
+    }
+
+    if (!confirmIsEqual) {
+      throw this.userException.passwordsDontMatch()
+    }
+
+    if (newPasswordIsEqualToOld) {
+      throw this.userException.passwordIsEqualToOld()
+    }
+
+    const hashedPassword = await this.hashPassword(newPassword)
+
+    return this.updateOne(user.id, { password: hashedPassword })
+  }
+
   public async save(user: User): Promise<User> {
     return this.userRepository.save(user)
   }
@@ -124,17 +158,10 @@ export class UserService {
     if (!file) {
       throw new BadRequestException('You must provide a photo')
     }
-    const fileBuffer = await sharp(file.buffer).resize({ height: 500, width: 500, fit: 'cover' }).toBuffer()
-    const [, type] = file.mimetype.split('/')
-    const params: PutObjectCommandInput = {
-      Bucket: this.s3Service.bucketName,
-      Key: `users/${id}.${type}`,
-      Body: fileBuffer,
-      ContentType: file.mimetype,
-      ACL: 'public-read'
-    }
+    const userFileName = `users/${id}/${new Date().getMilliseconds()}`
+
     const user = await this.getOneById(id)
-    user.photo = await this.s3Service.upload(params)
+    user.photo = await this.s3Service.upload(file, userFileName)
 
     return this.userRepository.save(user)
   }
@@ -187,5 +214,13 @@ export class UserService {
 
   public async getCount(): Promise<number> {
     return this.userRepository.getCount()
+  }
+
+  public async hashPassword(password: string): Promise<string> {
+    return bcrypt.hash(password, 3)
+  }
+
+  public async comparePassword(password: string, hash: string): Promise<boolean> {
+    return bcrypt.compare(password, hash)
   }
 }

@@ -2,7 +2,7 @@ import { User } from '@infrastructure/entities/common'
 
 export interface UserBeforeAuthentication {
   readonly email: string
-  readonly username?: string
+  username?: string
   readonly password?: string
   readonly auth_type: string
   readonly photo?: string

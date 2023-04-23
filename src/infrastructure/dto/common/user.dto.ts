@@ -3,11 +3,12 @@ import { IsBoolean, IsEmail, IsEnum, IsInt, IsNotEmpty, IsOptional, IsString, Is
 import { Type } from 'class-transformer'
 
 import { AUTHORIZATION_PROVIDER, RolesEnum } from '@common/constants'
+import { Match } from '@common/decorators/match.decorator'
 
 export class CreateUserDto {
   @ApiProperty({ example: 'User_228', description: 'The username of the user.' })
-  @MinLength(6)
-  @MaxLength(32)
+  @MinLength(3)
+  @MaxLength(50)
   @Type(() => String)
   public readonly username?: string
 
@@ -90,9 +91,26 @@ export class ResetPasswordDto {
   public readonly confirmPassword: string
 }
 
+export class UpdatePasswordDto {
+  @Type(() => String)
+  @IsString()
+  public readonly oldPassword: string
+
+  @Type(() => String)
+  @MinLength(8)
+  @MaxLength(20)
+  public readonly newPassword: string
+
+  @MinLength(8)
+  @MaxLength(20)
+  @Type(() => String)
+  @Match(UpdatePasswordDto, c => c.newPassword)
+  public readonly confirmPassword: string
+}
+
 export class UserDetailsDto {
-  @MinLength(2)
-  @MaxLength(32)
+  @MinLength(3)
+  @MaxLength(50)
   @Type(() => String)
   @IsNotEmpty()
   public username: string

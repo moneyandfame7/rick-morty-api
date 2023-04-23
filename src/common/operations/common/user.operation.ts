@@ -16,6 +16,8 @@ interface UserOtherOperations {
   GET_STATISTICS: BaseOperationOptions
   GET_RECENT: BaseOperationOptions
   REMOVE_MANY: BaseOperationOptions
+  EDIT_SETTINGS: BaseOperationOptions
+  UPDATE_PASSWORD: BaseOperationOptions
 }
 
 type UserOperations = UserOtherOperations & BaseOperations
@@ -80,15 +82,28 @@ export const USER_OPERATION: UserOperations = {
     type: User,
     method: HttpMethod.PATCH(':id'),
     /* role: getPrivelegedRoles(), */
-    guard: UseGuards(JwtAuthGuard, RolesGuard)
+    guard: UseGuards(JwtAuthGuard)
+  },
+  UPDATE_PASSWORD: {
+    summary: 'update user password',
+    status: HttpStatus.OK,
+    type: User,
+    method: HttpMethod.POST('/update-password'),
+    guard: UseGuards(JwtAuthGuard)
+  },
+  EDIT_SETTINGS: {
+    summary: 'update one user with specified id',
+    status: HttpStatus.OK,
+    type: User,
+    method: HttpMethod.PATCH('/settings'),
+    guard: UseGuards(JwtAuthGuard)
   },
   REMOVE: {
     summary: 'remove one user with specified id',
     status: HttpStatus.OK,
     type: User,
     method: HttpMethod.DELETE(':id'),
-    role: getPrivelegedRoles(),
-    guard: UseGuards(JwtAuthGuard, RolesGuard)
+    guard: UseGuards(JwtAuthGuard)
   },
   ADD_ROLE: {
     summary: 'give a role to user',
