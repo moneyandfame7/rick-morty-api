@@ -1,6 +1,4 @@
 import { BadRequestException, Injectable } from '@nestjs/common'
-import * as sharp from 'sharp'
-import type { PutObjectCommandInput } from '@aws-sdk/client-s3'
 
 import { PaginationService, S3Service } from '@app/services/common'
 import { QueryPaginationDto } from '@infrastructure/dto/common'
