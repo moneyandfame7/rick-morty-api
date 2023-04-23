@@ -12,7 +12,7 @@ export class GithubStrategy extends PassportStrategy(Strategy, 'github') {
     super({
       clientID: config.getGithubClientId(),
       clientSecret: config.getGithubClientSecret(),
-      callbackURL: config.getBaseUrl() + "/auth/github/redirect",
+      callbackURL: config.getBaseUrl() + '/auth/github/redirect',
       scope: ['public_profile', 'user:email']
     })
   }
