@@ -1,8 +1,8 @@
 import { DataSource, type SelectQueryBuilder } from 'typeorm'
 import { Injectable } from '@nestjs/common'
 
-import { CreateLocationDto, QueryLocationDto, UpdateLocationDto } from '@app/dto/main'
-import { QueryPaginationDto } from '@app/dto/common'
+import { CreateLocationDto, QueryLocationDto, UpdateLocationDto } from '@infrastructure/dto/main'
+import { QueryPaginationDto } from '@infrastructure/dto/common'
 
 import { MainRepositoryAbstract } from '@core/repositories/main'
 import type { GetManyLocations } from '@core/models/main'

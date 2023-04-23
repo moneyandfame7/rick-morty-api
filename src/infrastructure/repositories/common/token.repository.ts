@@ -23,7 +23,7 @@ export class TokenRepository extends Repository<Token> {
     return queryBuilder.where('user_id = :user_id', { user_id }).getOne()
   }
 
-  public async deleteByToken(refresh_token: string): Promise<Token> {
+  public async removeByToken(refresh_token: string): Promise<Token> {
     const queryBuilder = this.builder
 
     const { raw } = await queryBuilder.delete().from(Token).where('refresh_token = :refresh_token', { refresh_token }).returning('*').execute()

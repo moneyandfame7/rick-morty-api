@@ -1,20 +1,21 @@
-import { BaseOperations } from '@common/swagger/interface'
+import { BaseOperations } from '@common/operations/type'
 import { HttpStatus, UseGuards } from '@nestjs/common'
 
-import { Role } from '@infrastructure/entities/common'
-
-import { HttpMethod, ROLES } from '@common/constants'
-import { Roles } from '@common/decorators'
+import { HttpMethod, RolesEnum } from '@common/constants'
 import { JwtAuthGuard } from '@common/guards/authorization'
 import { RolesGuard } from '@common/guards/common'
+import { Role } from '@infrastructure/entities/common'
+import { Roles } from '@common/decorators'
 
-export const ROLE_OPERATION: Omit<BaseOperations, 'REMOVE' | 'UPDATE'> = {
+type RoleOperations = Omit<BaseOperations, 'REMOVE' | 'UPDATE'>
+
+export const ROLE_OPERATION: RoleOperations = {
   CREATE: {
     summary: 'create and save a new role to collection',
     status: HttpStatus.CREATED,
     type: Role,
     method: HttpMethod.POST(''),
-    role: Roles(ROLES.ADMIN),
+    role: Roles(RolesEnum.ADMIN, RolesEnum.USER),
     guard: UseGuards(JwtAuthGuard, RolesGuard)
   },
   GET_MANY: {

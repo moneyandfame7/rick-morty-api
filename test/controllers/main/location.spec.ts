@@ -2,7 +2,7 @@ import { Test, TestingModule } from '@nestjs/testing'
 
 import { LocationService } from '@app/services/main'
 import { LocationController } from '@app/controllers/main'
-import { QueryLocationDto, UpdateLocationDto } from '@app/dto/main'
+import { QueryLocationDto, UpdateLocationDto } from '@infrastructure/dto/main'
 
 import { ORDER } from '@common/constants'
 

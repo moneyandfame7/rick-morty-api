@@ -1,17 +1,21 @@
 import { NestFactory } from '@nestjs/core'
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger'
 import 'dotenv/config'
+
 import * as cookieParser from 'cookie-parser'
 
 import { AppModule } from '@app/app.module'
 
 import { CustomValidationPipe } from '@common/pipes'
+import { EnvironmentConfigService } from '@app/services/common'
 
 async function bootstrap(): Promise<void> {
   const PORT = process.env.PORT ?? 3001
   const app = await NestFactory.create(AppModule, {
     cors: { origin: process.env.CLIENT_URL, credentials: true }
   })
+  const envConfig = app.get(EnvironmentConfigService)
+  envConfig.getBaseUrl()
   app.useGlobalPipes(new CustomValidationPipe())
   app.use(cookieParser())
 

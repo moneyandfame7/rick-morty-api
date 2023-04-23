@@ -2,7 +2,7 @@ import { Test, TestingModule } from '@nestjs/testing'
 
 import { CharacterController } from '@app/controllers/main'
 import { CharacterService } from '@app/services/main'
-import { QueryCharacterDto, UpdateCharacterDto } from '@app/dto/main'
+import { QueryCharacterDto, UpdateCharacterDto } from '@infrastructure/dto/main'
 
 import { ORDER } from '@common/constants'
 

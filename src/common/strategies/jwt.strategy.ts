@@ -1,15 +1,15 @@
 import { PassportStrategy } from '@nestjs/passport'
-import { Injectable } from '@nestjs/common'
+import { Injectable, UnauthorizedException } from '@nestjs/common'
 import { ExtractJwt, Strategy } from 'passport-jwt'
 import type { Request } from 'express'
 
-import { EnvironmentConfigService } from '@app/services/common'
+import { EnvironmentConfigService, TokenService } from '@app/services/common'
 
 import type { JwtPayload } from '@core/models/authorization'
 
 @Injectable()
 export class JwtStrategy extends PassportStrategy(Strategy) {
-  public constructor(private readonly config: EnvironmentConfigService) {
+  public constructor(private readonly config: EnvironmentConfigService, private readonly tokenService: TokenService) {
     super({
       /*  це поле для cookie або з Headers "Authorization" */
       jwtFromRequest: ExtractJwt.fromExtractors([ExtractJwt.fromAuthHeaderAsBearerToken(), JwtStrategy.extractJwtFromCookie]),
@@ -26,7 +26,11 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
     return null
   }
 
-  public validate(payload: JwtPayload): JwtPayload {
+  public async validate(payload: JwtPayload): Promise<JwtPayload> {
+    const refreshToken = await this.tokenService.getOneByUserId(payload.id)
+    if (!refreshToken) {
+      throw new UnauthorizedException()
+    }
     return payload
   }
 }

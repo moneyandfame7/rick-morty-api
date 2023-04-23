@@ -1,4 +1,4 @@
-import { QueryPaginationDto } from '@app/dto/common'
+import { QueryPaginationDto } from '@infrastructure/dto/common'
 
 export interface PaginationOptions {
   queryPaginationDto: QueryPaginationDto

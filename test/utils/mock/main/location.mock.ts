@@ -1,5 +1,5 @@
 import { Location } from '@infrastructure/entities/main'
-import { CreateLocationDto } from '@app/dto/main'
+import { CreateLocationDto } from '@infrastructure/dto/main'
 import { ConflictException, NotFoundException } from '@nestjs/common'
 
 export const MOCK_LOCATION_COUNT = 33

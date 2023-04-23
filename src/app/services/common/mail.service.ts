@@ -29,7 +29,7 @@ export class MailService {
   }
 
   public async sendVerifyMail(email: string, link: string): Promise<void> {
-    const clientLink = `${this.config.getClientUrl()}/account/verify/${link}`
+    const clientLink = `${this.config.getClientUrl()}/verify/${link}`
 
     await this.transporter.sendMail({
       from: this.user,

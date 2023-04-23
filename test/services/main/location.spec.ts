@@ -3,7 +3,7 @@ import { Test, TestingModule } from '@nestjs/testing'
 
 import { PaginationService } from '@app/services/common'
 import { LocationService } from '@app/services/main'
-import { QueryPaginationDto } from '@app/dto/common'
+import { QueryPaginationDto } from '@infrastructure/dto/common'
 
 import { LocationRepository } from '@infrastructure/repositories/main'
 
