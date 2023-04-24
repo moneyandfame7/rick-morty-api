@@ -1,9 +1,9 @@
 import { DataSource, Repository, SelectQueryBuilder } from 'typeorm'
 import { Injectable } from '@nestjs/common'
 
-import { CreateUserDto, UpdateUserDto, UserQueryDto } from '@infrastructure/dto/common'
-
+import { CreateUserDto, UserQueryDto } from '@infrastructure/dto/common'
 import { User } from '@infrastructure/entities/common'
+
 import type { GetManyUsers, RecentUsers, UpdateUser, UserStatistics } from '@core/models/common'
 
 @Injectable()
@@ -91,7 +91,7 @@ export class UserRepository extends Repository<User> {
 
   public async removeMany(ids: string[]): Promise<void> {
     const queryBuilder = this.builderWithRelations
-    const removed = await queryBuilder.delete().from(User).where('id IN (:...ids)', { ids }).execute()
+    await queryBuilder.delete().from(User).where('id IN (:...ids)', { ids }).execute()
   }
 
   public async getOneByUsername(username: string): Promise<User | null> {

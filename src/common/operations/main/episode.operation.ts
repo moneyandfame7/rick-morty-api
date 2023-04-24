@@ -4,7 +4,6 @@ import { Episode } from '@infrastructure/entities/main'
 
 import { MainEntitiesOperations } from '@common/operations'
 import { HttpMethod } from '@common/constants'
-import { Roles } from '@common/decorators'
 import { JwtAuthGuard } from '@common/guards/authorization'
 import { RolesGuard } from '@common/guards/common'
 import { getPrivelegedRoles } from '@common/utils/getPrivelegedRoles'
