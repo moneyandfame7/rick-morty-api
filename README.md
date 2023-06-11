@@ -15,7 +15,7 @@ This is a REST API that provides access to data from the popular animated TV ser
 - Typescript
 - PostgreSQL + TypeORM
 - Passport (Google, Discord, Spotify, GitHub, JWT)
-
+- Uploading photo to AWS s3 bucket
 ## Authentication
 
 This API uses OAuth 2.0 and JWT used access and refresh token
