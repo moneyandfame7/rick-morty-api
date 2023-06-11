@@ -1,4 +1,4 @@
-import { Body, Controller, ForbiddenException, InternalServerErrorException, Param, Post, Query, Res, UploadedFile, UseInterceptors, ValidationPipe } from '@nestjs/common'
+import { Body, Controller, ForbiddenException, InternalServerErrorException, Param, Query, Res, UploadedFile, UseInterceptors } from '@nestjs/common'
 import { ApiTags } from '@nestjs/swagger'
 import { FileInterceptor } from '@nestjs/platform-express'
 import { memoryStorage } from 'multer'
@@ -7,7 +7,7 @@ import type { Response } from 'express'
 import { EnvironmentConfigService, TokenService, UserService } from '@app/services/common'
 import { AuthorizationService } from '@app/services/authorization'
 
-import { AddRoleDto, BanUserDto, CreateUserDto, UpdatePasswordDto, UpdateUserDto, UserQueryDto } from '@infrastructure/dto/common'
+import { AddRoleDto, BanUserDto, CreateUserDto, UpdatePasswordDto, UserQueryDto } from '@infrastructure/dto/common'
 import { User } from '@infrastructure/entities/common'
 
 import type { AuthResponse, JwtPayload } from '@core/models/authorization'

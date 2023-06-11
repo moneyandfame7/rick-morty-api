@@ -5,9 +5,9 @@ import 'dotenv/config'
 import * as cookieParser from 'cookie-parser'
 
 import { AppModule } from '@app/app.module'
+import { EnvironmentConfigService } from '@app/services/common'
 
 import { CustomValidationPipe } from '@common/pipes'
-import { EnvironmentConfigService } from '@app/services/common'
 
 async function bootstrap(): Promise<void> {
   const PORT = process.env.PORT ?? 3001

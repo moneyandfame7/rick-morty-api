@@ -11,7 +11,7 @@ import { UserException } from '@common/exceptions/common'
 import { AUTHORIZATION_PROVIDER, RolesEnum } from '@common/constants'
 import { hasPermission } from '@common/utils'
 
-import type { AuthResponse, JwtPayload } from '@core/models/authorization'
+import type { JwtPayload } from '@core/models/authorization'
 import type { GetManyUsers, RecentUsers, UpdateUser, UserStatistics } from '@core/models/common'
 
 @Injectable()

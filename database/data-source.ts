@@ -12,7 +12,7 @@ export const dataSourceOptions: DataSourceOptions & SeederOptions = {
   database: process.env.DB_NAME,
   synchronize: false,
   logging: false,
-  ssl: process.env.DB_SSL ? true : false,
+  ssl: true,
   migrationsTableName: 'migrations_typeorm',
   seeds: [MainSeeder],
   entities: ['dist/**/*.entity.js'],
