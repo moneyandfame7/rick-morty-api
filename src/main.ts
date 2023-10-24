@@ -8,11 +8,16 @@ import { AppModule } from '@app/app.module'
 import { EnvironmentConfigService } from '@app/services/common'
 
 import { CustomValidationPipe } from '@common/pipes'
+// import { NextFunction, Response } from 'express'
 
 async function bootstrap(): Promise<void> {
   const PORT = process.env.PORT ?? 3001
   const app = await NestFactory.create(AppModule, {
-    cors: { origin: process.env.CLIENT_URL, credentials: true }
+    cors: {
+      origin: process.env.CLIENT_URL,
+      credentials: true,
+      methods: ['GET', 'POST', 'OPTIONS']
+    }
   })
   const envConfig = app.get(EnvironmentConfigService)
   envConfig.getBaseUrl()
@@ -32,5 +37,6 @@ async function bootstrap(): Promise<void> {
 }
 
 bootstrap().then(() => {
+  console.log(process.env.CLIENT_URL, 'CLIENT URL')
   console.log(` >> 🥶️🚀Server started on ${process.env.BASE_URL} >> `) // eslint-disable-line
 })
